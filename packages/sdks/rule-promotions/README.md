@@ -1,781 +1,133 @@
-# @epcc-sdk/rule-promotions SDK
+# @epcc-sdk/rule-promotions
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
+A TypeScript client for the Elastic Path rule promotions API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+For standard promotions, use `@epcc-sdk/promotions-standard`.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/rule-promotions
-# or
-pnpm install @epcc-sdk/rule-promotions
-# or
-yarn add @epcc-sdk/rule-promotions
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
-
-```ts
-import { client } from "@epcc-sdk/rule-promotions";
-
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
-
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
-```
-
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
-
-### 2. Using the `createClient` function
-
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
-
-```ts
-import { createClient } from "@epcc-sdk/rule-promotions";
-
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
-```
-
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/rule-promotions>".
-
-```ts
-const response = await getRulePromotions({
-    client: myClient,
-});
-```
-
-### Direct configuration
-
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
-
-```ts
-const response = await getRulePromotions({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
-```
-
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/rule-promotions";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/rule-promotions";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-`createRulePromotionsClient` is the short way. It returns a client that holds a caching token
-source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
+## Quick start
 
 ```ts
 import {
   createRulePromotionsClient,
   getRulePromotions,
-} from "@epcc-sdk/rule-promotions";
+} from "@epcc-sdk/rule-promotions"
 
 const client = createRulePromotionsClient({
   baseUrl: "https://euwest.api.elasticpath.com",
   clientId: process.env.EPCC_CLIENT_ID!,
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
-});
+})
 
-const { data } = await getRulePromotions({ client });
+const { data, error } = await getRulePromotions({ client })
 ```
 
-Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
-`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
-`config` tune the rest. `config` is merged last, so anything the factory chose can be
-overridden.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-Pass the client to every operation. The module-level `client` exported by this package
-carries no credentials, so an operation called without `{ client }` gets a 401.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
-`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
-still install only `@epcc-sdk/rule-promotions`. Do not authenticate with a request
-interceptor: an interceptor cannot see the response, so it can never retry a 401.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
-## Validation schemas
+## Base URL
 
-Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
+
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
-import { zRulePromotionItem } from "@epcc-sdk/rule-promotions/zod";
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/rule-promotions"
 
-const promotion = zRulePromotionItem.parse(data?.data?.[0]);
+const source = createTokenSource(
+  clientCredentialsProvider({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-`page[offset]` and `page[limit]` are `int64` in the specification. The query schemas parse
-them to `number`, as the TypeScript types carry them. A numeric string, such as a query
-string value, is converted to a number.
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
 
-## MCP endpoint tools
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
 
-The `/mcp` subpath turns each of the 16 rule promotions operations into a Model Context Protocol
-(MCP) tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and
-`@modelcontextprotocol/server` 2 are needed only for this subpath.
+## Zod schemas
 
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`getRulePromotionsTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 16 in operation order. A handler returns an
-API error as an `isError` result and does not throw.
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
-Register one tool:
+```ts
+import { zGetRulePromotionsResponse } from "@epcc-sdk/rule-promotions/zod"
+
+const result = zGetRulePromotionsResponse.safeParse(data)
+```
+
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
+
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { getRulePromotionsTool } from "@epcc-sdk/rule-promotions/mcp"
+import { tools } from "@epcc-sdk/rule-promotions/mcp"
 
 const server = new McpServer({ name: "rule-promotions", version: "1.0.0" })
-const tool = getRulePromotionsTool()
-server.registerTool(tool.name, tool.config, tool.handler)
-```
-A tool built without a client calls through the package's module level `client`, like an operation
-does. That client has no credentials until you configure it. Configure it once:
 
-```ts
-import { client, createRulePromotionsClient } from "@epcc-sdk/rule-promotions"
-
-client.setConfig(
-  createRulePromotionsClient({ baseUrl, clientId, clientSecret }).getConfig(),
-)
-```
-Register every tool:
-
-```ts
-import * as rulePromotions from "@epcc-sdk/rule-promotions/mcp"
-
-rulePromotions
-  .tools()
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Give the tools a client, and set headers on it once. Every tool then sends them:
-
-```ts
-const client = createRulePromotionsClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
-})
-rulePromotions
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Register the read-only tools only:
-
-```ts
-rulePromotions
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Rename or reword a tool by passing a changed argument:
-
-```ts
-const tool = getRulePromotionsTool({ client })
-server.registerTool(
-  "elastic_path_list_rule_promotions",
-  { ...tool.config, title: "List rule promotions" },
-  tool.handler,
-)
-```
-Wrap a handler. The arguments keep the operation's types:
-
-```ts
-server.registerTool(tool.name, tool.config, async (args, ctx) => {
-  console.log("listing rule promotions", args.query)
-  return tool.handler(args, ctx)
-})
-```
-Each tool is named `rule_promotions_<snake_case_function>`, and its arguments are grouped under
-`path`, `query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec
-does not list. The `body` keeps them, so an attribute the spec does not list still reaches the API.
-The client supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request
-cancels the HTTP request.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
-The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-`anonymizeRulePromotionUsages` is a `POST` that replaces customer data in existing usage records and
-cannot be undone, so a spec override gives it the `update` risk, which marks it destructive.
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getRulePromotions } from "@epcc-sdk/rule-promotions";
-
-const product = await getRulePromotions({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-### **`getRulePromotions`**
-
-**Endpoint:** `GET /v2/rule-promotions`
-
-**Summary:** Get Rule Promotions
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getRulePromotions, type GetRulePromotionsData, type GetRulePromotionsResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetRulePromotionsData = {
-  query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-  },
-};
-
-const result: GetRulePromotionsResponse = await getRulePromotions(params);
-```
-
----
-
-### **`createRulePromotion`**
-
-**Endpoint:** `POST /v2/rule-promotions`
-
-**Summary:** Create a Rule Promotion
-
-**Description:** POST operation
-
-**TypeScript Example:**
-
-```typescript
-import { createRulePromotion, type CreateRulePromotionData, type CreateRulePromotionResponse } from "@epcc-sdk/rule-promotions";
-
-const params: CreateRulePromotionData = {
-  body: {
-    data: {
-      type: "resource",
-      attributes: {
-        name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
-  },
-};
-
-const result: CreateRulePromotionResponse = await createRulePromotion(params);
-```
-
----
-
-### **`deleteRulePromotion`**
-
-**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}`
-
-**Summary:** Delete a Rule Promotion
-
-**Description:** DELETE operation
-
-**TypeScript Example:**
-
-```typescript
-import { deleteRulePromotion, type DeleteRulePromotionData, type DeleteRulePromotionResponse } from "@epcc-sdk/rule-promotions";
-
-const params: DeleteRulePromotionData = {
-  path: {
-    promotionID: "promotionID",
-  },
-};
-
-const result: DeleteRulePromotionResponse = await deleteRulePromotion(params);
-```
-
----
-
-### **`getRulePromotionById`**
-
-**Endpoint:** `GET /v2/rule-promotions/{promotionID}`
-
-**Summary:** Get a Rule Promotion by ID
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getRulePromotionById, type GetRulePromotionByIdData, type GetRulePromotionByIdResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetRulePromotionByIdData = {
-  path: {
-    promotionID: "promotionID",
-  },
-};
-
-const result: GetRulePromotionByIdResponse = await getRulePromotionById(params);
-```
-
----
-
-### **`updateRulePromotion`**
-
-**Endpoint:** `PUT /v2/rule-promotions/{promotionID}`
-
-**Summary:** Update a Rule Promotion
-
-**Description:** PUT operation
-
-**TypeScript Example:**
-
-```typescript
-import { updateRulePromotion, type UpdateRulePromotionData, type UpdateRulePromotionResponse } from "@epcc-sdk/rule-promotions";
-
-const params: UpdateRulePromotionData = {
-  path: {
-    promotionID: "promotionID",
-  },
-  body: {
-    data: {
-      type: "resource",
-      attributes: {
-        name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
-  },
-};
-
-const result: UpdateRulePromotionResponse = await updateRulePromotion(params);
-```
-
----
-
-### **`deleteRulePromotionCodes`**
-
-**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}/codes`
-
-**Summary:** Delete Rule Promotion Codes
-
-**Description:** DELETE operation
-
-**TypeScript Example:**
-
-```typescript
-import { deleteRulePromotionCodes, type DeleteRulePromotionCodesData, type DeleteRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: DeleteRulePromotionCodesData = {
-  path: {
-    promotionID: "promotionID",
-  },
-};
-
-const result: DeleteRulePromotionCodesResponse = await deleteRulePromotionCodes(params);
-```
-
----
-
-### **`getRulePromotionCodes`**
-
-**Endpoint:** `GET /v2/rule-promotions/{promotionID}/codes`
-
-**Summary:** Get Rule Promotion Codes
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getRulePromotionCodes, type GetRulePromotionCodesData, type GetRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetRulePromotionCodesData = {
-  path: {
-    promotionID: "promotionID",
-  },
-};
-
-const result: GetRulePromotionCodesResponse = await getRulePromotionCodes(params);
-```
-
----
-
-### **`createRulePromotionCodes`**
-
-**Endpoint:** `POST /v2/rule-promotions/{promotionID}/codes`
-
-**Summary:** Create Rule Promotion Codes
-
-**Description:** POST operation
-
-**TypeScript Example:**
-
-```typescript
-import { createRulePromotionCodes, type CreateRulePromotionCodesData, type CreateRulePromotionCodesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: CreateRulePromotionCodesData = {
-  path: {
-    promotionID: "promotionID",
-  },
-  body: {
-    data: {
-      type: "resource",
-      attributes: {
-        name: "Resource Name",
-        description: "Resource Description"
-      }
-    }
-  },
-};
-
-const result: CreateRulePromotionCodesResponse = await createRulePromotionCodes(params);
-```
-
----
-
-### **`deleteSingleRulePromotionCode`**
-
-**Endpoint:** `DELETE /v2/rule-promotions/{promotionID}/codes/{codeID}`
-
-**Summary:** Delete A Single Rule Promotion Code
-
-**Description:** DELETE operation
-
-**TypeScript Example:**
-
-```typescript
-import { deleteSingleRulePromotionCode, type DeleteSingleRulePromotionCodeData, type DeleteSingleRulePromotionCodeResponse } from "@epcc-sdk/rule-promotions";
-
-const params: DeleteSingleRulePromotionCodeData = {
-  path: {
-    promotionID: "promotionID",
-    codeID: "CODE123",
-  },
-};
-
-const result: DeleteSingleRulePromotionCodeResponse = await deleteSingleRulePromotionCode(params);
-```
-
----
-
-### **`getV2RulePromotionsByUuidJobs`**
-
-**Endpoint:** `GET /v2/rule-promotions/{uuid}/jobs`
-
-**Summary:** Get Rule Promotion Jobs
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getV2RulePromotionsByUuidJobs, type GetV2RulePromotionsByUuidJobsData, type GetV2RulePromotionsByUuidJobsResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetV2RulePromotionsByUuidJobsData = {
-  path: {
-    uuid: "12345678-1234-5678-9012-123456789012",
-  },
-  query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-  },
-};
-
-const result: GetV2RulePromotionsByUuidJobsResponse = await getV2RulePromotionsByUuidJobs(params);
-```
-
----
-
-### **`postV2RulePromotionsByUuidJobs`**
-
-**Endpoint:** `POST /v2/rule-promotions/{uuid}/jobs`
-
-**Summary:** Create a Rule Promotion Job
-
-**Description:** POST operation
-
-**TypeScript Example:**
-
-```typescript
-import { postV2RulePromotionsByUuidJobs, type PostV2RulePromotionsByUuidJobsData, type PostV2RulePromotionsByUuidJobsResponse } from "@epcc-sdk/rule-promotions";
-
-const params: PostV2RulePromotionsByUuidJobsData = {
-  path: {
-    uuid: "12345678-1234-5678-9012-123456789012",
-  },
-  body: {
-    data: {
-      type: "resource"
-    }
-  },
-};
-
-const result: PostV2RulePromotionsByUuidJobsResponse = await postV2RulePromotionsByUuidJobs(params);
-```
-
----
-
-### **`getV2RulePromotionsByUuidJobsByJobUuidFile`**
-
-**Endpoint:** `GET /v2/rule-promotions/{uuid}/jobs/{job-uuid}/file`
-
-**Summary:** Get Rule Promotion Code Exported File
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getV2RulePromotionsByUuidJobsByJobUuidFile, type GetV2RulePromotionsByUuidJobsByJobUuidFileData, type GetV2RulePromotionsByUuidJobsByJobUuidFileResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetV2RulePromotionsByUuidJobsByJobUuidFileData = {
-  path: {
-    uuid: "12345678-1234-5678-9012-123456789012",
-    job-uuid: "12345678-1234-5678-9012-123456789012",
-  },
-};
-
-const result: GetV2RulePromotionsByUuidJobsByJobUuidFileResponse = await getV2RulePromotionsByUuidJobsByJobUuidFile(params);
-```
-
----
-
-### **`postV2RulePromotionsByUuidJobsByJobUuidCancel`**
-
-**Endpoint:** `POST /v2/rule-promotions/{uuid}/jobs/{job-uuid}/cancel`
-
-**Summary:** Cancel a Rule Promotion Job
-
-**Description:** POST operation
-
-**TypeScript Example:**
-
-```typescript
-import { postV2RulePromotionsByUuidJobsByJobUuidCancel, type PostV2RulePromotionsByUuidJobsByJobUuidCancelData, type PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse } from "@epcc-sdk/rule-promotions";
-
-const params: PostV2RulePromotionsByUuidJobsByJobUuidCancelData = {
-  path: {
-    uuid: "12345678-1234-5678-9012-123456789012",
-    job-uuid: "12345678-1234-5678-9012-123456789012",
-  },
-  body: {
-    data: {
-      type: "resource"
-    }
-  },
-};
-
-const result: PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse = await postV2RulePromotionsByUuidJobsByJobUuidCancel(params);
-```
-
----
-
-### **`anonymizeRulePromotionUsages`**
-
-**Endpoint:** `POST /v2/rule-promotions/usages/anonymize`
-
-**Summary:** Anonymize Rule Promotion Usages
-
-**Description:** POST operation
-
-**TypeScript Example:**
-
-```typescript
-import { anonymizeRulePromotionUsages, type AnonymizeRulePromotionUsagesData, type AnonymizeRulePromotionUsagesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: AnonymizeRulePromotionUsagesData = {
-  body: {
-    data: {
-      type: "resource"
-    }
-  },
-};
-
-const result: AnonymizeRulePromotionUsagesResponse = await anonymizeRulePromotionUsages(params);
-```
-
----
-
-### **`getRulePromotionUsages`**
-
-**Endpoint:** `GET /v2/rule-promotions/{promotionID}/usages`
-
-**Summary:** Get Rule Promotion Usages
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getRulePromotionUsages, type GetRulePromotionUsagesData, type GetRulePromotionUsagesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetRulePromotionUsagesData = {
-  path: {
-    promotionID: "promotionID",
-  },
-  query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-    "page[limit]": 10, // OPTIONAL
-    "page[offset]": 0, // OPTIONAL
-  },
-};
-
-const result: GetRulePromotionUsagesResponse = await getRulePromotionUsages(params);
-```
-
----
-
-### **`getRulePromotionCodeUsages`**
-
-**Endpoint:** `GET /v2/rule-promotions/{promotionID}/codes/{code}/usages`
-
-**Summary:** Get Rule Promotion Code Usages
-
-**Description:** GET operation
-
-**TypeScript Example:**
-
-```typescript
-import { getRulePromotionCodeUsages, type GetRulePromotionCodeUsagesData, type GetRulePromotionCodeUsagesResponse } from "@epcc-sdk/rule-promotions";
-
-const params: GetRulePromotionCodeUsagesData = {
-  path: {
-    promotionID: "promotionID",
-    code: "CODE123",
-  },
-  query: {
-    "filter": "eq(name,\"Product Name\")", // OPTIONAL
-    "page[limit]": 10, // OPTIONAL
-    "page[offset]": 0, // OPTIONAL
-  },
-};
-
-const result: GetRulePromotionCodeUsagesResponse = await getRulePromotionCodeUsages(params);
-```
-
----
-
-
-
-
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getRulePromotionsTool`.
+- The name of a tool is `rule_promotions_` and the operation name in snake case, for example `rule_promotions_get_rule_promotions`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
+
+These operations have a risk that is different from the default for their HTTP method:
+
+- `anonymizeRulePromotionUsages` is `update`, because it replaces customer data in usage records and cannot be undone.

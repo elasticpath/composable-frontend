@@ -1,470 +1,133 @@
-# @epcc-sdk/sdks-subscriptions SDK
+# @epcc-sdk/sdks-subscriptions
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path subscriptions API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-subscriptions
-# or
-pnpm install @epcc-sdk/sdks-subscriptions
-# or
-yarn add @epcc-sdk/sdks-subscriptions
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
-
-```ts
-import { client } from "@epcc-sdk/sdks-subscriptions";
-
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
-
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
-```
-
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
-
-### 2. Using the `createClient` function
-
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
-
-```ts
-import { createClient } from "@epcc-sdk/sdks-subscriptions";
-
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
-```
-
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-subscriptions>".
-
-```ts
-const response = await getOffering({
-    client: myClient,
-});
-```
-
-### Direct configuration
-
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
-
-```ts
-const response = await getOffering({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
-```
-
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-subscriptions";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-subscriptions";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-`createSubscriptionsClient` is the short way. It returns a client that holds a caching token
-source, sets the `auth` hook, refreshes and replays once on a 401, and backs off on a 429.
+## Quick start
 
 ```ts
 import {
   createSubscriptionsClient,
   listOfferings,
-} from "@epcc-sdk/sdks-subscriptions";
+} from "@epcc-sdk/sdks-subscriptions"
 
 const client = createSubscriptionsClient({
   baseUrl: "https://euwest.api.elasticpath.com",
   clientId: process.env.EPCC_CLIENT_ID!,
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
-});
+})
 
-const { data } = await listOfferings({ client });
+const { data, error } = await listOfferings({ client })
 ```
 
-Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
-`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
-`config` tune the rest. `config` is merged last, so anything the factory chose can be
-overridden.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-Pass the client to every operation. The module-level `client` exported by this package
-carries no credentials, so an operation called without `{ client }` gets a 401.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
-`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
-still install only `@epcc-sdk/sdks-subscriptions`. Do not authenticate with a request
-interceptor: an interceptor cannot see the response, so it can never retry a 401.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
-## Validation schemas
+## Base URL
 
-Zod schemas for every request body, path and response are published under the `/zod`
-subpath. `zod` is an optional peer dependency (4.x), so the root entry never imports it.
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
+
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
-import { zOffering } from "@epcc-sdk/sdks-subscriptions/zod";
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-subscriptions"
 
-const offering = zOffering.parse(data?.data?.[0]);
+const source = createTokenSource(
+  clientCredentialsProvider({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-The price amounts, dunning rule intervals and limits, proration and refund amounts, and the
-`page[offset]` and `page[limit]` query parameters are `int64` in the specification. The
-schemas parse them to `number`, as the TypeScript types and the unparsed response carry
-them.
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
 
-## MCP endpoint tools
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
 
-The `/mcp` subpath turns each of the 86 subscriptions operations into a Model Context Protocol (MCP)
-tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and `@modelcontextprotocol/server` 2
-are needed only for this subpath.
+## Zod schemas
 
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`listOfferingsTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 86 in operation order. A handler returns an API
-error as an `isError` result and does not throw.
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
-Register one tool:
+```ts
+import { zListOfferingsResponse } from "@epcc-sdk/sdks-subscriptions/zod"
+
+const result = zListOfferingsResponse.safeParse(data)
+```
+
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
+
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { listOfferingsTool } from "@epcc-sdk/sdks-subscriptions/mcp"
+import { tools } from "@epcc-sdk/sdks-subscriptions/mcp"
 
 const server = new McpServer({ name: "subscriptions", version: "1.0.0" })
-const tool = listOfferingsTool()
-server.registerTool(tool.name, tool.config, tool.handler)
-```
-A tool built without a client calls through the package's module level `client`, like an operation
-does. That client has no credentials until you configure it. Configure it once:
 
-```ts
-import { client, createSubscriptionsClient } from "@epcc-sdk/sdks-subscriptions"
-
-client.setConfig(createSubscriptionsClient({ baseUrl, clientId, clientSecret }).getConfig())
-```
-Register every tool, with a client that sends the same headers on every call:
-
-```ts
-import * as subscriptions from "@epcc-sdk/sdks-subscriptions/mcp"
-
-const client = createSubscriptionsClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
-})
-subscriptions
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Register the read-only tools only:
-
-```ts
-subscriptions
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Each tool is named `subscriptions_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
-list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
-supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
-HTTP request.
-
-`subscriptions_create_import` uploads a JSONL file. Its `import_file` field takes the file as a `data:` URI, and `import_file_name` takes its name. The tool accepts a file of at most 8,388,608 bytes (8 MiB) and returns an `isError` result for a larger file, a malformed URI, or a URL, without sending anything. The API itself limits an import to 50,000 lines, not to a size.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
-The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-`createSubscriptionProrationPreview` is a `POST` that only reads, so a spec override gives it the `read` risk.
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `listOfferingsTool`.
+- The name of a tool is `subscriptions_` and the operation name in snake case, for example `subscriptions_list_offerings`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
 
----
+These operations have a risk that is different from the default for their HTTP method:
 
+- `createSubscriptionProrationPreview` is `read`, because it only reads data.
 
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getOffering } from "@epcc-sdk/sdks-subscriptions";
-
-const product = await getOffering({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`listOfferings`** (`GET /subscriptions/offerings`)
-
-- **`createOffering`** (`POST /subscriptions/offerings`)
-
-- **`buildOffering`** (`POST /subscriptions/offerings/build`)
-
-- **`deleteOffering`** (`DELETE /subscriptions/offerings/{offering_uuid}`)
-
-- **`getOffering`** (`GET /subscriptions/offerings/{offering_uuid}`)
-
-- **`updateOffering`** (`PUT /subscriptions/offerings/{offering_uuid}`)
-
-- **`deleteOfferingFeature`** (`DELETE /subscriptions/offerings/{offering_uuid}/features/{feature_uuid}`)
-
-- **`updateOfferingFeature`** (`PUT /subscriptions/offerings/{offering_uuid}/features/{feature_uuid}`)
-
-- **`attachOfferingFeature`** (`POST /subscriptions/offerings/{offering_uuid}/features/attach`)
-
-- **`listOfferingPricingOptions`** (`GET /subscriptions/offerings/{offering_uuid}/pricing-options`)
-
-- **`createOfferingPricingOption`** (`POST /subscriptions/offerings/{offering_uuid}/pricing-options`)
-
-- **`deleteOfferingPricingOption`** (`DELETE /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}`)
-
-- **`updateOfferingPricingOption`** (`PUT /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}`)
-
-- **`listOfferingFeatures`** (`GET /subscriptions/offerings/{offering_uuid}/features`)
-
-- **`createOfferingFeature`** (`POST /subscriptions/offerings/{offering_uuid}/features`)
-
-- **`listOfferingPlans`** (`GET /subscriptions/offerings/{offering_uuid}/plans`)
-
-- **`createOfferingPlan`** (`POST /subscriptions/offerings/{offering_uuid}/plans`)
-
-- **`deleteOfferingPlan`** (`DELETE /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}`)
-
-- **`updateOfferingPlan`** (`PUT /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}`)
-
-- **`removeOfferingPlanPricingOptions`** (`DELETE /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
-
-- **`listOfferingPlanPricingOptions`** (`GET /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
-
-- **`addOfferingPlanPricingOptions`** (`POST /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options`)
-
-- **`listSubscriptions`** (`GET /subscriptions/subscriptions`)
-
-- **`createSubscription`** (`POST /subscriptions/subscriptions`)
-
-- **`deleteSubscription`** (`DELETE /subscriptions/subscriptions/{subscription_uuid}`)
-
-- **`getSubscription`** (`GET /subscriptions/subscriptions/{subscription_uuid}`)
-
-- **`updateSubscription`** (`PUT /subscriptions/subscriptions/{subscription_uuid}`)
-
-- **`listSubscriptionPlans`** (`GET /subscriptions/subscriptions/{subscription_uuid}/plans`)
-
-- **`manageSubscriptionPlans`** (`PUT /subscriptions/subscriptions/{subscription_uuid}/plans`)
-
-- **`listSubscriptionPricingOptions`** (`GET /subscriptions/subscriptions/{subscription_uuid}/pricing-options`)
-
-- **`listSubscriptionStates`** (`GET /subscriptions/subscriptions/{subscription_uuid}/states`)
-
-- **`createSubscriptionState`** (`POST /subscriptions/subscriptions/{subscription_uuid}/states`)
-
-- **`getSubscriptionState`** (`GET /subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}`)
-
-- **`listJobs`** (`GET /subscriptions/jobs`)
-
-- **`createJob`** (`POST /subscriptions/jobs`)
-
-- **`deleteJob`** (`DELETE /subscriptions/jobs/{job_uuid}`)
-
-- **`getJob`** (`GET /subscriptions/jobs/{job_uuid}`)
-
-- **`listImportJobs`** (`GET /subscriptions/imports`)
-
-- **`createImport`** (`POST /subscriptions/imports`)
-
-- **`getImport`** (`GET /subscriptions/imports/{import_uuid}`)
-
-- **`getImportErrors`** (`GET /subscriptions/imports/{import_uuid}/errors`)
-
-- **`listSubscriptionInvoices`** (`GET /subscriptions/subscriptions/{subscription_uuid}/invoices`)
-
-- **`listSubscriptionInvoicePayments`** (`GET /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments`)
-
-- **`getSubscriptionInvoicePayment`** (`GET /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}`)
-
-- **`getSubscriptionInvoice`** (`GET /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}`)
-
-- **`listInvoices`** (`GET /subscriptions/invoices`)
-
-- **`getInvoice`** (`GET /subscriptions/invoices/{invoice_uuid}`)
-
-- **`listInvoicePayments`** (`GET /subscriptions/invoices/{invoice_uuid}/payments`)
-
-- **`getInvoicePayment`** (`GET /subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}`)
-
-- **`updateInvoicePayment`** (`PUT /subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}`)
-
-- **`listSchedules`** (`GET /subscriptions/schedules`)
-
-- **`createSchedule`** (`POST /subscriptions/schedules`)
-
-- **`deleteSchedule`** (`DELETE /subscriptions/schedules/{schedule_uuid}`)
-
-- **`getSchedule`** (`GET /subscriptions/schedules/{schedule_uuid}`)
-
-- **`updateSchedule`** (`PUT /subscriptions/schedules/{schedule_uuid}`)
-
-- **`listSubscribers`** (`GET /subscriptions/subscribers`)
-
-- **`createSubscriber`** (`POST /subscriptions/subscribers`)
-
-- **`deleteSubscriber`** (`DELETE /subscriptions/subscribers/{subscriber_uuid}`)
-
-- **`getSubscriber`** (`GET /subscriptions/subscribers/{subscriber_uuid}`)
-
-- **`updateSubscriber`** (`PUT /subscriptions/subscribers/{subscriber_uuid}`)
-
-- **`listDunningRules`** (`GET /subscriptions/dunning-rules`)
-
-- **`createDunningRule`** (`POST /subscriptions/dunning-rules`)
-
-- **`deleteDunningRule`** (`DELETE /subscriptions/dunning-rules/{dunning_rule_uuid}`)
-
-- **`getDunningRule`** (`GET /subscriptions/dunning-rules/{dunning_rule_uuid}`)
-
-- **`updateDunningRule`** (`PUT /subscriptions/dunning-rules/{dunning_rule_uuid}`)
-
-- **`listProrationPolicies`** (`GET /subscriptions/proration-policies`)
-
-- **`createProrationPolicy`** (`POST /subscriptions/proration-policies`)
-
-- **`deleteProrationPolicy`** (`DELETE /subscriptions/proration-policies/{proration_policy_uuid}`)
-
-- **`getProrationPolicy`** (`GET /subscriptions/proration-policies/{proration_policy_uuid}`)
-
-- **`updateProrationPolicy`** (`PUT /subscriptions/proration-policies/{proration_policy_uuid}`)
-
-- **`listFeatures`** (`GET /subscriptions/features`)
-
-- **`createFeature`** (`POST /subscriptions/features`)
-
-- **`deleteFeature`** (`DELETE /subscriptions/features/{feature_uuid}`)
-
-- **`getFeature`** (`GET /subscriptions/features/{feature_uuid}`)
-
-- **`updateFeature`** (`PUT /subscriptions/features/{feature_uuid}`)
-
-
-
-
----
+`subscriptions_create_import` uploads a JSONL file. Give the file in `import_file` as a `data:` URI, for example `data:<media type>;base64,<data>`, and its name in `import_file_name`. The largest file is 8,388,608 bytes (8 MiB). The API also limits an import to 50,000 lines. If the file is larger, the URI is not valid, or the value is a URL, the tool returns an `isError` result and sends nothing. The tool never downloads a URL.

@@ -1,360 +1,130 @@
-# @epcc-sdk/sdks-authentication-realms SDK
+# @epcc-sdk/sdks-authentication-realms
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- a one-call client factory that holds a token, refreshes it on a 401 and backs off on a 429
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path authentication realms API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-authentication-realms
-# or
-pnpm install @epcc-sdk/sdks-authentication-realms
-# or
-yarn add @epcc-sdk/sdks-authentication-realms
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
-
-```ts
-import { client } from "@epcc-sdk/sdks-authentication-realms";
-
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
-
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
-```
-
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
-
-### 2. Using the `createClient` function
-
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
-
-```ts
-import { createClient } from "@epcc-sdk/sdks-authentication-realms";
-
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
-    baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
-```
-
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-authentication-realms>".
-
-```ts
-const response = await getPasswordProfileInfo({
-    client: myClient,
-});
-```
-
-### Direct configuration
-
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
-
-```ts
-const response = await getPasswordProfileInfo({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
-```
-
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-authentication-realms";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-authentication-realms";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-`createAuthenticationRealmsClient` is the short way. It returns a client that holds a
-caching token source, sets the `auth` hook, refreshes and replays once on a 401, and backs
-off on a 429.
+## Quick start
 
 ```ts
 import {
   createAuthenticationRealmsClient,
-  getAllAuthenticationRealms,
-} from "@epcc-sdk/sdks-authentication-realms";
+  getV2AuthenticationRealms,
+} from "@epcc-sdk/sdks-authentication-realms"
 
 const client = createAuthenticationRealmsClient({
-  baseUrl: "https://useast.api.elasticpath.com",
+  baseUrl: "https://euwest.api.elasticpath.com",
   clientId: process.env.EPCC_CLIENT_ID!,
   clientSecret: process.env.EPCC_CLIENT_SECRET!,
-});
+})
 
-const { data } = await getAllAuthenticationRealms({ client });
+const { data, error } = await getV2AuthenticationRealms({ client })
 ```
 
-Credentials come from `source`, `provider`, `token`, `clientId` plus `clientSecret`, or
-`clientId` alone for the implicit grant. `retry`, `storage`, `leewaySeconds`, `fetch` and
-`config` tune the rest. `config` is merged last, so anything the factory chose can be
-overridden.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-Pass the client to every operation. The module-level `client` exported by this package
-carries no credentials, so an operation called without `{ client }` gets a 401.
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-To assemble the stack by hand, `createTokenSource`, `createAuthenticatedFetch`,
-`createRetryFetch` and `createConfiguredClient` are re-exported from this package, so you
-still install only `@epcc-sdk/sdks-authentication-realms`. Do not authenticate with a
-request interceptor: an interceptor cannot see the response, so it can never retry a 401.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
 
-## MCP endpoint tools
+## Base URL
 
-The `/mcp` subpath turns each of the 31 authentication realms operations into a Model Context
-Protocol (MCP) tool for MCP SDK v2. The main entry imports none of it. `zod` 4 and
-`@modelcontextprotocol/server` 2 are needed only for this subpath.
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
 
-Each operation has one tool factory, named after its function with `Tool` added, such as
-`getV2AuthenticationRealmsTool`. A factory returns `{ name, config, handler }`, the three arguments that
-`McpServer.registerTool` takes. `tools()` returns all 31 in operation order. A handler returns an API
-error as an `isError` result and does not throw.
+## Credentials
 
-Register one tool:
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
+
+```ts
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-authentication-realms"
+
+const source = createTokenSource(
+  clientCredentialsProvider({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
+```
+
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
+
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
+
+## Zod schemas
+
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
+
+```ts
+import { zGetV2AuthenticationRealmsResponse } from "@epcc-sdk/sdks-authentication-realms/zod"
+
+const result = zGetV2AuthenticationRealmsResponse.safeParse(data)
+```
+
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
+
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
 import { McpServer } from "@modelcontextprotocol/server"
-import { getV2AuthenticationRealmsTool } from "@epcc-sdk/sdks-authentication-realms/mcp"
+import { tools } from "@epcc-sdk/sdks-authentication-realms/mcp"
 
-const server = new McpServer({ name: "authentication-realms", version: "1.0.0" })
-const tool = getV2AuthenticationRealmsTool()
-server.registerTool(tool.name, tool.config, tool.handler)
-```
-A tool built without a client calls through the package's module level `client`, like an operation
-does. That client has no credentials until you configure it. Configure it once:
-
-```ts
-import { client, createAuthenticationRealmsClient } from "@epcc-sdk/sdks-authentication-realms"
-
-client.setConfig(createAuthenticationRealmsClient({ baseUrl, clientId, clientSecret }).getConfig())
-```
-Register every tool, with a client that sends the same headers on every call:
-
-```ts
-import * as authenticationRealms from "@epcc-sdk/sdks-authentication-realms/mcp"
-
-const client = createAuthenticationRealmsClient({
-  baseUrl,
-  clientId,
-  clientSecret,
-  config: { headers: { "EP-Store-Id": storeId, "EP-Org-Id": orgId } },
+const server = new McpServer({
+  name: "authentication-realms",
+  version: "1.0.0",
 })
-authenticationRealms
-  .tools({ client })
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Register the read-only tools only:
 
-```ts
-authenticationRealms
-  .tools({ client })
-  .filter((t) => t.config._meta["com.elasticpath/operation"].risk === "read")
-  .forEach((t) => server.registerTool(t.name, t.config, t.handler))
-```
-Each tool is named `authentication_realms_<snake_case_function>`, and its arguments are grouped under `path`,
-`query`, `headers` and `body`. The `path`, `query` and `headers` groups reject keys the spec does not
-list. The `body` keeps them, so an attribute the spec does not list still reaches the API. The client
-supplies the `Authorization` header, so no tool asks for it. Cancelling the MCP request cancels the
-HTTP request.
-
-Each tool's description is written for a model choosing between tools: what the tool does, when to
-use it rather than a similar tool, and any caveat that changes when to call it, in at most 600
-characters. The full spec description stays in the doc comment of the operation's function and its
-tool factory.
-
-`config._meta["com.elasticpath/operation"]` holds the operation's `id`, `method`, `path` and `risk`.
-The risk is `read`, `create`, `update` or `delete`, and the annotations follow from it.
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getPasswordProfileInfo } from "@epcc-sdk/sdks-authentication-realms";
-
-const product = await getPasswordProfileInfo({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`getAllAuthenticationRealms`** (`GET /v2/authentication-realms`)
-
-- **`getAuthenticationRealm`** (`GET /v2/authentication-realms/{realmId}`)
-
-- **`updateAuthenticationRealm`** (`PUT /v2/authentication-realms/{realmId}`)
-
-- **`getAllOidcProfiles`** (`GET /v2/authentication-realms/{realmId}/openid-connect-profiles`)
-
-- **`createOidcProfile`** (`POST /v2/authentication-realms/{realmId}/openid-connect-profiles`)
-
-- **`deleteOidcProfile`** (`DELETE /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
-
-- **`getOidcProfile`** (`GET /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
-
-- **`updateOidcProfile`** (`PUT /v2/authentication-realms/{realmId}/openid-connect-profiles/{oidcProfileId}`)
-
-- **`getAllPasswordProfiles`** (`GET /v2/authentication-realms/{realmId}/password-profiles`)
-
-- **`createPasswordProfile`** (`POST /v2/authentication-realms/{realmId}/password-profiles`)
-
-- **`deletePasswordProfile`** (`DELETE /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
-
-- **`getPasswordProfile`** (`GET /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
-
-- **`updatePasswordProfile`** (`PUT /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}`)
-
-- **`createOneTimePasswordTokenRequest`** (`POST /v2/authentication-realms/{realmId}/password-profiles/{passwordProfileId}/one-time-password-token-request`)
-
-- **`getAllUserAuthenticationInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info`)
-
-- **`createUserAuthenticationInfo`** (`POST /v2/authentication-realms/{realmId}/user-authentication-info`)
-
-- **`deleteUserAuthenticationInfo`** (`DELETE /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
-
-- **`getUserAuthenticationInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
-
-- **`updateUserAuthenticationInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}`)
-
-- **`getAllUserAuthenticationOidcProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info`)
-
-- **`createUserAuthenticationOidcProfileInfo`** (`POST /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info`)
-
-- **`deleteUserAuthenticationOidcProfileInfo`** (`DELETE /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
-
-- **`getUserAuthenticationOidcProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
-
-- **`updateUserAuthenticationOidcProfileInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-openid-connect-profile-info/{userAuthenticationOidcProfileInfoId}`)
-
-- **`listPasswordProfileInfos`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info`)
-
-- **`createPasswordProfileInfo`** (`POST /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info`)
-
-- **`deletePasswordProfileInfo`** (`DELETE /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
-
-- **`getPasswordProfileInfo`** (`GET /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
-
-- **`updatePasswordProfileInfo`** (`PUT /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{userAuthenticationPasswordProfileInfoId}`)
-
-
-
-
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getV2AuthenticationRealmsTool`.
+- The name of a tool is `authentication_realms_` and the operation name in snake case, for example `authentication_realms_get_v2_authentication_realms`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
