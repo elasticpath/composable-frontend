@@ -5,6 +5,8 @@ import * as z from "zod"
 
 import type { Client } from "./client"
 import {
+  dataUriFields,
+  decodeDataUris,
   loose,
   type Tool,
   toToolResult,
@@ -49,6 +51,7 @@ import {
   zGetProductPriceByIdPath,
   zGetProductPricesPath,
   zGetProductPricesQuery,
+  zImportPricebookBody,
   zReplicatePricebookBody,
   zReplicatePricebookPath,
   zUpdatePricebookBody,
@@ -320,7 +323,14 @@ export const updatePricebookTool = (options?: ToolOptions) => {
   }
 }
 
-const importPricebookInput = z.object({}).strict()
+const importPricebookInput = withSharedSchemaIds(
+  "pricebooks",
+  z
+    .object({
+      body: dataUriFields(loose(zImportPricebookBody), ["file"], 52428800),
+    })
+    .strict(),
+)
 
 /**
  * Import a Price
@@ -337,19 +347,22 @@ const importPricebookInput = z.object({}).strict()
 export const importPricebookTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof importPricebookInput> = (args, ctx) =>
     toToolResult(
-      importPricebook({
-        ...args,
-        client: options?.client,
-        signal: ctx.mcpReq.signal,
-        throwOnError: false,
-      }),
+      decodeDataUris(args.body, ["file"], 52428800).then((body) =>
+        importPricebook({
+          ...args,
+          client: options?.client,
+          signal: ctx.mcpReq.signal,
+          throwOnError: false,
+          body,
+        }),
+      ),
     )
   return {
     name: "pricebooks_import_pricebook" as const,
     config: {
       title: "Import Price Books and Prices",
       description:
-        "Starts a bulk import that creates and updates price books and their prices from a JSONL file, optionally GZIP compressed, so it can overwrite existing prices. If an error occurs the import stops and the job fails, but objects already created or updated stay. Imports are processed one at a time, in the order sent.",
+        "Creates and updates price books and prices in bulk from a JSONL file, at most 50,000 objects; split larger sets across several imports. Each price line updates the price in its book that matches id, then external_ref, then sku, and creates the price if none matches. Send the file as a data:application/octet-stream;base64 URI. It starts a job; read the job until it finishes. If a line fails, the job fails, and the lines before it stay applied. Imports run one at a time, in the order sent.",
       inputSchema: importPricebookInput,
       annotations: {
         readOnlyHint: false,
