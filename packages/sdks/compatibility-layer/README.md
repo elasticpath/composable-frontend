@@ -148,6 +148,8 @@ function createBridgedClient<T extends HeyApiClient>(
 | `retry` | `Partial<RetryConfig>` | See below | Retry configuration |
 | `throttle` | `Partial<ThrottleConfig>` | See below | Throttle configuration |
 | `headers` | `Record<string, string>` | - | Default headers |
+| `getHeaders` | `HeadersProvider` | - | Returns headers for each request. Its headers win over `headers`, and headers set on the request win over both. `createBridgedClient` ignores it. |
+| `skipHeadersParam` | `string` | - | Query parameter that opts one request out of `getHeaders`. The bridge removes it before it sends the request. |
 | `leewaySec` | `number` | `60` | Token expiration leeway |
 
 #### RetryConfig
@@ -214,6 +216,9 @@ class ClientRegistry {
 | `clientSecret` | `string` | Required for `client_credentials` |
 | `storage` | `StorageAdapter \| string` | Token storage |
 | `legacyStorageKey` | `string` | Storage key for old SDK sharing |
+| `headers` | `Record<string, string>` | Default headers |
+| `getHeaders` | `HeadersProvider` | Returns headers for each request |
+| `skipHeadersParam` | `string` | Query parameter that opts one request out of `getHeaders` |
 
 ### `SharedAuthState`
 

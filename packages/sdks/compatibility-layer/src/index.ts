@@ -48,6 +48,7 @@ export type {
   TokenData,
   StorageAdapter,
   TokenProvider,
+  HeadersProvider,
   RetryConfig,
   ThrottleConfig,
   BridgeConfig,

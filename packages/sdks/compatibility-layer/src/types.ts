@@ -72,6 +72,17 @@ export interface ThrottleConfig {
 }
 
 /**
+ * Function that returns headers for one request (for example, the
+ * current store or organization). Called for every request.
+ */
+export type HeadersProvider = (
+  request: Request
+) =>
+  | Record<string, string>
+  | undefined
+  | Promise<Record<string, string> | undefined>
+
+/**
  * Configuration for creating a bridged client.
  */
 export interface BridgeConfig {
@@ -93,6 +104,14 @@ export interface BridgeConfig {
   throttle?: Partial<ThrottleConfig>
   /** Default headers to include in all requests */
   headers?: Record<string, string>
+  /**
+   * Per-request headers. These win over `headers`, and the request's own
+   * headers win over both. Applied by createBridgedFetch and the client
+   * registry. createBridgedClient ignores it.
+   */
+  getHeaders?: HeadersProvider
+  /** Query parameter that opts a request out of `getHeaders`. It is removed before the request is sent */
+  skipHeadersParam?: string
   /** Leeway in seconds for token expiration check (default: 60) */
   leewaySec?: number
 }

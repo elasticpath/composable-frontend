@@ -261,4 +261,46 @@ describe("createBridgedFetch", () => {
       "account-management"
     )
   })
+
+  it("should add the headers that getHeaders returns for each request", async () => {
+    const mockFetchFn = vi.fn().mockResolvedValue(
+      new Response("{}", { status: 200 })
+    )
+    vi.stubGlobal("fetch", mockFetchFn)
+
+    const { fetch: bridgedFetch } = createBridgedFetch({
+      baseUrl: "https://api.test.com",
+      clientId: "test-client-id",
+      storage: mockStorage,
+      tokenProvider: vi.fn().mockResolvedValue({ access_token: "test-token" }),
+      getHeaders: async () => ({ "EP-Store-ID": "store-1" }),
+    })
+
+    await bridgedFetch("https://api.test.com/products")
+
+    const calledRequest = mockFetchFn.mock.calls[0][0] as Request
+    expect(calledRequest.headers.get("EP-Store-ID")).toBe("store-1")
+  })
+
+  it("should skip getHeaders for a request with the opt-out parameter", async () => {
+    const mockFetchFn = vi.fn().mockResolvedValue(
+      new Response("{}", { status: 200 })
+    )
+    vi.stubGlobal("fetch", mockFetchFn)
+
+    const { fetch: bridgedFetch } = createBridgedFetch({
+      baseUrl: "https://api.test.com",
+      clientId: "test-client-id",
+      storage: mockStorage,
+      tokenProvider: vi.fn().mockResolvedValue({ access_token: "test-token" }),
+      getHeaders: () => ({ "EP-Store-ID": "store-1" }),
+      skipHeadersParam: "skipHeaderSetter",
+    })
+
+    await bridgedFetch("https://api.test.com/stores?skipHeaderSetter=true")
+
+    const calledRequest = mockFetchFn.mock.calls[0][0] as Request
+    expect(calledRequest.headers.get("EP-Store-ID")).toBeNull()
+    expect(calledRequest.url).toBe("https://api.test.com/stores")
+  })
 })

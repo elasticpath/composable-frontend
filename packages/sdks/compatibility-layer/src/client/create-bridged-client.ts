@@ -117,17 +117,48 @@ function composeFetch(
 
 /**
  * Wrap a fetch function so each request carries the configured headers.
- * A header the caller sets on the request wins over a configured one.
+ * Precedence, lowest first: config.headers, getHeaders(), then the headers
+ * the caller sets on the request.
  */
 function withHeaders(
   baseFetch: typeof fetch,
-  headers: Record<string, string> | undefined
+  config: Pick<BridgeConfig, "headers" | "getHeaders" | "skipHeadersParam">
 ): typeof fetch {
-  return (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    const request = new Request(input, init)
-    if (!headers) return baseFetch(request)
+  const { headers, getHeaders, skipHeadersParam } = config
+
+  return async (
+    input: RequestInfo | URL,
+    init?: RequestInit
+  ): Promise<Response> => {
+    let request = new Request(input, init)
+    if (!headers && !getHeaders) return baseFetch(request)
+
+    let skipGetHeaders = false
+    if (skipHeadersParam) {
+      const url = new URL(request.url)
+      if (url.searchParams.has(skipHeadersParam)) {
+        url.searchParams.delete(skipHeadersParam)
+        // Buffer the body: browsers reject or drop a stream body taken
+        // from another Request
+        const hasBody = request.method !== "GET" && request.method !== "HEAD"
+        request = new Request(url.toString(), {
+          method: request.method,
+          headers: request.headers,
+          body: hasBody ? await request.arrayBuffer() : undefined,
+          signal: request.signal,
+          credentials: request.credentials,
+        })
+        skipGetHeaders = true
+      }
+    }
 
     const merged = new Headers(headers)
+    if (getHeaders && !skipGetHeaders) {
+      const requestHeaders = await getHeaders(request)
+      new Headers(requestHeaders).forEach((value, key) =>
+        merged.set(key, value)
+      )
+    }
     request.headers.forEach((value, key) => merged.set(key, value))
     return baseFetch(new Request(request, { headers: merged }))
   }
@@ -230,7 +261,7 @@ export function createBridgedFetch(config: BridgeConfig): {
 
   const bridgedFetch = withHeaders(
     composeFetch(authState, config.retry ?? {}, config.throttle ?? {}),
-    config.headers
+    config
   )
 
   return {

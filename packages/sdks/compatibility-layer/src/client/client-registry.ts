@@ -33,6 +33,10 @@ export interface ClientInstanceConfig {
   legacyStorageKey?: string
   /** Default headers */
   headers?: Record<string, string>
+  /** Per-request headers */
+  getHeaders?: BridgeConfig["getHeaders"]
+  /** Query parameter that opts a request out of `getHeaders` */
+  skipHeadersParam?: string
   /** Retry configuration */
   retry?: BridgeConfig["retry"]
   /** Throttle configuration */
@@ -158,6 +162,8 @@ export class ClientRegistry {
       storage,
       tokenProvider,
       headers: config.headers,
+      getHeaders: config.getHeaders,
+      skipHeadersParam: config.skipHeadersParam,
       retry: config.retry,
       throttle: config.throttle,
       leewaySec: config.leewaySec,
