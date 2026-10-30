@@ -5,6 +5,17 @@ import type {
   SharedAuthStateInterface,
 } from "../types"
 
+/**
+ * JWT credentials store expires in milliseconds (exp * 1000), while OAuth
+ * credentials store it in seconds. A seconds timestamp above this value
+ * is after the year 5000, so a larger value must be milliseconds.
+ */
+const MAX_SECONDS_TIMESTAMP = 1e11
+
+function toSeconds(expires: number): number {
+  return expires > MAX_SECONDS_TIMESTAMP ? Math.floor(expires / 1000) : expires
+}
+
 export interface SharedAuthStateOptions {
   /** Storage adapter for persisting tokens */
   storage: StorageAdapter
@@ -97,15 +108,14 @@ export class SharedAuthState implements SharedAuthStateInterface {
   isExpired(): boolean {
     if (!this.credentials?.access_token) return true
 
+    const { expires } = this.credentials
+
+    // Without an expires field the expiry is unknown, so trust the token
+    // and let a 401 trigger the refresh
+    if (!expires) return false
+
     const now = Math.floor(Date.now() / 1000)
-
-    // Use the expires field if available (absolute timestamp)
-    if (this.credentials.expires) {
-      return now >= this.credentials.expires - this.leewaySec
-    }
-
-    // If we can't determine expiration, consider it expired
-    return true
+    return now >= toSeconds(expires) - this.leewaySec
   }
 
   /**

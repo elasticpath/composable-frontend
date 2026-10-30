@@ -136,8 +136,8 @@ describe("Token Sharing Integration", () => {
       })
 
       expect(auth.getSnapshot()).toBe("minimal-token")
-      // Without expires, should be considered expired
-      expect(auth.isExpired()).toBe(true)
+      // Without expires, the expiry is unknown, so the token is not expired
+      expect(auth.isExpired()).toBe(false)
     })
 
     it("should write tokens in format compatible with old SDK", async () => {

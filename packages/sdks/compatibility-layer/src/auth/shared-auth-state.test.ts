@@ -121,11 +121,25 @@ describe("SharedAuthState", () => {
       expect(authState.isExpired()).toBe(true)
     })
 
-    it("should consider token expired when no expires field present", () => {
-      // Token without an expires field should be considered expired
-      // (EP tokens always have an expires field, this handles edge cases)
+    it("should treat a missing expires field as unknown, not expired", () => {
       const tokenData: TokenData = {
         access_token: "token-without-expires",
+      }
+      storedValue = JSON.stringify(tokenData)
+
+      const authState = new SharedAuthState({
+        storage: mockStorage,
+        tokenProvider: mockTokenProvider,
+      })
+
+      expect(authState.isExpired()).toBe(false)
+    })
+
+    it("should read a JWT expires field in milliseconds", () => {
+      // Commerce Manager stores JWT credentials with expires = exp * 1000
+      const tokenData: TokenData = {
+        access_token: "expired-jwt",
+        expires: Date.now() - 1000,
       }
       storedValue = JSON.stringify(tokenData)
 
