@@ -72,3 +72,17 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/CartsCustomDiscountsObject'
+    # orders.svc requires type, and tax_item is its only value
+    # (internal/money/schema/create_tax_item.json). It decodes amount as an int64 (internal/money/tax_item.go).
+    CartsItemsTaxesCommon:
+      properties:
+        type:
+          default: tax_item
+        amount:
+          type: integer
+    CartsItemsTaxesWithAmount:
+      allOf:
+        - {}
+        - properties:
+            amount:
+              type: integer
