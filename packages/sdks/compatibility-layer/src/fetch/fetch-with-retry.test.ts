@@ -169,6 +169,25 @@ describe("fetchWithRetry", () => {
     expect(response.status).toBe(401)
   })
 
+  it("should send the stored token when the token provider throws", async () => {
+    mockFetch.mockResolvedValueOnce(new Response("{}", { status: 200 }))
+    vi.mocked(mockAuthState.getValidAccessToken).mockRejectedValueOnce(
+      new Error("provider failed")
+    )
+    vi.mocked(mockAuthState.getSnapshot).mockReturnValue("stored-token")
+
+    const request = new Request("https://api.test.com/products")
+    const promise = fetchWithRetry(request, {}, mockAuthState, mockFetch)
+
+    await vi.runAllTimersAsync()
+    await promise
+
+    const calledRequest = mockFetch.mock.calls[0][0] as Request
+    expect(calledRequest.headers.get("Authorization")).toBe(
+      "Bearer stored-token"
+    )
+  })
+
   it("should work without auth state", async () => {
     const mockResponse = new Response("{}", { status: 200 })
     mockFetch.mockResolvedValueOnce(mockResponse)

@@ -54,17 +54,19 @@ export async function fetchWithRetry(
 
   // Add auth token if not an OAuth request and we have auth state
   if (!skipAuth && authState) {
+    let token: string | undefined
     try {
-      const token = await authState.getValidAccessToken()
-      if (token && !request.headers.has("Authorization")) {
-        // Request headers are immutable, so we need to create a new request
-        const newHeaders = new Headers(request.headers)
-        newHeaders.set("Authorization", `Bearer ${token}`)
-        request = new Request(request, { headers: newHeaders })
-      }
+      token = await authState.getValidAccessToken()
     } catch {
-      // If token fetch fails, continue without auth
-      // The request will likely fail with 401 which triggers reauth
+      // The provider failed, so send the stored token. The server decides
+      // whether it is still valid, and a 401 triggers reauth
+      token = authState.getSnapshot()
+    }
+    if (token && !request.headers.has("Authorization")) {
+      // Request headers are immutable, so we need to create a new request
+      const newHeaders = new Headers(request.headers)
+      newHeaders.set("Authorization", `Bearer ${token}`)
+      request = new Request(request, { headers: newHeaders })
     }
   }
 
