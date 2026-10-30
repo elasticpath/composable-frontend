@@ -51,14 +51,6 @@
   "dependencies": {
     "throttled-queue": "^2.1.4"
   },
-  "peerDependencies": {
-    "@hey-api/client-fetch": ">=0.6.0"
-  },
-  "peerDependenciesMeta": {
-    "@hey-api/client-fetch": {
-      "optional": true
-    }
-  },
   "publishConfig": {
     "access": "public"
   }
