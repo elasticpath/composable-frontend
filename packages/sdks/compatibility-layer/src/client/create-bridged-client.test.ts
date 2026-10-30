@@ -239,4 +239,26 @@ describe("createBridgedFetch", () => {
       "Bearer existing-token"
     )
   })
+
+  it("should add config headers to each request", async () => {
+    const mockFetchFn = vi.fn().mockResolvedValue(
+      new Response("{}", { status: 200 })
+    )
+    vi.stubGlobal("fetch", mockFetchFn)
+
+    const { fetch: bridgedFetch } = createBridgedFetch({
+      baseUrl: "https://api.test.com",
+      clientId: "test-client-id",
+      storage: mockStorage,
+      tokenProvider: vi.fn().mockResolvedValue({ access_token: "test-token" }),
+      headers: { "EP-Beta-Features": "account-management" },
+    })
+
+    await bridgedFetch("https://api.test.com/products")
+
+    const calledRequest = mockFetchFn.mock.calls[0][0] as Request
+    expect(calledRequest.headers.get("EP-Beta-Features")).toBe(
+      "account-management"
+    )
+  })
 })

@@ -116,6 +116,24 @@ function composeFetch(
 }
 
 /**
+ * Wrap a fetch function so each request carries the configured headers.
+ * A header the caller sets on the request wins over a configured one.
+ */
+function withHeaders(
+  baseFetch: typeof fetch,
+  headers: Record<string, string> | undefined
+): typeof fetch {
+  return (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const request = new Request(input, init)
+    if (!headers) return baseFetch(request)
+
+    const merged = new Headers(headers)
+    request.headers.forEach((value, key) => merged.set(key, value))
+    return baseFetch(new Request(request, { headers: merged }))
+  }
+}
+
+/**
  * Create a bridged client that uses old SDK's auth, retry, and throttle logic.
  *
  * This function configures a @hey-api/client-fetch client to use:
@@ -210,10 +228,9 @@ export function createBridgedFetch(config: BridgeConfig): {
     leewaySec: config.leewaySec,
   })
 
-  const bridgedFetch = composeFetch(
-    authState,
-    config.retry ?? {},
-    config.throttle ?? {}
+  const bridgedFetch = withHeaders(
+    composeFetch(authState, config.retry ?? {}, config.throttle ?? {}),
+    config.headers
   )
 
   return {
