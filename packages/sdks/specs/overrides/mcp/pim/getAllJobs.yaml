@@ -4,3 +4,7 @@ x-mcp-description: >-
   duplicates and deletes, and price book imports and deletes. Each job shows
   its type and status (pending, started, success, failed, cancelling or
   cancelled). Use it to find a job ID or see what is queued.
+# pim.svc pages this list (internal/api/job/handler_list_jobs.go), but the published spec omits the parameters.
+parameters:
+  - $ref: '#/components/parameters/page_offset'
+  - $ref: '#/components/parameters/page_limit'

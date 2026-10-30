@@ -857,6 +857,10 @@ apis:
     output: ../bundled/pim_standalone.yaml
     root: ../pim.yaml
     decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/security-schemes.yaml
+          - ../overrides/pim_service_corrections.yaml
       override/operation-property-override:
         operationIds:
           attachCustomRelationships: ../overrides/mcp/pim/attachCustomRelationships.yaml

@@ -159,6 +159,7 @@ import {
   zExportProductsQuery,
   zGetAllChildrenPath,
   zGetAllChildrenQuery,
+  zGetAllJobsQuery,
   zGetAllModifiersPath,
   zGetAllModifiersQuery,
   zGetAllNodeChildrenPath,
@@ -232,7 +233,11 @@ type ToolOptions = {
   client?: Client
 }
 
-const getAllJobsInput = z.object({}).strict()
+const getAllJobsInput = z
+  .object({
+    query: zGetAllJobsQuery.strict().optional(),
+  })
+  .strict()
 
 /**
  * Get All Jobs
@@ -1147,7 +1152,7 @@ export const getProductsNodesTool = (options?: ToolOptions) => {
     config: {
       title: "List a Product's Nodes",
       description:
-        "Lists the hierarchy nodes that a product is attached to. The product must have live status. Results are paginated with a limit of up to 100.",
+        "Lists the hierarchy nodes a product is attached to, across all hierarchies. Each node gives its hierarchy_id, its parent node when it has one, and its breadcrumbs. The product can be draft or live. A product attached to no node returns an empty list, and an unknown product ID returns 404. Paginate with page[limit], at most 100, and page[offset].",
       inputSchema: getProductsNodesInput,
       annotations: {
         readOnlyHint: true,
