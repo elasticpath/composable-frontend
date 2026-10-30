@@ -59,6 +59,35 @@ describe("ClientRegistry", () => {
       expect(instance1).toBe(instance2)
     })
 
+    it("should replace the client when its configuration changes", () => {
+      const config = {
+        name: "test-client",
+        authType: "implicit" as const,
+        baseUrl: "https://api.test.com",
+        clientId: "test-client-id",
+        storage: "memory" as const,
+        headers: { "EP-Beta-Features": "account-management" },
+      }
+
+      const original = registry.getOrCreate(config)
+      const disposeSpy = vi.spyOn(original.auth, "dispose")
+
+      const sameValues = registry.getOrCreate({
+        ...config,
+        headers: { ...config.headers },
+      })
+      const changed = registry.getOrCreate({
+        ...config,
+        clientId: "other-client-id",
+      })
+
+      expect(sameValues).toBe(original)
+      expect(changed).not.toBe(original)
+      expect(changed.config.clientId).toBe("other-client-id")
+      expect(registry.get("test-client")).toBe(changed)
+      expect(disposeSpy).toHaveBeenCalled()
+    })
+
     it("should create separate instances for different names", () => {
       const instance1 = registry.getOrCreate({
         name: "client-1",

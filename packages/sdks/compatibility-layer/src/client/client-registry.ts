@@ -61,6 +61,43 @@ export interface ClientInstance {
   config: ClientInstanceConfig
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Object.getPrototypeOf(value) === Object.prototype
+  )
+}
+
+function isShallowEqual(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>
+): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)])
+  for (const key of keys) {
+    if (!Object.is(a[key], b[key])) return false
+  }
+  return true
+}
+
+/**
+ * Compare two client configurations. Nested plain objects (headers,
+ * retry, throttle) compare by value, everything else by identity.
+ */
+function isSameConfig(a: ClientInstanceConfig, b: ClientInstanceConfig): boolean {
+  const left = a as unknown as Record<string, unknown>
+  const right = b as unknown as Record<string, unknown>
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)])
+  for (const key of keys) {
+    const x = left[key]
+    const y = right[key]
+    if (Object.is(x, y)) continue
+    if (isPlainObject(x) && isPlainObject(y) && isShallowEqual(x, y)) continue
+    return false
+  }
+  return true
+}
+
 /**
  * Registry for managing multiple client instances.
  *
@@ -96,11 +133,17 @@ export class ClientRegistry {
 
   /**
    * Get an existing client or create a new one.
+   * If the configuration for the name changed, the old client is disposed
+   * and replaced. Functions in the configuration compare by identity, so
+   * pass stable functions to keep the same client.
    */
   getOrCreate(config: ClientInstanceConfig): ClientInstance {
     const existing = this.clients.get(config.name)
     if (existing) {
-      return existing
+      if (isSameConfig(existing.config, config)) {
+        return existing
+      }
+      existing.auth.dispose()
     }
 
     const instance = this.createInstance(config)
