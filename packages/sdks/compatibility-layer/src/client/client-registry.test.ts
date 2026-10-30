@@ -94,6 +94,31 @@ describe("ClientRegistry", () => {
       expect(instance).toBeDefined()
     })
 
+    it("should get tokens through an injected token fetch", async () => {
+      const tokenFetch = vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ access_token: "injected-token" }), {
+          status: 200,
+        })
+      )
+
+      const instance = registry.getOrCreate({
+        name: "admin-client",
+        authType: "client_credentials",
+        baseUrl: "https://api.test.com",
+        clientId: "admin-client-id",
+        clientSecret: "admin-secret",
+        storage: "memory",
+        tokenFetch,
+      })
+
+      await expect(instance.auth.refresh()).resolves.toBe("injected-token")
+      expect(tokenFetch).toHaveBeenCalledWith(
+        "https://api.test.com/oauth/access_token",
+        expect.objectContaining({ method: "POST" })
+      )
+      expect(globalThis.fetch).not.toHaveBeenCalled()
+    })
+
     it("should throw for client_credentials without secret", () => {
       expect(() =>
         registry.getOrCreate({

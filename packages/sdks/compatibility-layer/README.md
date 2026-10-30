@@ -216,6 +216,7 @@ class ClientRegistry {
 | `clientSecret` | `string` | Required for `client_credentials` |
 | `storage` | `StorageAdapter \| string` | Token storage |
 | `tokenProvider` | `TokenProvider` | Host token provider for `password`, `sso` and `jwt`. Without it, set tokens with `auth.setToken()`. |
+| `tokenFetch` | `typeof fetch` | Fetch for the `implicit` and `client_credentials` token requests. The default is `globalThis.fetch`. |
 | `legacyStorageKey` | `string` | Storage key for old SDK sharing |
 | `headers` | `Record<string, string>` | Default headers |
 | `getHeaders` | `HeadersProvider` | Returns headers for each request |

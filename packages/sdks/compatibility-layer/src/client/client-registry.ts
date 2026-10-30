@@ -31,6 +31,8 @@ export interface ClientInstanceConfig {
   storage?: StorageAdapter | "localStorage" | "cookie" | "memory"
   /** Host token provider for the password, sso and jwt auth types */
   tokenProvider?: TokenProvider
+  /** Fetch for the implicit and client_credentials token requests (default: globalThis.fetch) */
+  tokenFetch?: typeof fetch
   /** Legacy storage key (if sharing with old SDK) */
   legacyStorageKey?: string
   /** Default headers */
@@ -215,9 +217,9 @@ export class ClientRegistry {
   private createImplicitTokenProvider(
     config: ClientInstanceConfig
   ): TokenProvider {
+    const tokenFetch = this.resolveTokenFetch(config)
     return async () => {
-      // Use globalThis.fetch to avoid circular dependencies with the bridged fetch
-      const response = await globalThis.fetch(`${config.baseUrl}/oauth/access_token`, {
+      const response = await tokenFetch(`${config.baseUrl}/oauth/access_token`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
@@ -246,9 +248,9 @@ export class ClientRegistry {
       )
     }
 
+    const tokenFetch = this.resolveTokenFetch(config)
     return async () => {
-      // Use globalThis.fetch to avoid circular dependencies with the bridged fetch
-      const response = await globalThis.fetch(`${config.baseUrl}/oauth/access_token`, {
+      const response = await tokenFetch(`${config.baseUrl}/oauth/access_token`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
@@ -266,6 +268,18 @@ export class ClientRegistry {
 
       return response.json()
     }
+  }
+
+  /**
+   * Resolve the fetch for token requests. It must not be the bridged
+   * fetch, which would call back into the token provider.
+   */
+  private resolveTokenFetch(config: ClientInstanceConfig): typeof fetch {
+    return (
+      config.tokenFetch ??
+      ((input: RequestInfo | URL, init?: RequestInit) =>
+        globalThis.fetch(input, init))
+    )
   }
 
   /**
