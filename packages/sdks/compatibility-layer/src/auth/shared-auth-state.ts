@@ -30,6 +30,8 @@ export class SharedAuthState implements SharedAuthStateInterface {
   private storage: StorageAdapter
   private tokenProvider: TokenProvider
   private credentials: TokenData | undefined
+  /** Last raw value read from or written to storage, to detect outside writes */
+  private lastStoredData: string | undefined
   private refreshPromise: Promise<string> | undefined
   private leewaySec: number
   private subscribers: Set<() => void> = new Set()
@@ -57,6 +59,7 @@ export class SharedAuthState implements SharedAuthStateInterface {
    */
   private loadFromStorage(): void {
     const storedData = this.storage.get()
+    this.lastStoredData = storedData
     if (storedData) {
       try {
         const parsed = JSON.parse(storedData)
@@ -71,6 +74,14 @@ export class SharedAuthState implements SharedAuthStateInterface {
       this.credentials = undefined
     }
     this.notifySubscribers()
+  }
+
+  /**
+   * Write to storage and remember what storage now holds.
+   */
+  private writeStorage(value: string | undefined): void {
+    this.storage.set(value)
+    this.lastStoredData = this.storage.get()
   }
 
   /**
@@ -101,6 +112,10 @@ export class SharedAuthState implements SharedAuthStateInterface {
    * Get a valid access token, refreshing if necessary.
    */
   async getValidAccessToken(): Promise<string> {
+    // Re-read storage: writes from the legacy SDK in this tab fire no storage event
+    if (this.storage.get() !== this.lastStoredData) {
+      this.loadFromStorage()
+    }
     if (this.credentials?.access_token && !this.isExpired()) {
       return this.credentials.access_token
     }
@@ -124,7 +139,7 @@ export class SharedAuthState implements SharedAuthStateInterface {
         })
         this.credentials = tokenData
         // Store in format compatible with old SDK
-        this.storage.set(JSON.stringify(tokenData))
+        this.writeStorage(JSON.stringify(tokenData))
         this.notifySubscribers()
         return tokenData.access_token
       } finally {
@@ -141,7 +156,7 @@ export class SharedAuthState implements SharedAuthStateInterface {
    */
   setToken(tokenData: TokenData): void {
     this.credentials = tokenData
-    this.storage.set(JSON.stringify(tokenData))
+    this.writeStorage(JSON.stringify(tokenData))
     this.notifySubscribers()
   }
 
@@ -150,7 +165,7 @@ export class SharedAuthState implements SharedAuthStateInterface {
    */
   clear(): void {
     this.credentials = undefined
-    this.storage.set(undefined)
+    this.writeStorage(undefined)
     this.notifySubscribers()
   }
 

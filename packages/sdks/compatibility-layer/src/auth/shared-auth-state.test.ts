@@ -174,6 +174,24 @@ describe("SharedAuthState", () => {
       expect(token).toBe("new-token")
       expect(mockTokenProvider).toHaveBeenCalledTimes(1)
     })
+
+    it("should return a token written to storage without a storage event", async () => {
+      const authState = new SharedAuthState({
+        storage: mockStorage,
+        tokenProvider: mockTokenProvider,
+      })
+
+      // The legacy SDK writes in the same tab, so no storage event fires
+      storedValue = JSON.stringify({
+        access_token: "legacy-refreshed-token",
+        expires: Math.floor(Date.now() / 1000) + 3600,
+      })
+
+      const token = await authState.getValidAccessToken()
+
+      expect(token).toBe("legacy-refreshed-token")
+      expect(mockTokenProvider).not.toHaveBeenCalled()
+    })
   })
 
   describe("refresh", () => {
