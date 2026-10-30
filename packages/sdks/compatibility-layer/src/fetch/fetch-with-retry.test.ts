@@ -169,6 +169,27 @@ describe("fetchWithRetry", () => {
     expect(response.status).toBe(401)
   })
 
+  it("should retry on 403 with token refresh when reauthOn403 is set", async () => {
+    mockFetch
+      .mockResolvedValueOnce(new Response("{}", { status: 403 }))
+      .mockResolvedValueOnce(new Response("{}", { status: 200 }))
+
+    const request = new Request("https://api.test.com/products")
+    const promise = fetchWithRetry(
+      request,
+      { reauthOn403: true },
+      mockAuthState,
+      mockFetch
+    )
+
+    await vi.runAllTimersAsync()
+    const response = await promise
+
+    expect(mockAuthState.refresh).toHaveBeenCalledTimes(1)
+    expect(mockFetch).toHaveBeenCalledTimes(2)
+    expect(response.status).toBe(200)
+  })
+
   it("should not refresh on 401 when the caller set its own Authorization", async () => {
     mockFetch.mockResolvedValueOnce(new Response("{}", { status: 401 }))
 

@@ -54,6 +54,8 @@ export interface RetryConfig {
   jitter: number
   /** Whether to re-authenticate on 401 (default: true) */
   reauth: boolean
+  /** Whether to re-authenticate on 403 (default: false) */
+  reauthOn403: boolean
 }
 
 /**
@@ -133,6 +135,7 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
   baseDelay: 1000,
   jitter: 500,
   reauth: true,
+  reauthOn403: false,
 }
 
 export const DEFAULT_THROTTLE_CONFIG: ThrottleConfig = {

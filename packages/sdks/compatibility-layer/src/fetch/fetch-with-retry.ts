@@ -32,6 +32,7 @@ function isOAuthEndpoint(url: string): boolean {
  * Implements:
  * - Exponential backoff with jitter on retries
  * - 401 handling: re-authenticate and retry
+ * - 403 handling: re-authenticate and retry, when reauthOn403 is set
  * - 429 handling: retry with backoff (rate limiting)
  * - Configurable max attempts
  *
@@ -91,10 +92,12 @@ export async function fetchWithRetry(
     return response
   }
 
-  // Handle 401 - re-authenticate and retry
+  // Handle 401 (and 403 when enabled) - re-authenticate and retry
+  const shouldReauth =
+    (response.status === 401 && fullConfig.reauth) ||
+    (response.status === 403 && fullConfig.reauthOn403)
   if (
-    response.status === 401 &&
-    fullConfig.reauth &&
+    shouldReauth &&
     !skipAuth &&
     !callerSetAuth &&
     authState
@@ -116,7 +119,7 @@ export async function fetchWithRetry(
         attempt + 1
       )
     } catch {
-      // Auth refresh failed, return original 401 response
+      // Auth refresh failed, return the original response
       return response
     }
   }

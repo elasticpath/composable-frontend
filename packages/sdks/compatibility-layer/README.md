@@ -158,6 +158,7 @@ function createBridgedClient<T extends HeyApiClient>(
 | `baseDelay` | `number` | `1000` | Base delay in ms |
 | `jitter` | `number` | `500` | Random jitter in ms |
 | `reauth` | `boolean` | `true` | Re-authenticate on 401 |
+| `reauthOn403` | `boolean` | `false` | Re-authenticate and retry on 403 |
 
 #### ThrottleConfig
 
