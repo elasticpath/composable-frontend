@@ -52,6 +52,9 @@ export async function fetchWithRetry(
   // Skip auth injection for OAuth endpoints to prevent infinite loops
   const skipAuth = isOAuthEndpoint(request.url)
 
+  // A caller-set token is not ours to refresh
+  const callerSetAuth = request.headers.has("Authorization")
+
   // Add auth token if not an OAuth request and we have auth state
   if (!skipAuth && authState) {
     let token: string | undefined
@@ -62,7 +65,7 @@ export async function fetchWithRetry(
       // whether it is still valid, and a 401 triggers reauth
       token = authState.getSnapshot()
     }
-    if (token && !request.headers.has("Authorization")) {
+    if (token && !callerSetAuth) {
       // Request headers are immutable, so we need to create a new request
       const newHeaders = new Headers(request.headers)
       newHeaders.set("Authorization", `Bearer ${token}`)
@@ -89,7 +92,13 @@ export async function fetchWithRetry(
   }
 
   // Handle 401 - re-authenticate and retry
-  if (response.status === 401 && fullConfig.reauth && !skipAuth && authState) {
+  if (
+    response.status === 401 &&
+    fullConfig.reauth &&
+    !skipAuth &&
+    !callerSetAuth &&
+    authState
+  ) {
     try {
       // Force token refresh
       await authState.refresh()

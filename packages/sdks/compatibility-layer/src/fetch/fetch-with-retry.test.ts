@@ -169,6 +169,22 @@ describe("fetchWithRetry", () => {
     expect(response.status).toBe(401)
   })
 
+  it("should not refresh on 401 when the caller set its own Authorization", async () => {
+    mockFetch.mockResolvedValueOnce(new Response("{}", { status: 401 }))
+
+    const request = new Request("https://api.test.com/products", {
+      headers: { Authorization: "Bearer caller-token" },
+    })
+    const promise = fetchWithRetry(request, {}, mockAuthState, mockFetch)
+
+    await vi.runAllTimersAsync()
+    const response = await promise
+
+    expect(mockAuthState.refresh).not.toHaveBeenCalled()
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(response.status).toBe(401)
+  })
+
   it("should send the stored token when the token provider throws", async () => {
     mockFetch.mockResolvedValueOnce(new Response("{}", { status: 200 }))
     vi.mocked(mockAuthState.getValidAccessToken).mockRejectedValueOnce(
