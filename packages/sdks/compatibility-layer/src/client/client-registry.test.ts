@@ -156,6 +156,29 @@ describe("ClientRegistry", () => {
         "requires manual token setting"
       )
     })
+
+    it.each(["password", "sso", "jwt"] as const)(
+      "should get a token from a host token provider for %s",
+      async (authType) => {
+        const tokenProvider = vi.fn().mockResolvedValue({
+          access_token: `${authType}-host-token`,
+        })
+
+        const instance = registry.getOrCreate({
+          name: `${authType}-client`,
+          authType,
+          baseUrl: "https://api.test.com",
+          clientId: "client-id",
+          storage: "memory",
+          tokenProvider,
+        })
+
+        await expect(instance.auth.getValidAccessToken()).resolves.toBe(
+          `${authType}-host-token`
+        )
+        expect(tokenProvider).toHaveBeenCalledTimes(1)
+      }
+    )
   })
 
   describe("get", () => {

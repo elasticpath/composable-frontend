@@ -29,6 +29,8 @@ export interface ClientInstanceConfig {
   clientSecret?: string
   /** Storage adapter or shorthand */
   storage?: StorageAdapter | "localStorage" | "cookie" | "memory"
+  /** Host token provider for the password, sso and jwt auth types */
+  tokenProvider?: TokenProvider
   /** Legacy storage key (if sharing with old SDK) */
   legacyStorageKey?: string
   /** Default headers */
@@ -200,8 +202,8 @@ export class ClientRegistry {
       case "password":
       case "sso":
       case "jwt":
-        // These require external token setting
-        return this.createManualTokenProvider(config)
+        // The host owns these logins. Without its provider, tokens must be set manually
+        return config.tokenProvider ?? this.createManualTokenProvider(config)
       default:
         throw new Error(`Unknown auth type: ${config.authType}`)
     }
