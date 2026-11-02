@@ -253,14 +253,11 @@ describe("Multi-Client Integration", () => {
     })
 
     it("should support custom storage adapter", async () => {
-      const customStorage: Record<string, string | null> = {}
+      const customStorage: Record<string, string | undefined> = {}
       const adapter = {
-        get: () => customStorage["token"] ?? null,
-        set: (value: string) => {
+        get: () => customStorage["token"],
+        set: (value?: string) => {
           customStorage["token"] = value
-        },
-        delete: () => {
-          customStorage["token"] = null
         },
       }
 
