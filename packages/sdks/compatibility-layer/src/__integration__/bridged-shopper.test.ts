@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
 import { client as shopperClient } from "@epcc-sdk/sdks-shopper"
-import { createBridgedClient, createLegacyStorageBridge } from "../index"
+import {
+  createBridgedClient,
+  createBridgedFetch,
+  createLegacyStorageBridge,
+} from "../index"
 import {
   setupMswServer,
   teardownMswServer,
@@ -92,28 +96,23 @@ describe("Bridged Shopper Client Integration", () => {
       // Set up MSW to return 401 once, then succeed
       setReturn401(true, 1)
 
-      const { auth } = createBridgedClient(shopperClient, {
+      const { fetch: bridgedFetch, auth } = createBridgedFetch({
         baseUrl: "https://api.elasticpath.com",
         clientId: "test-client-id",
         storage,
-        retry: { maxAttempts: 3, reauth: true },
+        retry: { maxAttempts: 3, reauth: true, baseDelay: 1, jitter: 0 },
       })
 
-      // Use the bridged fetch to make a request
-      const token = await auth.getValidAccessToken()
-      const response = await globalThis.fetch(
-        "https://api.elasticpath.com/catalog/products",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await bridgedFetch(
+        "https://api.elasticpath.com/catalog/products"
       )
 
-      // Note: The retry happens at fetch level, not at auth level
-      // This test verifies the auth system works, the retry-on-401 is tested
-      // in the fetch-with-retry unit tests
-      expect(response.status).toBe(401) // First request gets 401
+      expect(response.status).toBe(200)
+      expect(getRequestCounts()).toEqual({
+        authRequestCount: 1,
+        productRequestCount: 2,
+      })
+      expect(auth.getSnapshot()).toBe(mockTokenData.access_token)
     })
 
     it("should trigger token refresh on explicit refresh call", async () => {
@@ -148,26 +147,20 @@ describe("Bridged Shopper Client Integration", () => {
 
       setReturn429(true)
 
-      const { auth } = createBridgedClient(shopperClient, {
+      const { fetch: bridgedFetch } = createBridgedFetch({
         baseUrl: "https://api.elasticpath.com",
         clientId: "test-client-id",
         storage,
+        retry: { baseDelay: 1, jitter: 0 },
       })
 
-      const token = await auth.getValidAccessToken()
-
-      // First request should get 429, but we're just testing auth works
-      const response = await globalThis.fetch(
-        "https://api.elasticpath.com/catalog/products",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await bridgedFetch(
+        "https://api.elasticpath.com/catalog/products"
       )
 
-      // MSW handler returns 429 once then succeeds
-      expect(response.status).toBe(429)
+      // The handler returns 429 once, so the retry succeeds
+      expect(response.status).toBe(200)
+      expect(getRequestCounts().productRequestCount).toBe(2)
     })
   })
 
@@ -175,38 +168,26 @@ describe("Bridged Shopper Client Integration", () => {
     it("should throttle rapid requests when enabled", async () => {
       const storage = createLegacyStorageBridge({ backend: "memory" })
 
-      const { auth } = createBridgedClient(shopperClient, {
+      const { fetch: bridgedFetch, auth } = createBridgedFetch({
         baseUrl: "https://api.elasticpath.com",
         clientId: "test-client-id",
         storage,
         throttle: { enabled: true, limit: 2, interval: 100 },
       })
+      await auth.getValidAccessToken()
 
-      const token = await auth.getValidAccessToken()
+      const start = Date.now()
+      const responses = await Promise.all(
+        Array.from({ length: 4 }, () =>
+          bridgedFetch("https://api.elasticpath.com/catalog/products")
+        )
+      )
 
-      // Make multiple rapid requests
-      await Promise.all([
-        fetch("https://api.elasticpath.com/catalog/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch("https://api.elasticpath.com/catalog/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch("https://api.elasticpath.com/catalog/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch("https://api.elasticpath.com/catalog/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ])
-
-      // All requests should complete
-      const { productRequestCount } = getRequestCounts()
-      expect(productRequestCount).toBe(4)
-
-      // Should have taken some time due to throttling
-      // With limit=2 and interval=100ms, 4 requests should take at least 100ms
-      // But we don't enforce exact timing in tests due to CI variability
+      expect(responses.map((r) => r.status)).toEqual([200, 200, 200, 200])
+      expect(getRequestCounts().productRequestCount).toBe(4)
+      // limit=2 per 100ms, so the last two requests wait for the next interval.
+      // Only a lower bound, because CI timing varies upward
+      expect(Date.now() - start).toBeGreaterThanOrEqual(90)
     })
   })
 
