@@ -1047,12 +1047,13 @@ export const zUpdatePricebookResponse = zPricebookData
 export const zImportPricebookBody = z.object({
   file: z.string().register(z.globalRegistry, {
     description:
-      'A JSONL file with up to 50,000 objects, one on each line, or the same file compressed with GZIP. Each object is {"data": {...}}, and data.type is pricebook or product-price. A product-price object needs attributes.sku, and pricebook_id or pricebook_external_ref, for example {"data":{"type":"product-price","pricebook_external_ref":"wholesale","attributes":{"sku":"SKU-1","currencies":{"USD":{"amount":1000,"includes_tax":false}}}}}. A pricebook object has the attributes of a price book create.',
+      'A JSONL file with up to 50,000 objects, one on each line, or the same file compressed with GZIP; then set file_compression to gzip. Each object is {"data": {...}}, and data.type is pricebook or product-price. A product-price object needs attributes.sku, and pricebook_id or pricebook_external_ref, for example {"data":{"type":"product-price","pricebook_external_ref":"wholesale","attributes":{"sku":"SKU-1","currencies":{"USD":{"amount":1000,"includes_tax":false}}}}}. A pricebook object has the attributes of a price book create.',
   }),
   file_compression: z
-    .enum(["gzip"])
+    .string()
     .register(z.globalRegistry, {
-      description: "Set to gzip when the file is compressed with GZIP.",
+      description:
+        "Set to gzip when the file is compressed with GZIP. Without it, a compressed file fails with a 422. Other values are ignored.",
     })
     .optional(),
 })
