@@ -6,9 +6,10 @@ x-mcp-description: >-
   50,000 objects; split larger sets across several imports. Each price line
   updates the price in its book that matches id, then external_ref, then sku,
   and creates the price if none matches. Send the file as a
-  data:application/octet-stream;base64 URI. It starts a job; read the job until
-  it finishes. If a line fails, the job fails, and the lines before it stay
-  applied. Imports run one at a time, in the order sent.
+  data:application/octet-stream;base64 URI. A line without sku rejects the whole
+  file with 422. Otherwise it starts a job; read the job until it finishes. A
+  price book reference that does not exist fails the job, and nothing from the
+  file is applied. Imports run one at a time, in the order sent.
 # The published spec declares no request body, so the SDK typed this operation as body?: never.
 # The body is what pricebooks.svc's import handler reads (importer_handlers.go, service/import.go).
 # Remove this requestBody once the published spec carries it (pricebooks.svc!696).

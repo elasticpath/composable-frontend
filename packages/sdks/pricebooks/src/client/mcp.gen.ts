@@ -362,7 +362,7 @@ export const importPricebookTool = (options?: ToolOptions) => {
     config: {
       title: "Import Price Books and Prices",
       description:
-        "Creates and updates price books and prices in bulk from a JSONL file, at most 50,000 objects; split larger sets across several imports. Each price line updates the price in its book that matches id, then external_ref, then sku, and creates the price if none matches. Send the file as a data:application/octet-stream;base64 URI. It starts a job; read the job until it finishes. If a line fails, the job fails, and the lines before it stay applied. Imports run one at a time, in the order sent.",
+        "Creates and updates price books and prices in bulk from a JSONL file, at most 50,000 objects; split larger sets across several imports. Each price line updates the price in its book that matches id, then external_ref, then sku, and creates the price if none matches. Send the file as a data:application/octet-stream;base64 URI. A line without sku rejects the whole file with 422. Otherwise it starts a job; read the job until it finishes. A price book reference that does not exist fails the job, and nothing from the file is applied. Imports run one at a time, in the order sent.",
       inputSchema: importPricebookInput,
       annotations: {
         readOnlyHint: false,
