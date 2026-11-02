@@ -1152,7 +1152,7 @@ export const getProductsNodesTool = (options?: ToolOptions) => {
     config: {
       title: "List a Product's Nodes",
       description:
-        "Lists the hierarchy nodes a product is attached to, across all hierarchies. Each node gives its hierarchy_id, its parent node when it has one, and its breadcrumbs. The product can be draft or live. A product attached to no node returns an empty list, and an unknown product ID returns 404. Paginate with page[limit], at most 100, and page[offset].",
+        "Lists the hierarchy nodes a product is attached to, across all hierarchies. Each node gives its hierarchy_id and its breadcrumbs, the path from the hierarchy down to the node. The product can be draft or live. A product attached to no node returns an empty list, and an unknown product ID returns 404. Paginate with page[limit] and page[offset].",
       inputSchema: getProductsNodesInput,
       annotations: {
         readOnlyHint: true,
