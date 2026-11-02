@@ -6,7 +6,7 @@ import {
 } from "esbuild-fix-imports-plugin"
 
 export default defineConfig({
-  entry: ["src/**/*.ts", "!src/**/*.test.ts"],
+  entry: ["src/**/*.ts", "!src/**/*.test.ts", "!src/__integration__/**"],
   format: ["esm", "cjs"],
   dts: true,
   splitting: false,
