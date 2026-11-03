@@ -1,0 +1,17 @@
+# Where the published spec and pricebooks.svc disagree, the service wins. Remove an entry once
+# the published spec agrees (pricebooks.svc!696).
+components:
+  schemas:
+    # The update handlers return 409 when data.id differs from the path ID (update_handlers.go).
+    pricebook-update:
+      properties:
+        id:
+          description: The unique identifier of a price book. It must match the price book ID in the path, or the request fails with 409.
+    price-modifier-update:
+      properties:
+        id:
+          description: A unique identifier for the price modifier. It must match the price modifier ID in the path, or the request fails with 409.
+    product-price:
+      properties:
+        id:
+          description: The unique identifier for the product price. In an update, it must match the price ID in the path, or the request fails with 409.

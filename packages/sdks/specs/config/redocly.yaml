@@ -779,6 +779,9 @@ apis:
     output: ../bundled/pricebooks_standalone.yaml
     root: ../pricebooks.yaml
     decorators:
+      override/component-merge:
+        mergeRef:
+          - ../overrides/pricebooks_service_corrections.yaml
       override/operation-property-override:
         operationIds:
           createPriceModifier: ../overrides/mcp/pricebooks/createPriceModifier.yaml
