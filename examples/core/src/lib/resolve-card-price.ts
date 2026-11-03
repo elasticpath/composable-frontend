@@ -1,7 +1,6 @@
-import type { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
-import { formatCurrency } from "./format-currency";
+import { formatCurrency, type FormattableCurrency } from "./format-currency";
 
-const DEFAULT_CURRENCY: Partial<ResponseCurrency> = { code: "USD", decimal_places: 2 };
+const DEFAULT_CURRENCY: FormattableCurrency = { code: "USD", decimal_places: 2 };
 
 type DisplayPrice = {
   currency?: string;
@@ -30,7 +29,7 @@ export function resolveCardPrice({
   preferredCurrency,
 }: {
   hit?: PricedHit | null;
-  preferredCurrency?: Partial<ResponseCurrency>;
+  preferredCurrency?: FormattableCurrency;
 }): string | undefined {
   const currency = preferredCurrency ?? DEFAULT_CURRENCY;
 

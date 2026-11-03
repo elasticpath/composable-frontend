@@ -1,8 +1,15 @@
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
+/**
+ * A currency that can be partial, for fallbacks like { code: "USD", decimal_places: 2 }.
+ * formatCurrency gives a default for every field it reads. `code` keeps its SDK type,
+ * so it is required once the SDK marks it required.
+ */
+export type FormattableCurrency = Pick<ResponseCurrency, "code"> & Partial<ResponseCurrency>;
+
 export function formatCurrency(
   amount: number,
-  currency: Partial<ResponseCurrency>,
+  currency: FormattableCurrency,
   options: {
     locals?: Parameters<typeof Intl.NumberFormat>[0];
   } = { locals: "en-US" },
