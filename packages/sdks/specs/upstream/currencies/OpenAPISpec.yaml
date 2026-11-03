@@ -14,8 +14,8 @@ info:
   license:
     name: MIT
     url: assets/LICENSE
-  version: 26.0225.7248250
-  x-version-timestamp: 2026-02-25T21:31:11Z
+  version: 26.1030.8413251
+  x-version-timestamp: 2026-10-30T18:54:53Z
 servers:
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
@@ -376,12 +376,17 @@ components:
         data: {}
     SelfLink:
       type: object
+      required:
+        - self
       properties:
         self:
           description: Specifies the URL of this currency.
           type: string
     Timestamps:
       type: object
+      required:
+        - created_at
+        - updated_at
       properties:
         created_at:
           description: Indicates the creation date of this currency.
@@ -389,18 +394,38 @@ components:
           example: '2023-11-07T23:04:18.845Z'
         updated_at:
           description: Indicates the updated date of this currency.
+          type: string
           example: '2023-11-07T23:04:18.845Z'
     Response.Meta.Currency:
       type: object
+      required:
+        - timestamps
+        - owner
       properties:
         timestamps:
           $ref: '#/components/schemas/Timestamps'
         owner:
-          description: Indicates whether the owner is store or org.
+          description: Indicates whether the owner is `store` or `organization`.
           example: store
           type: string
+          enum:
+            - store
+            - organization
     Response.Currency:
       type: object
+      required:
+        - id
+        - type
+        - code
+        - exchange_rate
+        - format
+        - decimal_point
+        - thousand_separator
+        - decimal_places
+        - default
+        - enabled
+        - links
+        - meta
       properties:
         id:
           description: The unique identifier for this currency.
@@ -528,10 +553,42 @@ components:
       title: Data.UpdateCurrencies
       type: object
       properties:
+        code:
+          description: Specifies the currency code. For example, GBP.
+          type: string
+          example: GBP
+          maxLength: 3
+          minLength: 3
+        decimal_places:
+          description: Indicates how many decimal places the currency is formatted to.
+          type: integer
+          example: 2
+          minimum: 0
+        decimal_point:
+          description: Indicates the decimal point character.
+          type: string
+          example: .
         default:
           description: Specifies whether this is the default currency or not. Either `true` or `false`.
           type: boolean
           example: true
+        enabled:
+          description: Specifies if this currency is available for products. Either `true` or `false`.
+          type: boolean
+          example: true
+        exchange_rate:
+          description: Specifies the exchange rate from the default currency.
+          type: number
+          example: 1
+          minimum: 0
+        format:
+          description: Specifies how the price currency is displayed. For example, "£{price}".
+          type: string
+          example: £{price}
+        thousand_separator:
+          description: Indicates the thousand separator character.
+          type: string
+          example: ','
     Request.UpdateCurrencies:
       type: object
       properties:
