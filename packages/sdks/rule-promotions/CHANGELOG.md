@@ -1,5 +1,17 @@
 # @epcc-sdk/rule-promotions
 
+## 0.7.0
+
+### Minor Changes
+
+- d2816881: Regenerate from the upstream `rule-promotions` spec (spec version 26.1030.8414225, published 2026-10-30T23:50:05Z).
+
+  Adds 3 exported symbols.
+
+### Patch Changes
+
+- 3c9d93f6: Describe the rule promotion request shape in the create and update tools: the required fields, `rules` as one object, and what `item_category` and `account_tags` args hold.
+
 ## 0.6.1
 
 ### Patch Changes

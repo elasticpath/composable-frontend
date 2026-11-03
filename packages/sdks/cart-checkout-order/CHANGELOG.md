@@ -1,5 +1,12 @@
 # @epcc-sdk/sdks-cart-checkout-order
 
+## 0.8.3
+
+### Patch Changes
+
+- 3c9d93f6: Default a tax item's `type` to `tax_item`, its only value, and type its `amount` as an integer, as orders.svc decodes it.
+- 7bf9e8f1: Describe the five transaction note MCP tools: who can call them, the note text and count limits, the list order and when each returns 404.
+
 ## 0.8.2
 
 ### Patch Changes

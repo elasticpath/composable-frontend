@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-pxm
 
+## 0.8.0
+
+### Minor Changes
+
+- 3c9d93f6: Page the jobs list with `page[offset]` and `page[limit]`, default a hierarchy update's `type` to `hierarchy`, and correct the product nodes tool description: a draft product can have nodes.
+
 ## 0.7.1
 
 ### Patch Changes

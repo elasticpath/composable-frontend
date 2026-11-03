@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.14.0
+
+### Minor Changes
+
+- 7e6c5899: Regenerate from the upstream `catalog_search` spec (spec version 26.1102.8426924, published 2026-11-02T13:48:31Z).
+
+  Adds 54 exported symbols.
+
 ## 0.13.1
 
 ### Patch Changes
