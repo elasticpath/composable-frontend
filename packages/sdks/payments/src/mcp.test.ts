@@ -99,12 +99,11 @@ const writtenDescriptions = () =>
   )
 
 describe("tools", () => {
-  it("holds 12 tools with valid, unique names, in operation order", () => {
+  it("holds one tool per operation, with valid, unique names, in operation order", () => {
     const names = tools().map((tool) => tool.name)
 
-    expect(names).toHaveLength(12)
     for (const name of names) expect(name).toMatch(/^[a-zA-Z0-9_-]{1,64}$/)
-    expect(new Set(names).size).toBe(12)
+    expect(new Set(names).size).toBe(names.length)
     expect(tools().map((tool) => operationOf(tool).id)).toEqual(
       functionNamesInOperationOrder().map((name) => `payments.${name}`),
     )
@@ -113,7 +112,7 @@ describe("tools", () => {
   it("exports one tool factory for each operation", () => {
     const factories = Object.keys(mcp).filter((name) => name.endsWith("Tool"))
 
-    expect(factories).toHaveLength(12)
+    expect(factories).toHaveLength(functionNamesInOperationOrder().length)
   })
 
   describe("sends each tool's request to its own operation's method and path", () => {
@@ -287,8 +286,8 @@ describe("the payments tools on an MCP server", () => {
     }
   })
 
-  it("lists all 12, each passing the MCP SDK's Tool spec type", () => {
-    expect(listed).toHaveLength(12)
+  it("lists every tool, each passing the MCP SDK's Tool spec type", () => {
+    expect(listed).toHaveLength(tools().length)
     for (const tool of listed) {
       expect(isSpecType.Tool(tool), tool.name).toBe(true)
     }
