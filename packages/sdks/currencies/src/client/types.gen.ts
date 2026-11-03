@@ -15,71 +15,71 @@ export type SelfLink = {
   /**
    * Specifies the URL of this currency.
    */
-  self?: string
+  self: string
 }
 
 export type Timestamps = {
   /**
    * Indicates the creation date of this currency.
    */
-  created_at?: string
+  created_at: string
   /**
    * Indicates the updated date of this currency.
    */
-  updated_at?: unknown
+  updated_at: string
 }
 
 export type ResponseMetaCurrency = {
-  timestamps?: Timestamps
+  timestamps: Timestamps
   /**
-   * Indicates whether the owner is store or org.
+   * Indicates whether the owner is `store` or `organization`.
    */
-  owner?: string
+  owner: "store" | "organization"
 }
 
 export type ResponseCurrency = {
   /**
    * The unique identifier for this currency.
    */
-  id?: string
+  id: string
   /**
    * Represents the type represents the object being returned.
    */
-  type?: string
+  type: string
   /**
    * Specifies the currency code. For example, YEN.
    */
-  code?: string
+  code: string
   /**
    * Specifies the exchange rate from the default currency.
    */
-  exchange_rate?: number
+  exchange_rate: number
   /**
    * Specifies how the price currency is displayed. For example, "£{price}".
    */
-  format?: string
+  format: string
   /**
    * Indicates the decimal point character.
    */
-  decimal_point?: string
+  decimal_point: string
   /**
    * Indicates the thousand separator character.
    */
-  thousand_separator?: string
+  thousand_separator: string
   /**
    * Indicates how many decimal places the currency is formatted to.
    */
-  decimal_places?: number
+  decimal_places: number
   /**
    * Specifies whether this is the default currency or not. Either `true` or `false`.
    */
-  default?: boolean
+  default: boolean
   /**
    * Specifies if this currency is available for products. Either `true` or `false`.
    */
-  enabled?: boolean
-  links?: SelfLink
-  meta?: ResponseMetaCurrency
+  enabled: boolean
+  links: SelfLink
+  meta: ResponseMetaCurrency
 }
 
 export type ResponseError = {
@@ -145,9 +145,37 @@ export type RequestCreateCurrencies = {
  */
 export type DataUpdateCurrencies = {
   /**
+   * Specifies the currency code. For example, GBP.
+   */
+  code?: string
+  /**
+   * Indicates how many decimal places the currency is formatted to.
+   */
+  decimal_places?: number
+  /**
+   * Indicates the decimal point character.
+   */
+  decimal_point?: string
+  /**
    * Specifies whether this is the default currency or not. Either `true` or `false`.
    */
   default?: boolean
+  /**
+   * Specifies if this currency is available for products. Either `true` or `false`.
+   */
+  enabled?: boolean
+  /**
+   * Specifies the exchange rate from the default currency.
+   */
+  exchange_rate?: number
+  /**
+   * Specifies how the price currency is displayed. For example, "£{price}".
+   */
+  format?: string
+  /**
+   * Indicates the thousand separator character.
+   */
+  thousand_separator?: string
 }
 
 export type RequestUpdateCurrencies = {

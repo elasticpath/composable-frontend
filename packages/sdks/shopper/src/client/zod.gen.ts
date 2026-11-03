@@ -12116,106 +12116,64 @@ export const zUserAuthenticationInfoUpdateInput = z.object({
 })
 
 export const zSelfLink2 = z.object({
-  self: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Specifies the URL of this currency.",
-    })
-    .optional(),
+  self: z.string().register(z.globalRegistry, {
+    description: "Specifies the URL of this currency.",
+  }),
 })
 
 export const zTimestamps = z.object({
-  created_at: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Indicates the creation date of this currency.",
-    })
-    .optional(),
-  updated_at: z
-    .unknown()
-    .register(z.globalRegistry, {
-      description: "Indicates the updated date of this currency.",
-    })
-    .optional(),
+  created_at: z.string().register(z.globalRegistry, {
+    description: "Indicates the creation date of this currency.",
+  }),
+  updated_at: z.string().register(z.globalRegistry, {
+    description: "Indicates the updated date of this currency.",
+  }),
 })
 
 export const zResponseMetaCurrency = z.object({
-  timestamps: zTimestamps.optional(),
-  owner: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Indicates whether the owner is store or org.",
-    })
-    .optional(),
+  timestamps: zTimestamps,
+  owner: z.enum(["store", "organization"]).register(z.globalRegistry, {
+    description: "Indicates whether the owner is `store` or `organization`.",
+  }),
 })
 
 export const zResponseCurrency = z.object({
-  id: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "The unique identifier for this currency.",
-    })
-    .optional(),
-  type: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Represents the type represents the object being returned.",
-    })
-    .optional(),
-  code: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Specifies the currency code. For example, YEN.",
-    })
-    .optional(),
-  exchange_rate: z
-    .number()
-    .register(z.globalRegistry, {
-      description: "Specifies the exchange rate from the default currency.",
-    })
-    .optional(),
-  format: z
-    .string()
-    .register(z.globalRegistry, {
-      description:
-        'Specifies how the price currency is displayed. For example, "£{price}".',
-    })
-    .optional(),
-  decimal_point: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Indicates the decimal point character.",
-    })
-    .optional(),
-  thousand_separator: z
-    .string()
-    .register(z.globalRegistry, {
-      description: "Indicates the thousand separator character.",
-    })
-    .optional(),
-  decimal_places: z
-    .number()
-    .register(z.globalRegistry, {
-      description:
-        "Indicates how many decimal places the currency is formatted to.",
-    })
-    .optional(),
-  default: z
-    .boolean()
-    .register(z.globalRegistry, {
-      description:
-        "Specifies whether this is the default currency or not. Either `true` or `false`.",
-    })
-    .optional(),
-  enabled: z
-    .boolean()
-    .register(z.globalRegistry, {
-      description:
-        "Specifies if this currency is available for products. Either `true` or `false`.",
-    })
-    .optional(),
-  links: zSelfLink2.optional(),
-  meta: zResponseMetaCurrency.optional(),
+  id: z.string().register(z.globalRegistry, {
+    description: "The unique identifier for this currency.",
+  }),
+  type: z.string().register(z.globalRegistry, {
+    description: "Represents the type represents the object being returned.",
+  }),
+  code: z.string().register(z.globalRegistry, {
+    description: "Specifies the currency code. For example, YEN.",
+  }),
+  exchange_rate: z.number().register(z.globalRegistry, {
+    description: "Specifies the exchange rate from the default currency.",
+  }),
+  format: z.string().register(z.globalRegistry, {
+    description:
+      'Specifies how the price currency is displayed. For example, "£{price}".',
+  }),
+  decimal_point: z.string().register(z.globalRegistry, {
+    description: "Indicates the decimal point character.",
+  }),
+  thousand_separator: z.string().register(z.globalRegistry, {
+    description: "Indicates the thousand separator character.",
+  }),
+  decimal_places: z.number().register(z.globalRegistry, {
+    description:
+      "Indicates how many decimal places the currency is formatted to.",
+  }),
+  default: z.boolean().register(z.globalRegistry, {
+    description:
+      "Specifies whether this is the default currency or not. Either `true` or `false`.",
+  }),
+  enabled: z.boolean().register(z.globalRegistry, {
+    description:
+      "Specifies if this currency is available for products. Either `true` or `false`.",
+  }),
+  links: zSelfLink2,
+  meta: zResponseMetaCurrency,
 })
 
 export const zResponseError = z.object({
@@ -12281,11 +12239,59 @@ export const zRequestCreateCurrencies = z.object({
  * Data.UpdateCurrencies
  */
 export const zDataUpdateCurrencies = z.object({
+  code: z
+    .string()
+    .length(3)
+    .register(z.globalRegistry, {
+      description: "Specifies the currency code. For example, GBP.",
+    })
+    .optional(),
+  decimal_places: z
+    .int()
+    .gte(0)
+    .register(z.globalRegistry, {
+      description:
+        "Indicates how many decimal places the currency is formatted to.",
+    })
+    .optional(),
+  decimal_point: z
+    .string()
+    .register(z.globalRegistry, {
+      description: "Indicates the decimal point character.",
+    })
+    .optional(),
   default: z
     .boolean()
     .register(z.globalRegistry, {
       description:
         "Specifies whether this is the default currency or not. Either `true` or `false`.",
+    })
+    .optional(),
+  enabled: z
+    .boolean()
+    .register(z.globalRegistry, {
+      description:
+        "Specifies if this currency is available for products. Either `true` or `false`.",
+    })
+    .optional(),
+  exchange_rate: z
+    .number()
+    .gte(0)
+    .register(z.globalRegistry, {
+      description: "Specifies the exchange rate from the default currency.",
+    })
+    .optional(),
+  format: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        'Specifies how the price currency is displayed. For example, "£{price}".',
+    })
+    .optional(),
+  thousand_separator: z
+    .string()
+    .register(z.globalRegistry, {
+      description: "Indicates the thousand separator character.",
     })
     .optional(),
 })
