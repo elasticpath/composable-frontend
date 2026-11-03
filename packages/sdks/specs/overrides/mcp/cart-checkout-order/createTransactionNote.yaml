@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Adds a note to one transaction of an order, for example the reason for a
+  partial refund. Send data.type note and data.text of 1 to 250 characters. A
+  transaction holds at most 50 notes; a 51st returns 400. Returns 404 when the
+  order or the transaction does not exist. Needs a client credentials token; a
+  shopper or account token returns 422.

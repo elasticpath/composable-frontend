@@ -87,6 +87,11 @@ apis:
           getOrderTransactions: ../overrides/mcp/cart-checkout-order/getOrderTransactions.yaml
           getATransaction: ../overrides/mcp/cart-checkout-order/getATransaction.yaml
           cancelATransaction: ../overrides/mcp/cart-checkout-order/cancelATransaction.yaml
+          getTransactionNotes: ../overrides/mcp/cart-checkout-order/getTransactionNotes.yaml
+          createTransactionNote: ../overrides/mcp/cart-checkout-order/createTransactionNote.yaml
+          getTransactionNote: ../overrides/mcp/cart-checkout-order/getTransactionNote.yaml
+          updateTransactionNote: ../overrides/mcp/cart-checkout-order/updateTransactionNote.yaml
+          deleteTransactionNote: ../overrides/mcp/cart-checkout-order/deleteTransactionNote.yaml
           getOrderShippingGroups: ../overrides/mcp/cart-checkout-order/getOrderShippingGroups.yaml
           createOrderShippingGroup: ../overrides/mcp/cart-checkout-order/createOrderShippingGroup.yaml
           getShippingGroupsById: ../overrides/mcp/cart-checkout-order/getShippingGroupsById.yaml

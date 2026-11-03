@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Replaces the text of one note on a transaction. Send data.type note and
+  data.text of 1 to 250 characters. Returns 404 when the order, the transaction
+  or the note does not exist. Needs a client credentials token; a shopper or
+  account token returns 422.

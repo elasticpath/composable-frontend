@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the notes on one transaction of an order, newest first. Paginate with
+  page[limit] and page[offset]. Returns 404 when the order or the transaction
+  does not exist. Needs a client credentials token; a shopper or account token
+  returns 422.

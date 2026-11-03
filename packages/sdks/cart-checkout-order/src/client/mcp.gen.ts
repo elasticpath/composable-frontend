@@ -3908,7 +3908,7 @@ export const getTransactionNotesTool = (options?: ToolOptions) => {
     config: {
       title: "List notes for a transaction",
       description:
-        "List notes for a transaction. Retrieve all notes attached to a transaction.",
+        "Lists the notes on one transaction of an order, newest first. Paginate with page[limit] and page[offset]. Returns 404 when the order or the transaction does not exist. Needs a client credentials token; a shopper or account token returns 422.",
       inputSchema: getTransactionNotesInput,
       annotations: {
         readOnlyHint: true,
@@ -3971,7 +3971,7 @@ export const createTransactionNoteTool = (options?: ToolOptions) => {
     config: {
       title: "Create a note for a transaction",
       description:
-        "Create a note for a transaction. Create a new note on a transaction, e.g. to record the reason for a partial refund. A transaction may have at most 50 notes.",
+        "Adds a note to one transaction of an order, for example the reason for a partial refund. Send data.type note and data.text of 1 to 250 characters. A transaction holds at most 50 notes; a 51st returns 400. Returns 404 when the order or the transaction does not exist. Needs a client credentials token; a shopper or account token returns 422.",
       inputSchema: createTransactionNoteInput,
       annotations: {
         readOnlyHint: false,
@@ -4030,7 +4030,7 @@ export const deleteTransactionNoteTool = (options?: ToolOptions) => {
     config: {
       title: "Delete a transaction note",
       description:
-        "Delete a transaction note. Deletes a note from a transaction.",
+        "Deletes one note from a transaction. Returns 404 when the order, the transaction or the note does not exist, including a note already deleted. Needs a client credentials token; a shopper or account token returns 422.",
       inputSchema: deleteTransactionNoteInput,
       annotations: {
         readOnlyHint: false,
@@ -4086,7 +4086,7 @@ export const getTransactionNoteTool = (options?: ToolOptions) => {
     config: {
       title: "Get a transaction note",
       description:
-        "Get a transaction note. Retrieve a single note attached to a transaction.",
+        "Gets one note on a transaction by ID. Returns 404 when the order, the transaction or the note does not exist. Needs a client credentials token; a shopper or account token returns 422.",
       inputSchema: getTransactionNoteInput,
       annotations: {
         readOnlyHint: true,
@@ -4148,7 +4148,8 @@ export const updateTransactionNoteTool = (options?: ToolOptions) => {
     name: "cart_checkout_order_update_transaction_note" as const,
     config: {
       title: "Update a transaction note",
-      description: "Update a transaction note. Replaces a note's text.",
+      description:
+        "Replaces the text of one note on a transaction. Send data.type note and data.text of 1 to 250 characters. Returns 404 when the order, the transaction or the note does not exist. Needs a client credentials token; a shopper or account token returns 422.",
       inputSchema: updateTransactionNoteInput,
       annotations: {
         readOnlyHint: false,

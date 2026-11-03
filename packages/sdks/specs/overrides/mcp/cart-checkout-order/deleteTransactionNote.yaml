@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one note from a transaction. Returns 404 when the order, the
+  transaction or the note does not exist, including a note already deleted.
+  Needs a client credentials token; a shopper or account token returns 422.
