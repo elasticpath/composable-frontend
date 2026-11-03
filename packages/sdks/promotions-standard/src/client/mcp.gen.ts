@@ -79,26 +79,6 @@ const getAllPromotionsInput = z
  * |:-----|:---------|:---------|:----------------------------------------|
  * | `code` |  `string`   | `eq` | `eq(code,some_code)`          |
  *
- * For filtering advanced promotion usages, pass the `EP-Public-Search-Type=cm_search` header. Advanced search filtering is only applicable when the promotion code is consumed and the promotion is not deleted.
- *
- * | Attribute | Type | Operator     | Example                            |
- * |:-----|:---------|:---------|:----------------------------------------|
- * | `promo_id`                    | `string`        |  `eq`	                  | `eq(promo_id, 69c63c9d-8ccf-44b1-8e98-1e7feebfb581)` |
- * | `promo_name`                  |`string`	      | `eq`, `like`	              | `eq(promo_name,cart percent discount)` |
- * | `promo_type`                  | `string`	      | `eq`	                  | `eq(promo_type,fixed_discount)` |
- * | `promo_status`                | `string`	      | `eq`	                  | `eq(promo_status,Running)` |
- * | `promo_checkouts`            | `string`	      | `eq`,`gt`, `ge`, `lt`, `le`	      | `eq(promo_checkouts,2)` |
- * | `promo_skus_prod_ids`         |	`string`	  | `eq`, `like`	              | `eq(promo_skus_prod_ids, sku1)` |
- * | `promo_start_date`            |	`string`	| `eq`, `gt`, `gr`, `lt`, `le`      | `eq(promo_start_date,2023-01-01)` |
- * | `promo_end_date`              |	`string`  | `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(promo_end_date,2050-06-15)` |
- * | `code_id`	                  | `string`  | `eq`                  | `eq(promo_id,2ea0cd1d-43a9-441b-b03f-3cab84aaee0c):eq(code_id,14b55e6c-3f80-436e-a90a-4de5f0e36240)`  |
- * | `code_code`                   |  `string` | `eq`, `like`                | 	`eq(code_code,cart_fixed_10)` |
- * | `code_used`	                  | `string`  | `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(code_used,2)` |
- * | `code_created_date`           |	`string`	| `eq`, `gt`, `gr`, `lt`, `le`	  | `eq(code_created_date,2023-11-15)` |
- * | `order_id`                    |	`string`  | `eq`, `like`	              | `eq(order_id,ccb13673-627c-4976-88da-f77c542b528f)`  |
- * | `order_customer_email`	      | `string`  | `eq`, `like`	              | `like(order_customer_email,andy*)`  |
- * | `order_created_date`	      |  `string`	| `eq`, `gt`, `gr`,`lt`, `le`	      |  `le(order_created_date,2023-11-15)`  |
- *
  */
 export const getAllPromotionsTool = (options?: ToolOptions) => {
   const handler: ToolCallback<typeof getAllPromotionsInput> = (args, ctx) =>
