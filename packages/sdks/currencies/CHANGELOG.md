@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-currencies
 
+## 0.4.2
+
+### Patch Changes
+
+- 7e223450: Regenerate from the upstream `currencies` spec (spec version 26.1030.8413251, published 2026-10-30T18:54:53Z).
+
 ## 0.4.1
 
 ### Patch Changes
