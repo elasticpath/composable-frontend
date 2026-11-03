@@ -1,0 +1,5 @@
+x-mcp-title: List Variations
+x-mcp-description: >-
+  Lists the variations in Product Experience Manager, such as size or color.
+  Each has a name and sort order. Get a variation's options separately.
+  Results are paginated with a limit of up to 100.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an integration that delivers store events to a webhook URL, an Amazon
+  SQS queue or a STOMP queue. Give it a name, the integration type, the events
+  it observes and the matching configuration. The response includes the
+  configuration, which can contain a webhook secret key or queue credentials.

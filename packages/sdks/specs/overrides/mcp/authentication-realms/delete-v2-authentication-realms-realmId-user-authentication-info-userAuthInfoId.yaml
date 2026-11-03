@@ -1,0 +1,4 @@
+x-mcp-name: authentication_realms_delete_user_authentication_info
+x-mcp-description: >-
+  Deletes a user from a realm, along with that user's OIDC profile info and
+  password profile info records. This cannot be undone.

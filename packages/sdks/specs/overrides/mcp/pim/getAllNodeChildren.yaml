@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the child nodes of one node, filterable and paginated up to 100 per
+  page. To list the children of the hierarchy itself, get the hierarchy's
+  children instead. This works on draft data in Product Experience Manager, not
+  a published catalog release.

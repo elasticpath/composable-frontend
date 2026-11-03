@@ -5,8 +5,7 @@ import * as pdfjsViewer from "pdfjs-dist/web/pdf_viewer.mjs";
 import { useEffect, useRef, useState } from "react";
 
 interface IPDFModalProps {
-  url: string;
-  filename?: string;
+  fileId: string;
   onClose: () => void;
 }
 /*
@@ -21,7 +20,7 @@ interface IPDFModalProps {
  * If the iframe alternate approach is acceptable then the public worker script support can be removed.
  *
  */
-const PDFModal = ({ url, filename, onClose }: IPDFModalProps) => {
+const PDFModal = ({ fileId, onClose }: IPDFModalProps) => {
   const viewerContainerRef = useRef<HTMLDivElement>(null);
   const outerContainerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({
@@ -55,7 +54,7 @@ const PDFModal = ({ url, filename, onClose }: IPDFModalProps) => {
 
         // Load the PDF document
         const loadingTask = pdfjsLib.getDocument(
-          `/pdf?url=${encodeURI(url)}&filename=${encodeURI(filename ?? "pdf-viewer")}`,
+          `/pdf?file=${encodeURIComponent(fileId)}`,
         );
         const pdf = await loadingTask.promise;
         pdfViewer.setDocument(pdf);
@@ -73,7 +72,7 @@ const PDFModal = ({ url, filename, onClose }: IPDFModalProps) => {
     };
 
     loadPDF();
-  }, [url, filename]);
+  }, [fileId]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">

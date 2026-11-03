@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a plan inside an offering, with a name and optionally a SKU, image,
+  prices by currency, feature configurations, custom attributes and pricing
+  options to attach. If any pricing option in the offering has no fixed price,
+  the plan must include a price. The change applies to new subscriptions only.

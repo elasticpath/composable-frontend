@@ -19,7 +19,6 @@ import {
 import { Suspense } from "react";
 import { Skeleton } from "../../skeleton/Skeleton";
 import { retrieveAccountMemberCredentials } from "../../../lib/retrieve-account-member-credentials";
-import { TAGS } from "../../../lib/constants";
 
 export default async function MobileNavBar() {
   const client = await createElasticPathClient();
@@ -38,9 +37,6 @@ export default async function MobileNavBar() {
     },
     query: {
       include: ["items"],
-    },
-    next: {
-      tags: [TAGS.cart],
     },
   });
 
@@ -67,9 +63,6 @@ export default async function MobileNavBar() {
   // Fetch currencies
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
 
   if (!cart.data) {

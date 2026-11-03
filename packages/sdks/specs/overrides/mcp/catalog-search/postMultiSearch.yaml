@@ -1,0 +1,8 @@
+x-mcp-risk: read
+x-mcp-title: Run Multiple Shopper Catalog Searches
+x-mcp-description: >-
+  Runs one or more product searches in a single request against the published
+  catalog that applies to the shopper context (channel, context tag, currency).
+  Each search has its own query, filter, sort, facets and paging, and can be a
+  search or an autocomplete. A POST that only reads; it changes nothing. For one
+  query, a plain search is simpler.

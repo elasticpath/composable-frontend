@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Makes existing nodes children of a hierarchy, by node ID, with an optional
+  sort order per node. Every node must already belong to this hierarchy, and
+  siblings need unique names and slugs. It returns the hierarchy. This works
+  on draft data in Product Experience Manager, not a published catalog
+  release.

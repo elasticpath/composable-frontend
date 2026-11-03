@@ -1,5 +1,7 @@
 // This file is used to test that ESM imports work correctly
-import * as upromotionsstandard from './dist/index.mjs';
+import * as PromotionsStandard from "./dist/index.mjs"
+import * as mcp from "./dist/mcp.mjs"
 
-console.log('upromotionsstandard:', Object.keys(upromotionsstandard));
-console.log('Test successful!');
+console.log("PromotionsStandard:", Object.keys(PromotionsStandard))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

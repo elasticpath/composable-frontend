@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the pricing options attached to a subscription offering. Each pricing
+  option sets how often the customer is billed (a billing interval and
+  frequency), plus trial period, plan length and whether the subscriber can
+  pause, resume or cancel.

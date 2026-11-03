@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the hierarchies in one published catalog release; pass a release ID, or
+  latestPublished for the newest release. Use it to browse a catalog's structure
+  or find a hierarchy ID, and filter by name, slug or id.

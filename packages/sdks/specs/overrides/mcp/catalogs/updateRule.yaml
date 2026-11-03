@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a catalog rule's attributes, such as the catalog it selects or who it
+  applies to. Send only the attributes to change: the others keep their values,
+  and an empty attributes section changes nothing.

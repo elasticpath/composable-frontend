@@ -1,0 +1,5 @@
+x-mcp-title: Confirm a Transaction
+x-mcp-description: >-
+  Confirms a transaction on an order by syncing its details from the third-party
+  payment provider, so Elastic Path reflects the provider's values. For Stripe
+  3D Secure, call it after the shopper's client-side authentication succeeds.

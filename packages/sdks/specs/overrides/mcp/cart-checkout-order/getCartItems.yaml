@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the items in a cart, with each item's discounts broken down by promotion
+  and any shipping group IDs. Can include tax items, custom discounts or
+  promotions. Use it when you need the items rather than the cart's own details.

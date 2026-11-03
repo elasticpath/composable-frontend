@@ -1,255 +1,127 @@
-# @epcc-sdk/commerce-extensions SDK
+# @epcc-sdk/commerce-extensions
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path Commerce Extensions API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/commerce-extensions
-# or
-pnpm install @epcc-sdk/commerce-extensions
-# or
-yarn add @epcc-sdk/commerce-extensions
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
+## Quick start
 
 ```ts
-import { client } from "@epcc-sdk/commerce-extensions";
+import {
+  createCommerceExtensionsClient,
+  listCustomApis,
+} from "@epcc-sdk/commerce-extensions"
 
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
+const client = createCommerceExtensionsClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+})
 
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
+const { data, error } = await listCustomApis({ client })
 ```
 
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-### 2. Using the `createClient` function
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
+
+## Base URL
+
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
+
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
 
 ```ts
-import { createClient } from "@epcc-sdk/commerce-extensions";
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/commerce-extensions"
 
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
+const source = createTokenSource(
+  clientCredentialsProvider({
     baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/commerce-extensions>".
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
+
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
+
+## Zod schemas
+
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
 ```ts
-const response = await getACustomEntry({
-    client: myClient,
-});
+import { zListCustomApisResponse } from "@epcc-sdk/commerce-extensions/zod"
+
+const result = zListCustomApisResponse.safeParse(data)
 ```
 
-### Direct configuration
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
 
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
-const response = await getACustomEntry({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
+import { McpServer } from "@modelcontextprotocol/server"
+import { tools } from "@epcc-sdk/commerce-extensions/mcp"
+
+const server = new McpServer({ name: "commerce-extensions", version: "1.0.0" })
+
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/commerce-extensions";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/commerce-extensions";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
-
-```ts
-import { client } from "@epcc-sdk/commerce-extensions";
-
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
-});
-```
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
-```
-
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getACustomEntry } from "@epcc-sdk/commerce-extensions";
-
-const product = await getACustomEntry({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`getAllCustomApis`** (`GET /v2/settings/extensions/custom-apis`)
-
-- **`createACustomApi`** (`POST /v2/settings/extensions/custom-apis`)
-
-- **`deleteACustomApi`** (`DELETE /v2/settings/extensions/custom-apis/{custom_api_id}`)
-
-- **`getACustomApi`** (`GET /v2/settings/extensions/custom-apis/{custom_api_id}`)
-
-- **`updateACustomApi`** (`PUT /v2/settings/extensions/custom-apis/{custom_api_id}`)
-
-- **`getAllCustomFields`** (`GET /v2/settings/extensions/custom-apis/{custom_api_id}/fields`)
-
-- **`createACustomField`** (`POST /v2/settings/extensions/custom-apis/{custom_api_id}/fields`)
-
-- **`deleteACustomField`** (`DELETE /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`)
-
-- **`getACustomField`** (`GET /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`)
-
-- **`updateACustomField`** (`PUT /v2/settings/extensions/custom-apis/{custom_api_id}/fields/{custom_field_id}`)
-
-- **`getAllCustomEntries`** (`GET /v2/settings/extensions/custom-apis/{custom_api_id}/entries`)
-
-- **`createACustomEntry`** (`POST /v2/settings/extensions/custom-apis/{custom_api_id}/entries`)
-
-- **`deleteACustomEntry`** (`DELETE /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`)
-
-- **`getACustomEntry`** (`GET /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`)
-
-- **`updateACustomEntry`** (`PUT /v2/settings/extensions/custom-apis/{custom_api_id}/entries/{custom_api_entry_id}`)
-
-- **`getCustomEntriesSettings`** (`GET /v2/extensions/{custom_api_slug}`)
-
-- **`createACustomEntrySettings`** (`POST /v2/extensions/{custom_api_slug}`)
-
-- **`deleteACustomEntrySettings`** (`DELETE /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`)
-
-- **`getACustomEntrySettings`** (`GET /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`)
-
-- **`putACustomEntrySettings`** (`PUT /v2/extensions/{custom_api_slug}/{custom_api_entry_id}`)
-
-
-
-
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `listCustomApisTool`.
+- The name of a tool is `commerce_extensions_` and the operation name in snake case, for example `commerce_extensions_list_custom_apis`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.

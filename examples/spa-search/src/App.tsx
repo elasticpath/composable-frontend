@@ -5,14 +5,18 @@ import {
   postMultiSearch,
   SearchResult,
 } from "@epcc-sdk/sdks-shopper"
+import { getErrorMessage } from "./lib/get-error-message"
 
 function App() {
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null)
+  const [searchError, setSearchError] = useState<string | null>(null)
   const [query, setQuery] = useState("*")
 
   const performSearch = async (query: string) => {
+    setSearchError(null)
+
     try {
-      const response = await postMultiSearch({
+      const { data, error } = await postMultiSearch({
         body: {
           searches: [
             {
@@ -22,9 +26,19 @@ function App() {
           ],
         },
       })
-      setSearchResults(response.data?.results?.[0] || null)
+
+      if (error) {
+        console.error("Failed to search catalog:", error)
+        setSearchResults(null)
+        setSearchError(getErrorMessage(error))
+        return
+      }
+
+      setSearchResults(data?.results?.[0] || null)
     } catch (error) {
       console.error("Failed to search catalog:", error)
+      setSearchResults(null)
+      setSearchError(getErrorMessage(error))
     }
   }
 
@@ -67,7 +81,11 @@ function App() {
         <h2 className="text-lg font-medium mb-3 text-black">
           Search Results List
         </h2>
-        {searchResults?.hits?.length === 0 ? (
+        {searchError ? (
+          <p className="text-red-600" role="alert">
+            Search failed: {searchError}
+          </p>
+        ) : searchResults?.hits?.length === 0 ? (
           <p className="text-black">No products found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

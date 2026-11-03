@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates the cart settings of the store with the given store ID: cart expiry in
+  days (up to 365), custom discounts, rule promotions, deferred inventory
+  checks, show_all_carts and separating items by location. The settings are the
+  defaults for every cart in that store; one cart's custom discount and
+  inventory check settings can be changed on that cart instead.

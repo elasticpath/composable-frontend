@@ -1,0 +1,7 @@
+x-mcp-title: Create a Flow Entry Relationship
+x-mcp-description: >-
+  Creates relationships from a flow entry to other resources through a
+  relationship field, identified by the flow slug, entry ID and field slug.
+  Relationships already present are kept and the ones sent are added. In Product
+  Experience Manager it associates a template with a product. Send each related
+  resource's id and type.

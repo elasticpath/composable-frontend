@@ -11,6 +11,7 @@ import {
   authenticateWithOneTimeToken,
   resetUserPassword,
 } from "../lib/password-reset"
+import { safeReturnPath } from "../lib/return-url"
 
 configureClient()
 
@@ -39,6 +40,8 @@ const resetPasswordSchema = z.object({
   password: z.string().min(8),
   token: z.string(),
   email: z.string().email(),
+  realmId: z.string(),
+  userAuthInfoId: z.string(),
   profileInfoId: z.string(),
 })
 
@@ -104,6 +107,7 @@ export async function login(formData: FormData) {
       name: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
       value: JSON.stringify(tokenData),
       path: "/",
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(tokenData.expires * 1000),
     })
@@ -114,7 +118,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect(returnUrl ?? "/")
+  redirect(safeReturnPath(returnUrl, "/"))
 }
 
 export async function logout() {
@@ -189,6 +193,7 @@ export async function register(formData: FormData) {
       name: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
       value: JSON.stringify(tokenData),
       path: "/",
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(tokenData.expires * 1000),
     })
@@ -244,7 +249,8 @@ export async function resetPassword(formData: FormData) {
     }
   }
 
-  const { password, token, email, profileInfoId } = validatedProps.data
+  const { password, token, email, realmId, userAuthInfoId, profileInfoId } =
+    validatedProps.data
 
   try {
     // Authenticate with the one-time password token
@@ -272,7 +278,13 @@ export async function resetPassword(formData: FormData) {
     const authToken = memberData.token
 
     // Reset the password using the authentication token
-    await resetUserPassword(profileInfoId, authToken, password, email)
+    await resetUserPassword({
+      realmId,
+      userAuthInfoId,
+      passwordProfileInfoId: profileInfoId,
+      authToken,
+      newPassword: password,
+    })
 
     return {
       success: true,

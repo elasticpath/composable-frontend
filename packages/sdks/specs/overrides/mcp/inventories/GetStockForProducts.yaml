@@ -1,0 +1,7 @@
+x-mcp-risk: read
+x-mcp-title: Get Stock for Several Products
+x-mcp-description: >-
+  Returns stock for the products whose IDs you supply in the request body, with
+  available, allocated and total quantities and the figures per location. It only
+  reads stock, even though it is a POST. Use it to check a known set of products
+  in one call rather than one at a time.

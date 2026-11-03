@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a search rule by ID within a rule group. It is allowed even when the
+  group is attached to a search profile. Deleting a rule that is already gone
+  succeeds.

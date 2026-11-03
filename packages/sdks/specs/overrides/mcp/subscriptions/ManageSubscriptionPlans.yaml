@@ -1,0 +1,6 @@
+x-mcp-title: Detach Plans from a Subscription
+x-mcp-description: >-
+  Detaches plans from a subscription, given a list of plan IDs. It fails with
+  400 when the subscription's offering has a proration policy. To switch the
+  subscription to a different plan, update the subscription instead. The request
+  body accepts the detach action only.

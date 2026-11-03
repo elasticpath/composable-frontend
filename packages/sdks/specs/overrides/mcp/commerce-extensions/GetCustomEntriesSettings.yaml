@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the entries of the Custom API with this slug, through the extensions
+  endpoint (/v2/extensions/{slug}). The entry operations addressed by Custom API
+  ID are under /v2/settings/extensions/custom-apis/{id}/entries. Filtering,
+  sorting and paging work as on the ID-based listing; a timeout in milliseconds
+  (1 to 20000) can be set, and exceeding it returns 422.

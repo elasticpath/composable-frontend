@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a hierarchy with a name, description and slug, plus optional locales
+  and custom attributes. It creates an empty hierarchy; add nodes and products
+  afterwards. This works on draft data in Product Experience Manager, not a
+  published catalog release.

@@ -1,0 +1,6 @@
+x-mcp-title: Create a Flow Entry
+x-mcp-description: >-
+  Creates an entry in a flow identified by its slug (paths under /v2/flows), or
+  in Product Experience Manager in a template. Send type entry plus a value for
+  each field, keyed by field slug. Use it for custom flows; entries of core
+  flows are managed automatically.

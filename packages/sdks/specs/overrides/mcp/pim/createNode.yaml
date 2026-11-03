@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a node in a hierarchy with a name, slug and description, plus optional
+  sort order, curated products (at most 20) and custom attributes. Names and
+  slugs must be unique among sibling nodes. It creates the node only; relate it
+  to a parent and to products separately. This works on draft data in Product
+  Experience Manager, not a published catalog release.

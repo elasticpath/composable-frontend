@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the delivery logs of one integration by ID. Each shows whether the
+  attempt succeeded, the attempt number, processing time, status code, response
+  body and error detail. Use it to debug a failing webhook or queue.

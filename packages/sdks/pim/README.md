@@ -1,379 +1,149 @@
-# @epcc-sdk/sdks-pxm SDK
+# @epcc-sdk/sdks-pxm
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path Product Experience Manager (PXM) API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-pxm
-# or
-pnpm install @epcc-sdk/sdks-pxm
-# or
-yarn add @epcc-sdk/sdks-pxm
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
+## Quick start
 
 ```ts
-import { client } from "@epcc-sdk/sdks-pxm";
+import { createPxmClient, getAllProducts } from "@epcc-sdk/sdks-pxm"
 
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
+const client = createPxmClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+})
 
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
+const { data, error } = await getAllProducts({ client })
 ```
 
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-### 2. Using the `createClient` function
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
+
+## Base URL
+
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path.
+
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Import products
+
+`importProducts` sends a CSV file in a multipart request. Give the file as a `File` in `body.file`. The API runs the import as a job, and the response gives the job.
 
 ```ts
-import { createClient } from "@epcc-sdk/sdks-pxm";
+import { readFile } from "node:fs/promises"
+import { importProducts } from "@epcc-sdk/sdks-pxm"
 
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
+const file = new File([await readFile("products.csv")], "products.csv", {
+  type: "text/csv",
+})
+
+const { data, error } = await importProducts({ client, body: { file } })
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later. To read dates in the file with the conventions of a locale, set `query.locale`, for example `en-GB`.
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
+
+```ts
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-pxm"
+
+const source = createTokenSource(
+  clientCredentialsProvider({
     baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-pxm>".
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
+
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
+
+## Zod schemas
+
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
 ```ts
-const response = await getChildProducts({
-    client: myClient,
-});
+import { zGetAllProductsResponse } from "@epcc-sdk/sdks-pxm/zod"
+
+const result = zGetAllProductsResponse.safeParse(data)
 ```
 
-### Direct configuration
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
 
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
-const response = await getChildProducts({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
+import { McpServer } from "@modelcontextprotocol/server"
+import { tools } from "@epcc-sdk/sdks-pxm/mcp"
+
+const server = new McpServer({ name: "pim", version: "1.0.0" })
+
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-## Interceptors (Middleware)
-
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-pxm";
-
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-pxm";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
-
-```ts
-import { client } from "@epcc-sdk/sdks-pxm";
-
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
-});
-```
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
-```
-
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getChildProducts } from "@epcc-sdk/sdks-pxm";
-
-const product = await getChildProducts({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`getAllJobs`** (`GET /pcm/jobs`)
-
-- **`getJob`** (`GET /pcm/jobs/{jobID}`)
-
-- **`cancelJob`** (`POST /pcm/jobs/{jobID}/cancel`)
-
-- **`getJobErrors`** (`GET /pcm/jobs/{jobID}/errors`)
-
-- **`getAllProducts`** (`GET /pcm/products`)
-
-- **`createProduct`** (`POST /pcm/products`)
-
-- **`importProducts`** (`POST /pcm/products/import`)
-
-- **`exportProducts`** (`POST /pcm/products/export`)
-
-- **`deleteProduct`** (`DELETE /pcm/products/{productID}`)
-
-- **`getProduct`** (`GET /pcm/products/{productID}`)
-
-- **`updateProduct`** (`PUT /pcm/products/{productID}`)
-
-- **`attachNodes`** (`POST /pcm/products/attach_nodes`)
-
-- **`detachNodes`** (`POST /pcm/products/detach_nodes`)
-
-- **`getProductsNodes`** (`GET /pcm/products/{productID}/nodes`)
-
-- **`buildChildProducts`** (`POST /pcm/products/{productID}/build`)
-
-- **`getChildProducts`** (`GET /pcm/products/{productID}/children`)
-
-- **`deleteProductTemplateRelationship`** (`DELETE /pcm/products/{productID}/relationships/templates`)
-
-- **`getProductTemplateRelationships`** (`GET /pcm/products/{productID}/relationships/templates`)
-
-- **`createProductTemplateRelationship`** (`POST /pcm/products/{productID}/relationships/templates`)
-
-- **`getProductComponentProductsRelationships`** (`GET /pcm/products/{productID}/relationships/component_products`)
-
-- **`deleteProductFileRelationships`** (`DELETE /pcm/products/{productID}/relationships/files`)
-
-- **`getProductFileRelationships`** (`GET /pcm/products/{productID}/relationships/files`)
-
-- **`createProductFileRelationships`** (`POST /pcm/products/{productID}/relationships/files`)
-
-- **`updateProductFileRelationships`** (`PUT /pcm/products/{productID}/relationships/files`)
-
-- **`deleteProductVariationRelationships`** (`DELETE /pcm/products/{productID}/relationships/variations`)
-
-- **`getProductVariationRelationships`** (`GET /pcm/products/{productID}/relationships/variations`)
-
-- **`createProductVariationRelationships`** (`POST /pcm/products/{productID}/relationships/variations`)
-
-- **`updateProductVariationRelationships`** (`PUT /pcm/products/{productID}/relationships/variations`)
-
-- **`deleteProductMainImageRelationships`** (`DELETE /pcm/products/{productID}/relationships/main_image`)
-
-- **`getProductMainImageRelationships`** (`GET /pcm/products/{productID}/relationships/main_image`)
-
-- **`createProductMainImageRelationships`** (`POST /pcm/products/{productID}/relationships/main_image`)
-
-- **`updateProductMainImageRelationships`** (`PUT /pcm/products/{productID}/relationships/main_image`)
-
-- **`detachCustomRelationships`** (`DELETE /pcm/products/{productID}/custom-relationships`)
-
-- **`listAttachedCustomRelationship`** (`GET /pcm/products/{productID}/custom-relationships`)
-
-- **`attachCustomRelationships`** (`POST /pcm/products/{productID}/custom-relationships`)
-
-- **`dissociateProducts`** (`DELETE /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
-
-- **`getRelatedProductIdsOfAProductId`** (`GET /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
-
-- **`productAssociationId`** (`POST /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}`)
-
-- **`getRelatedProductsOfAProductId`** (`GET /pcm/products/{productID}/custom-relationships/{customRelationshipSlug}/products`)
-
-- **`getAllVariations`** (`GET /pcm/variations`)
-
-- **`createVariation`** (`POST /pcm/variations`)
-
-- **`deleteVariation`** (`DELETE /pcm/variations/{variationID}`)
-
-- **`getVariation`** (`GET /pcm/variations/{variationID}`)
-
-- **`updateVariation`** (`PUT /pcm/variations/{variationID}`)
-
-- **`getAllVariationOptions`** (`GET /pcm/variations/{variationID}/options`)
-
-- **`createVariationOption`** (`POST /pcm/variations/{variationID}/options`)
-
-- **`deleteVariationOption`** (`DELETE /pcm/variations/{variationID}/options/{optionID}`)
-
-- **`getVariationOption`** (`GET /pcm/variations/{variationID}/options/{optionID}`)
-
-- **`updateVariationOption`** (`PUT /pcm/variations/{variationID}/options/{optionID}`)
-
-- **`getAllModifiers`** (`GET /pcm/variations/{variationID}/options/{optionID}/modifiers`)
-
-- **`createModifier`** (`POST /pcm/variations/{variationID}/options/{optionID}/modifiers`)
-
-- **`deleteModifier`** (`DELETE /pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}`)
-
-- **`getModifier`** (`GET /pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}`)
-
-- **`updateModifier`** (`PUT /pcm/variations/{variationID}/options/{optionID}/modifiers/{modifierID}`)
-
-- **`getHierarchy`** (`GET /pcm/hierarchies`)
-
-- **`createHierarchy`** (`POST /pcm/hierarchies`)
-
-- **`getAllNodes`** (`GET /pcm/hierarchies/nodes`)
-
-- **`deleteHierarchy`** (`DELETE /pcm/hierarchies/{hierarchyID}`)
-
-- **`getHierarchyChild`** (`GET /pcm/hierarchies/{hierarchyID}`)
-
-- **`updateHierarchy`** (`PUT /pcm/hierarchies/{hierarchyID}`)
-
-- **`getAllNodesInHierarchy`** (`GET /pcm/hierarchies/{hierarchyID}/nodes`)
-
-- **`createNode`** (`POST /pcm/hierarchies/{hierarchyID}/nodes`)
-
-- **`deleteNode`** (`DELETE /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}`)
-
-- **`getHierarchyNode`** (`GET /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}`)
-
-- **`updateNode`** (`PUT /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}`)
-
-- **`getAllChildren`** (`GET /pcm/hierarchies/{hierarchyID}/children`)
-
-- **`createHierarchyChildRelationships`** (`POST /pcm/hierarchies/{hierarchyID}/relationships/children`)
-
-- **`createNodeChildRelationships`** (`POST /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/children`)
-
-- **`getAllNodeChildren`** (`GET /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/children`)
-
-- **`deleteNodeParent`** (`DELETE /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/parent`)
-
-- **`updateNodeParent`** (`PUT /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/parent`)
-
-- **`deleteNodeProductRelationships`** (`DELETE /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products`)
-
-- **`createNodeProductRelationship`** (`POST /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/relationships/products`)
-
-- **`getNodeProducts`** (`GET /pcm/hierarchies/{hierarchyID}/nodes/{nodeID}/products`)
-
-- **`duplicateHierarchy`** (`POST /pcm/hierarchies/{hierarchyID}/duplicate_job`)
-
-- **`getAllProductTags`** (`GET /pcm/tags`)
-
-- **`getProductTag`** (`GET /pcm/tags/{tagID}`)
-
-- **`getCustomRelationships`** (`GET /pcm/custom-relationships`)
-
-- **`createCustomRelationship`** (`POST /pcm/custom-relationships`)
-
-- **`deleteCustomRelationship`** (`DELETE /pcm/custom-relationships/{customRelationshipSlug}`)
-
-- **`getCustomRelationship`** (`GET /pcm/custom-relationships/{customRelationshipSlug}`)
-
-- **`updateCustomRelationship`** (`PUT /pcm/custom-relationships/{customRelationshipSlug}`)
-
-
-
-
----
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `getAllProductsTool`.
+- The name of a tool is `pim_` and the operation name in snake case, for example `pim_get_all_products`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
+
+These operations have a risk that is different from the default for their HTTP method:
+
+- `importProducts` is `update`, because it changes or removes existing data.
+- `detachNodes` is `update`, because it changes or removes existing data.
+- `buildChildProducts` is `update`, because it changes or removes existing data.
+
+`pim_import_products` uploads a CSV file. Give the file in `file` as a `data:` URI, for example `data:<media type>;base64,<data>`, and its name in `file_name`. The largest file is 52,428,800 bytes (50 MiB). The limit is the documented limit of the API. If the file is larger, the URI is not valid, or the value is a URL, the tool returns an `isError` result and sends nothing. The tool never downloads a URL.

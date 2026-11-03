@@ -3,7 +3,7 @@ import Hits from "./Hits";
 import Pagination from "./Pagination";
 import { Fragment, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import NodeMenu from "./NodeMenu";
+import NodeMenu, { WhenFiltersPresent } from "./NodeMenu";
 import { ProductsProvider, usePageContext, useSettings } from "./ProductsProvider";
 import MobileFilters from "./MobileFilters";
 import NoResults from "./NoResults";
@@ -47,7 +47,9 @@ export default function SearchResults(): JSX.Element {
         <hr />
         <div className="grid grid-cols-[auto_1fr] gap-8">
           <div className="hidden w-[14rem] md:block lg:w-[16rem]">
-            <h3 className="font-semibold">Category</h3>
+            <WhenFiltersPresent>
+              <h3 className="font-semibold">Category</h3>
+            </WhenFiltersPresent>
             <NodeMenu />
             { // attribute={EP_ROUTE_PRICE}
             }

@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
-  version: 2.0.0
+  version: 26.0701.7843571
+  x-version-timestamp: 2026-07-01T09:25:34Z
   title: Inventories Introduction
   description: |
     The Inventory API allows you to manage stock for products at both organization and store levels. Stock can be optionally managed in [multiple locations](#multi-location-inventories) representing different stores or warehouses.
@@ -66,7 +67,7 @@ info:
         If the payment succeeds, that stock is still allocated, and the items belong to the customer, unless for any reason they are reallocated before shipment. For example, if the customer cancels, or you realize the order is fraudulent, then you can reallocate the inventory. 
     5. Finally, when the order is marked as shipped, that stock is fully decremented. This means the allocation number is reduced, and therefore the total, and the products are no longer in the warehouse.
 
-    During split payments, stocks are allocated only if the first transaction for an order is complete. If the transaction fails, the stocks are deallocated. Once the first transaction is complete, the stocks are not allocated for the subsequent transactions as they are already reserved for the order. The stocks are deallocated and return to available when then the order is canceled.
+    During split payments, stocks are allocated only if the first transaction for an order is complete. If the transaction fails, the stocks are deallocated. Once the first transaction is complete, the stocks are not allocated for the subsequent transactions as they are already reserved for the order. The stocks are deallocated and return to available when the order is canceled.
 
     ### Implications of the inventories API
 
@@ -101,6 +102,25 @@ tags:
       :::
   - name: Transactions
     description: Methods to allow you to modify and view a products stock via transactions.
+  - name: Imports
+    description: |
+      You can import stock positions for up to 50,000 products in a single operation via an import. This is useful for synchronosing external systems with Elastic Path.
+      The API uses a [**JSONL**](https://jsonlines.org/) file, with one line per product. For each product one specifies the total stock in each location. For example
+
+      ```
+      {"data":{"type":"stock","id":"b36ba644-6fdc-49b3-9ebb-410ed34908a8","attributes":{"locations":{"vancouver":{"total":20}}}}}
+      {"data":{"type":"stock","id":"2e5a4c7b-6f88-4aad-a3c2-4d8b29bc32a4","attributes":{"locations":{"vancouver":{"total":54},"denver":{"total":1},"boston":{"total":20},"portland":{"total":100}}}}}
+      ```
+
+      ### Characteristics of Inventories Import
+
+      The Inventories Import API has the following characteristics:
+
+      - The Inventories Import API reads the entire file and then updates the inventory.
+
+      - Inventories imports are asynchronous and are processed one at a time. You can continue to send import requests, but these are queued. 
+
+      - If a product in an import does not already exist in the inventories database it will be created.
 paths:
   /inventories:
     post:
@@ -219,8 +239,6 @@ paths:
       tags:
         - Inventory
       operationId: GetStock
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. Returns the stock for the given product UUID
@@ -397,13 +415,19 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/Filter'
+        - description: Only supported value is `location`. When specified, the results are sorted in ascending order based on the value of the field. For `location`, this means ascending distance from the supplied geolocation. For more information, see [Sorting](/guides/Getting-Started/sorting). For location sorting, `Ep-Geolocation` header must be provided as well.
+          name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - location
+        - $ref: '#/components/parameters/EpGeolocation'
       summary: List Locations
       description: Lists all Inventory Locations
       tags:
         - Locations
       operationId: ListLocations
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of locations is returned
@@ -581,6 +605,140 @@ paths:
       responses:
         '204':
           description: Success. The location is deleted
+  /inventories/imports:
+    post:
+      tags:
+        - Imports
+      summary: Import a dataset
+      operationId: CreateImport
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - import_file
+              properties:
+                external_ref:
+                  $ref: '#/components/schemas/ExternalRef'
+                import_file:
+                  description: The JSONL file you want to upload.
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success. The import was started.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Import'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - Imports
+      summary: List import jobs
+      description: |
+        Retrieves a list of all import jobs.
+      parameters:
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      operationId: ListImportJobs
+      responses:
+        '200':
+          description: Success. A list of import jobs is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Import'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /inventories/imports/{import_uuid}:
+    parameters:
+      - name: import_uuid
+        in: path
+        description: The unique identifier of the import.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      tags:
+        - Imports
+      summary: Get import
+      description: Retrieves the import job for the specified ID.
+      operationId: GetImport
+      responses:
+        '200':
+          description: Success. The import is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Import'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /inventories/imports/{import_uuid}/errors:
+    parameters:
+      - name: import_uuid
+        in: path
+        description: The unique identifier of the import.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      tags:
+        - Imports
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      summary: Get import errors
+      description: |
+        Retrieves all errors encountered as part of the import. Each error is attributed to a line in the JSONL file 
+        imported, so for example, if at line 1 in your JSONL you had a stock without locations, there would
+        be a missing key error for locations.
+
+        Errors are also ordered by line number ascending, and can be paginated.
+      operationId: GetImportErrors
+      responses:
+        '200':
+          description: Success. The import errors are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoriesImportError'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -618,6 +776,14 @@ components:
         description: |
           Some Inventories API endpoints support filtering. For the general syntax, see [**Filtering**](/guides/Getting-Started/filtering), but you must go to a specific endpoint to understand the attributes and operators an endpoint supports.
         example: eq(location,new-york)
+    EpGeolocation:
+      description: Latitude, Longitude representing current location
+      name: Ep-Geolocation
+      in: header
+      schema:
+        type: string
+        pattern: ^-?\d+(\.\d+)?,-?\d+(\.\d+)?$
+      example: 49.2847027,-123.1109329
   responses:
     ValidationError:
       description: Bad request. The request failed validation.
@@ -1162,3 +1328,138 @@ components:
           type: string
           format: uri
           example: http://example.com/schemas/article-comments
+    Import:
+      required:
+        - id
+        - type
+        - meta
+        - attributes
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/InventoriesImportType'
+        attributes:
+          $ref: '#/components/schemas/ImportAttributes'
+        meta:
+          $ref: '#/components/schemas/ImportMeta'
+    ImportAttributes:
+      required:
+        - status
+      properties:
+        external_ref:
+          $ref: '#/components/schemas/ExternalRef'
+        status:
+          type: string
+          description: |
+            The status of job.
+            - **pending** - Commerce has received the request but is currently busy processing other requests.
+            - **started** - Commerce has started processing the job.
+            - **success** - The job has successfully completed.
+            - **failed** - The job has failed.
+          enum:
+            - pending
+            - started
+            - success
+            - failed
+          example: pending
+          x-go-type: model.JobStatus
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/inventories.svc/internal/domain/model
+    ImportMeta:
+      readOnly: true
+      required:
+        - timestamps
+        - records
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/JobTimestamps'
+        records:
+          $ref: '#/components/schemas/ImportRecords'
+    ImportRecords:
+      type: object
+      description: You can track the number of records imported to ensure the completeness, accuracy and integrity of the import. Uploaded shows the number of records ready to be imported. However, this does not mean they are valid objects, only that they have the correct type and their JSON format is properly formatted. Imported shows the number of records that have been both validated and successfully added.
+      required:
+        - uploaded
+        - imported
+      properties:
+        uploaded:
+          type: object
+          properties:
+            stock:
+              description: The total number of product transactions uploaded.
+              type: integer
+              example: 50000
+          required:
+            - stock
+        imported:
+          properties:
+            stock:
+              description: The total number of product transactions uploaded.
+              type: integer
+              example: 50000
+          required:
+            - stock
+    InventoriesImportType:
+      type: string
+      example: inventories_import
+      enum:
+        - inventories_import
+    ExternalRef:
+      description: A unique attribute that you could use to contain information from another company system, for example. The maximum length is 2048 characters.
+      type: string
+      example: abc123
+      maxLength: 2048
+    JobTimestamps:
+      allOf:
+        - $ref: '#/components/schemas/Timestamps'
+        - properties:
+            started_at:
+              description: The date and time a job is started.
+              type: string
+              example: '2017-01-10T11:41:19.244842Z'
+            finished_at:
+              description: The date and time a job finished.
+              type: string
+              example: '2017-01-10T11:41:19.244842Z'
+    InventoriesImportError:
+      type: object
+      required:
+        - id
+        - type
+        - meta
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/InventoriesImportErrorType'
+        meta:
+          $ref: '#/components/schemas/InventoriesImportErrorMeta'
+    InventoriesImportErrorType:
+      type: string
+      example: inventories_import_error
+      enum:
+        - inventories_import_error
+    InventoriesImportErrorMeta:
+      type: object
+      required:
+        - timestamps
+        - error
+        - field
+        - line_number
+      properties:
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+        error:
+          type: string
+          example: product name cannot be empty
+        field:
+          type: string
+          example: name
+        line_number:
+          type: integer
+          description: The line in the imported JSONL file at which the validation error occurred. Starts from 1.
+          example: 123
+        external_ref:
+          $ref: '#/components/schemas/ExternalRef'

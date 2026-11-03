@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists rule promotions with their discount type, eligibility rules and
+  settings. Filter by code, name, active status, stackability, or start and end
+  dates. Filter by code to find the promotion a code belongs to.

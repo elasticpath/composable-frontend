@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Gets the account authentication settings: whether self signup is enabled,
+  whether an account is created automatically for each new account member,
+  whether members can update their own details, and the token expiry in
+  seconds. It also returns the authentication realm and the client ID for single
+  sign-on.

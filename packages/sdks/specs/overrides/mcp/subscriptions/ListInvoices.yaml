@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists subscription invoices across subscriptions. Filter by subscriber ID,
+  subscription ID, outstanding status or whether tax is required. Use it to find
+  unpaid invoices. To list the invoices of a single subscription, list that
+  subscription's invoices instead.

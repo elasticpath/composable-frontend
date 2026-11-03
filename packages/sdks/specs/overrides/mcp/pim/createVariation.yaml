@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a variation, such as size or color, with a name and an optional sort
+  order. Add options to it, and attach it to products, to build child
+  products. Higher sort order values display first, and products must be
+  rebuilt for sort changes to apply.

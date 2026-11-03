@@ -1,5 +1,7 @@
 // This file is used to test that ESM imports work correctly
-import * as umerchantrealmmapping from './dist/index.mjs';
+import * as MerchantRealmMapping from "./dist/index.mjs"
+import * as mcp from "./dist/mcp.mjs"
 
-console.log('umerchantrealmmapping:', Object.keys(umerchantrealmmapping));
-console.log('Test successful!');
+console.log("MerchantRealmMapping:", Object.keys(MerchantRealmMapping))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

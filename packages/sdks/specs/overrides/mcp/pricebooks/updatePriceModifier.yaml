@@ -1,0 +1,5 @@
+x-mcp-title: Update a Price Modifier
+x-mcp-description: >-
+  Updates a price modifier by ID: its name, type, currencies or external
+  reference. Send only the attributes you want to change; the rest stay the
+  same, and an empty attributes section changes nothing.

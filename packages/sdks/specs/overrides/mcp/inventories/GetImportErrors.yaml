@@ -1,0 +1,5 @@
+x-mcp-title: Get Stock Import Errors
+x-mcp-description: >-
+  Lists the errors found in a stock import, in ascending order of line number in
+  the uploaded JSONL file. Each error gives the line, the field and a message.
+  The list is paginated.

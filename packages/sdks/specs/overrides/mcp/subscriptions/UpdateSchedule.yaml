@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a schedule's name, cron-style specification, time zone location or job
+  type. Changing the specification or job type changes when and what jobs the
+  schedule creates automatically.

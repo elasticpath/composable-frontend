@@ -1,0 +1,8 @@
+x-mcp-risk: read
+x-mcp-description: >-
+  Calculates the proration that switching a subscription to a different plan and
+  pricing option would produce, returning the costs involved and any refund,
+  without saving anything or affecting billing. A result of would_prorate false
+  is not an error; rejection_reason says why no proration would apply. It
+  returns 422 when the offering has no proration policy. To make the change,
+  update the subscription.

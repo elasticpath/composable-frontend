@@ -1,73 +1,17 @@
+import type { StorageAdapter } from "@epcc-sdk/sdks-runtime"
 import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
 
-export interface StorageAdapter {
-  /** Return the current access token (string) or undefined if none. */
-  get(): string | undefined
-  /** Persist or remove the access token. */
-  set(token?: string): void
-  /** Optional: subscribe to external changes (e.g., other tabs). Returns an unsubscribe. */
-  subscribe?(cb: () => void): () => void
-}
-
-/** Safe localStorage adapter with cross-tab sync (via 'storage' event). */
-export function localStorageAdapter(
-  key = CREDENTIALS_STORAGE_KEY,
-): StorageAdapter {
-  const subs = new Set<() => void>()
-
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === key) subs.forEach((fn) => fn())
-  }
-
-  const safeGet = () => {
-    try {
-      if (typeof window === "undefined" || !("localStorage" in window))
-        return undefined
-      return window.localStorage.getItem(key) ?? undefined
-    } catch {
-      return undefined
-    }
-  }
-
-  const safeSet = (t?: string) => {
-    try {
-      if (typeof window === "undefined" || !("localStorage" in window)) return
-      if (!t) window.localStorage.removeItem(key)
-      else window.localStorage.setItem(key, t)
-    } catch {
-      /* no-op */
-    }
-  }
-
-  return {
-    get: safeGet,
-    set: safeSet,
-    subscribe(cb) {
-      subs.add(cb)
-      if (typeof window !== "undefined") {
-        window.addEventListener("storage", onStorage)
-      }
-      return () => {
-        subs.delete(cb)
-        if (!subs.size && typeof window !== "undefined") {
-          window.removeEventListener("storage", onStorage)
-        }
-      }
-    },
-  }
+type CookieOptions = {
+  name?: string
+  path?: string
+  domain?: string
+  sameSite?: "Lax" | "Strict" | "None"
+  secure?: boolean
+  maxAge?: number
 }
 
 /** JS-readable cookie adapter (NOT httpOnly). For httpOnly cookies, keep access token here only. */
-export function cookieAdapter(
-  options: {
-    name?: string
-    path?: string
-    domain?: string
-    sameSite?: "Lax" | "Strict" | "None"
-    secure?: boolean
-    maxAge?: number // seconds
-  } = {},
-): StorageAdapter {
+export function cookieAdapter(options: CookieOptions = {}): StorageAdapter {
   const { name = CREDENTIALS_STORAGE_KEY, ...attrs } = options
   const { path = "/", sameSite = "Lax" } = attrs
   const read = () => {
@@ -102,23 +46,5 @@ export function cookieAdapter(
   return {
     get: read,
     set: (t) => (t ? write(t) : clear()),
-    // No reliable cookie change event across tabs; omit subscribe
-  }
-}
-
-/** In-memory adapter (useful for SSR/tests). */
-export function memoryAdapter(initial?: string): StorageAdapter {
-  let value = initial
-  const subs = new Set<() => void>()
-  return {
-    get: () => value,
-    set: (t) => {
-      value = t
-      subs.forEach((fn) => fn())
-    },
-    subscribe(cb) {
-      subs.add(cb)
-      return () => subs.delete(cb)
-    },
   }
 }

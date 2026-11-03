@@ -1,5 +1,7 @@
 // This file is used to test that CommonJS requires work correctly
-const umerchantrealmmapping = require('./dist/index.cjs');
+const MerchantRealmMapping = require("./dist/index.cjs")
+const mcp = require("./dist/mcp.cjs")
 
-console.log('umerchantrealmmapping:', Object.keys(umerchantrealmmapping));
-console.log('Test successful!');
+console.log("MerchantRealmMapping:", Object.keys(MerchantRealmMapping))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

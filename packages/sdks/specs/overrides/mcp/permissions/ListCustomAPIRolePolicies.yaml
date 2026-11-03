@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists custom API role policies, which set what each role can do with the
+  entries of a custom API. Filter by ID, timestamps, custom API ID or role ID,
+  and sort by ID or timestamps; the default is newest first. Supports offset and
+  limit pagination.

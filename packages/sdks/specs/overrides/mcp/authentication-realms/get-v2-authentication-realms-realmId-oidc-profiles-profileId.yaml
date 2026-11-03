@@ -1,0 +1,6 @@
+x-mcp-name: authentication_realms_get_oidc_profile
+x-mcp-description: >-
+  Gets one OIDC profile by ID: its name, discovery URL, client ID, issuer, and
+  the authorization endpoint, callback endpoint and discovery document links.
+  The client secret is never returned, so use this to check settings, not to
+  recover a secret.

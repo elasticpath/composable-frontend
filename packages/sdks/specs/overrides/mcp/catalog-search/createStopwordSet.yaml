@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a stopword set, a list of common words such as the or and that search
+  ignores. A set has an optional locale and at least one stopword; omit the
+  locale for the default set. Only one set per locale is allowed, so a second
+  set for the same locale returns 409. Sets are synced to search asynchronously.

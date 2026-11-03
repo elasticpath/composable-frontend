@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PhoneIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
 import { GitHubIcon } from "../icons/github-icon";
 import EpLogo from "../icons/ep-logo";
+import { ConsentSettingsLink } from "../consent-banner/ConsentSettingsLink";
 
 import type { JSX } from "react";
 
@@ -30,6 +31,7 @@ const Footer = (): JSX.Element => (
           <Link href="/terms" className="hover:underline">
             Terms
           </Link>
+          <ConsentSettingsLink />
         </div>
         <div className="justify-start" />
         <div className="flex items-center justify-end gap-4 self-start">

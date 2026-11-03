@@ -2,6 +2,7 @@ openapi: 3.1.0
 info:
   title: Personal Data Introduction
   version: '1.0'
+  # language=markdown
   description: |
     
     In Commerce, every change to a user’s personal data is logged.
@@ -14,17 +15,17 @@ info:
 
     ## Personal Data Resource Types
 
-    | Entity type                               | Endpoint                                                                                                                                              | Documentation                                                                                                                                               |
-    | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | customer                                  | `v2/customers/{id}`                                                                                                                                   | [Customers](/docs/customer-management/customer-management-api/customer-management-api-overview)                                                             |
-    | account                                   | `v2/accounts/{id}`                                                                                                                                    | [Accounts](/docs/api/accounts/post-v-2-accounts)                                                                                                            |
-    | account-member                            | `v2/account-members/{id}`                                                                                                                             | [Account Members](/docs/api/accounts/account-members)                                                                                                       |
-    | account-membership                        | `v2/accounts/{accountId}/account-memberships/{id}`                                                                                                    | [Account Memberships](/docs/api/accounts/account-membership)                                                                                                |
-    | address                                   | `v2/customers/{customerId}/addresses/{id}`; `v2/accounts/{accountId}/addresses/{id}`                                                                  | [Addresses](/docs/api/addresses/addresses-introduction)                                                                                                     |
-    | user-authentication-info                  | `v2/authentication-realms/{realmId}/user-authentication-info/{id}`                                                                                    | [User Authentication Info](/docs/authentication/single-sign-on/user-authentication-info-api/overview)                                                       |
-    | user-authentication-oidc-profile-info     | `v2/authentication-realms/{authenticationRealmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{id}`     | [User Authentication OIDC Profile Info](/docs/authentication/single-sign-on/user-authentication-openid-connect-profile-api/openid-connect-profile-overview) |
-    | user-authentication-password-profile-info | `v2/authentication-realms/{authenticationRealmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{id}` | [User Authentication Password Profile Info](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview)        |
-    | order                                     | `v2/orders/{id}`                                                                                                                                      | [Orders](/docs/api/carts/orders)                                                                                                                            |
+    | Entity type                               | Endpoint                                                                                                                                              | Documentation                                                                                                    |
+    |-------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+    | customer                                  | `v2/customers/{id}`                                                                                                                                   | [Customers](/docs/customer-management/customer-management-api/customer-management-api-overview)                  |
+    | account                                   | `v2/accounts/{id}`                                                                                                                                    | [Accounts](/docs/api/accounts/post-v-2-accounts)                                                                 |
+    | account-member                            | `v2/account-members/{id}`                                                                                                                             | [Account Members](/docs/api/accounts/account-members)                                                            |
+    | account-membership                        | `v2/accounts/{accountId}/account-memberships/{id}`                                                                                                    | [Account Memberships](/docs/api/accounts/account-membership)                                                     |
+    | address                                   | `v2/customers/{customerId}/addresses/{id}`; `v2/accounts/{accountId}/addresses/{id}`                                                                  | [Addresses](/docs/api/addresses/addresses-introduction)                                                          |
+    | user-authentication-info                  | `v2/authentication-realms/{realmId}/user-authentication-info/{id}`                                                                                    | [User Authentication Info](/docs/api/single-sign-on/user-authentication-infos)                                   |
+    | user-authentication-oidc-profile-info     | `v2/authentication-realms/{authenticationRealmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-oidc-profile-info/{id}`     | [User Authentication OIDC Profile Info](/docs/api/single-sign-on/user-authentication-oidc-profile-infos)         |
+    | user-authentication-password-profile-info | `v2/authentication-realms/{authenticationRealmId}/user-authentication-info/{userAuthenticationInfoId}/user-authentication-password-profile-info/{id}` | [User Authentication Password Profile Info](/docs/api/single-sign-on/user-authentication-password-profile-infos) |
+    | order                                     | `v2/orders/{id}`                                                                                                                                      | [Orders](/docs/api/carts/orders)                                                                                 |
 
   contact:
     name: Elastic Path
@@ -110,7 +111,7 @@ paths:
         
         :::note
         * This request is only accessible to `client_credentials` token users with `Seller Admin`, `Support` and `IT` roles.
-        * Non `client_credentials` token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+        * Non `client_credentials` token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
         * This request requires a filter for `resource_type` and `resource_id`.
           :::
         
@@ -219,7 +220,7 @@ paths:
         :::note
         
         * This request is only accessible to `client_credentials` token users with `Seller Admin`, `Support` and `IT` roles.
-        * Non `client_credentials` token users cannot access this endpoint. See [Permissions](/docs/authentication/Tokens/permissions).
+        * Non `client_credentials` token users cannot access this endpoint. See [Permissions](/docs/authentication/tokens/permissions).
         * This request requires a filter for `resource_type` and `resource_id`.
         
         :::

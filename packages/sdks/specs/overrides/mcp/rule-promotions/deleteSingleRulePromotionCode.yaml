@@ -1,0 +1,5 @@
+x-mcp-title: Delete a Rule Promotion Code
+x-mcp-description: >-
+  Deletes one code from a rule promotion by its code ID, leaving the promotion's
+  other codes in place. Deletion is permanent. To delete several codes in one
+  request, delete them in bulk instead.

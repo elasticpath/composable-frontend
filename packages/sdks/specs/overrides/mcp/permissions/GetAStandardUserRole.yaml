@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one standard user role by its ID, with its access level (none, view or
+  manage) for each permission group, such as catalogs, orders, promotions and
+  application keys.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the rules in a search rule group in execution order, with offset and
+  limit pagination. It returns each rule's trigger, actions and stop_after_match
+  setting.

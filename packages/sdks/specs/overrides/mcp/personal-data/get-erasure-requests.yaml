@@ -1,0 +1,6 @@
+x-mcp-title: List Personal Data Erasure Requests
+x-mcp-description: >-
+  Lists the erasure requests for one personal data record, with each request's
+  status, status description and time. A filter on both resource type and
+  resource ID is required. Use it to check whether an earlier erasure request
+  succeeded or failed. Supports pagination.

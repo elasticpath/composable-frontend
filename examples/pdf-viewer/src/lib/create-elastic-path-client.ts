@@ -1,12 +1,19 @@
 import { createClient } from "@epcc-sdk/sdks-shopper";
 import { applyDefaultNextMiddleware } from "@epcc-sdk/sdks-nextjs";
+import {
+  ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  CREDENTIALS_COOKIE_NAME,
+} from "./cookie-constants";
 
 export function createElasticPathClient() {
   const localClient = createClient({
     // set default base url for requests made by this client
     baseUrl: `https://${process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL}`,
   });
-  applyDefaultNextMiddleware(localClient);
+  applyDefaultNextMiddleware(localClient, {
+    cookieKey: CREDENTIALS_COOKIE_NAME,
+    accountCookieKey: ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  });
   applyMultiLocationInventoryMiddleware(localClient);
 
   return localClient;

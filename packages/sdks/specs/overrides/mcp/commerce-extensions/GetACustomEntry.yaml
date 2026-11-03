@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one entry of a Custom API by Custom API ID and entry ID, the generic
+  admin route. The response has the entry's field values and its meta, including
+  the etag_id, which can be sent as If-Match when updating or deleting the
+  entry.

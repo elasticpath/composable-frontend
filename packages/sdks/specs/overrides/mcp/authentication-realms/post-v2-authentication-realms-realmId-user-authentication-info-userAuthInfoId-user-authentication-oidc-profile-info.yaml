@@ -1,0 +1,6 @@
+x-mcp-name: authentication_realms_create_oidc_profile_info
+x-mcp-description: >-
+  Links a user to an OIDC profile by creating an OIDC profile info. It needs the
+  OIDC profile ID, the user's subject (their identifier at the identity
+  provider) and the issuer. Create it so the user can sign in through that
+  provider.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a price book by ID together with all the prices in it. The products
+  are not deleted, and pricing details in orders that used the price book are
+  kept. This cannot be undone.

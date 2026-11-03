@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a subscription for an account, with a currency, name and email. Choose
+  an offering, plan and pricing option by ID or external reference, and set how
+  it is paid: through a payment gateway, or with manual payments, which creates
+  a pending payment instead. It can also create a pending subscription, or
+  import one that is already running.

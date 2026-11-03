@@ -14,6 +14,7 @@ import {
 import { retrieveAccountMemberCredentials } from "../../lib/retrieve-account-member-credentials";
 import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "../../lib/get-error-message";
+import { safeReturnPath } from "../../lib/return-url";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -70,7 +71,7 @@ export async function login(props: FormData) {
     };
   }
 
-  redirect(returnUrl ?? "/");
+  redirect(safeReturnPath(returnUrl, "/"));
 }
 
 export async function logout() {

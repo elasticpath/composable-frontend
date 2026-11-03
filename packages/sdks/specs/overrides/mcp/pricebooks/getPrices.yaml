@@ -1,0 +1,5 @@
+x-mcp-title: Get Prices Across All Price Books
+x-mcp-description: >-
+  Lists product prices from every price book at once. Filter by SKU, ID or
+  external reference, or by created or updated date to find recent changes. To
+  list the prices of a single price book, get that price book's prices instead.

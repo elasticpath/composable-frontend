@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a hierarchy's name, description, slug, locales or custom attributes.
+  It is a partial update, so send only the fields to change, and the hierarchy
+  ID in the body must match the ID in the path. This works on draft data in
+  Product Experience Manager, not a published catalog release.

@@ -1,5 +1,7 @@
 // This file is used to test that CommonJS requires work correctly
-const upayments = require('./dist/index.cjs');
+const Payments = require("./dist/index.cjs")
+const mcp = require("./dist/mcp.cjs")
 
-console.log('upayments:', Object.keys(upayments));
-console.log('Test successful!');
+console.log("Payments:", Object.keys(Payments))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

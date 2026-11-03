@@ -1,0 +1,4 @@
+x-mcp-title: List a Product's Variations
+x-mcp-description: >-
+  Lists the variations attached to a product, as variation IDs. Use it to see
+  which variations a product uses for building child products.

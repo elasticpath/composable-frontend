@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Relates one or more existing files to a product by file ID, with optional tags
+  on each relationship. It returns no content. To set the product's whole file
+  list in one step, replace the file relationships instead.

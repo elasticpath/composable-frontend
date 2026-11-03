@@ -127,7 +127,8 @@ info:
   license:
     name: MIT
     url: 'assets/LICENSE'
-  version: 1.0.0
+  version: 26.0504.7552059
+  x-version-timestamp: 2026-05-04T17:39:21Z
 security:
   - bearerAuth: [ ]
 servers:
@@ -539,6 +540,18 @@ paths:
           style: simple
           schema:
             type: string
+        - name: filter
+          in: query
+          schema:
+            type: string
+          description: |
+            This parameter accepts a filtering expression that uses specific operators and attributes. Promotion codes are case-insensitive.
+            
+            The following operators and attributes are available when filtering on this endpoint. See [Supported Filtering Characters](/guides/Getting-Started/filtering#supported-characters).
+            
+            | Attribute | Type     | Operator    | Example        |
+            |:--------- |:---------|:------------|:---------------|
+            | `code`    | `string`, `number` |  `eq`, `gt`       |  `eq(code,summer2024)`, `gt(code,2024)` |
       responses:
         '200':
           description: ''

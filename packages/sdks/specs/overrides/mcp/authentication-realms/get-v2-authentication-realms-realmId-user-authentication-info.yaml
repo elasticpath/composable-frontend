@@ -1,0 +1,7 @@
+x-mcp-name: authentication_realms_list_user_authentication_infos
+x-mcp-description: >-
+  Lists the users (user authentication info) in a realm, each with a name,
+  optional given, middle and family names, and email. Filter by email, name,
+  given name, middle name, family name, created_at or updated_at, and sort by
+  created_at, id or updated_at. Account members and customers who sign in
+  through OIDC are users here. Supports pagination.

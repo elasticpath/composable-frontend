@@ -1,243 +1,165 @@
-# @epcc-sdk/sdks-inventories SDK
+# @epcc-sdk/sdks-inventories
 
-Below you'll find instructions on how to install, set up, and use the client, along with a list of available operations.
-
-
-## Features
-
-- type-safe response data and errors
-- response data validation and transformation
-- access to the original request and response
-- granular request and response customization options
-- minimal learning curve thanks to extending the underlying technology
-
----
-
+A TypeScript client for the Elastic Path inventories API. The functions, types and Zod schemas are generated from the OpenAPI spec of the API.
 
 ## Installation
 
 ```bash
 npm install @epcc-sdk/sdks-inventories
-# or
-pnpm install @epcc-sdk/sdks-inventories
-# or
-yarn add @epcc-sdk/sdks-inventories
 ```
 
----
-
-## Client Usage
-
-
-Clients are responsible for sending the actual HTTP requests.
-
-The Fetch client is built as a thin wrapper on top of Fetch API, extending its functionality. If you're already familiar with Fetch, configuring your client will feel like working directly with Fetch API.
-
-You can configure the client in two ways:
-
-- Configuring the internal `client` instance directly
-- Using the `createClient` function
-
-**When using the operation function to make requests, by default the global client will be used unless another is provided.**
-
-
-### 1. Configure the internal `client` instance directly
-
-This is the simpler approach. You can call the setConfig() method at the beginning of your application or anytime you need to update the client configuration. You can pass any Fetch API configuration option to setConfig(), and even your own Fetch implementation.
+## Quick start
 
 ```ts
-import { client } from "@epcc-sdk/sdks-inventories";
+import { createInventoriesClient, listStock } from "@epcc-sdk/sdks-inventories"
 
-client.setConfig({
-// set default base url for requests
-baseUrl: 'https://euwest.api.elasticpath.com',
+const client = createInventoriesClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+})
 
-// set default headers for requests
-headers: {
-Authorization: 'Bearer YOUR_AUTH_TOKEN',
-},
-});
+const { data, error } = await listStock({ client })
 ```
 
-The disadvantage of this approach is that your code may call the client instance before it's configured for the first time. Depending on your use case, you might need to use the second approach.
+The client gets an access token and adds it to each request. It gets a new token before the token expires. After a 401 response, it gets a new token and sends the request one more time. After a 408 or 429 response, or after some server and network errors, it waits and sends the request again.
 
-### 2. Using the `createClient` function
+Pass the client to each operation. The package also exports a `client` that has no credentials. If you call an operation without `{ client }`, it uses that client and the API returns a 401 response.
 
-This is useful when you want to use a different instance of the client for different parts of your application or when you want to use different configurations for different parts of your application.
+A failed request does not throw. The operation returns the error in `error`. To make operations throw, add `config: { throwOnError: true }` to the factory options.
+
+## Base URL
+
+Set `baseUrl` to the API host of your region, with no path. Each operation adds its own path. This API is under `/v2`. The factory adds `/v2` to the operations, so give it the host only. If you make a client with `createClient`, add `/v2` to the host yourself.
+
+## Credentials
+
+| Option                        | Grant type                                                                               |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `clientId` and `clientSecret` | Client credentials. Use it only on a server, because it contains a secret.               |
+| `clientId`                    | Implicit. You can use it in a browser.                                                   |
+| `token`                       | A token that you got yourself. The client cannot replace it, so a 401 response is final. |
+| `provider`                    | Your own `TokenProvider` function.                                                       |
+| `source`                      | A `TokenSource` that you keep, for example to clear the token when a user signs out.     |
+
+These options change the default behavior:
+
+| Option          | What it does                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`       | Where the client keeps the token. The default is `memoryStorage`. `localStorageAdapter` keeps the token across page loads and browser tabs. |
+| `leewaySeconds` | How many seconds before expiry the client gets a new token.                                                                                 |
+| `retry`         | The options of `createRetryFetch`. Set it to `false` to stop the retries.                                                                   |
+| `fetch`         | The `fetch` function that the client uses for all requests, including token requests.                                                       |
+| `config`        | Client configuration, for example `headers`. It overrides the values that the factory sets.                                                 |
+
+## Multi-location inventory
+
+The types and schemas describe the multi-location inventory response. The API uses that shape only when the request has the `EP-Inventories-Multi-Location: true` header. The location operations also need this header. Without it, the list of locations returns a 404 response. To send the header with each request, set it when you make the client:
 
 ```ts
-import { createClient } from "@epcc-sdk/sdks-inventories";
+const client = createInventoriesClient({
+  baseUrl: "https://euwest.api.elasticpath.com",
+  clientId: process.env.EPCC_CLIENT_ID!,
+  clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  config: { headers: { "EP-Inventories-Multi-Location": "true" } },
+})
+```
 
-// Create the client with your API base URL.
-const client = createClient({
-    // set default base url for requests
+## Import stock
+
+`createImport` sends a JSONL file in a multipart request. Give the file as a `File` in `body.import_file`.
+
+```ts
+import { readFile } from "node:fs/promises"
+import { createImport } from "@epcc-sdk/sdks-inventories"
+
+const importFile = new File([await readFile("stock.jsonl")], "stock.jsonl", {
+  type: "application/jsonl",
+})
+
+const { data, error } = await createImport({
+  client,
+  body: { import_file: importFile },
+})
+```
+
+In a browser, use the `File` from an `<input type="file">` element. In Node, `File` is global in version 20 and later.
+
+## Make the client yourself
+
+The package exports the parts that the factory uses. Use them when you need your own token source or your own `fetch`.
+
+```ts
+import {
+  clientCredentialsProvider,
+  createAuthCallback,
+  createAuthenticatedFetch,
+  createClient,
+  createConfig,
+  createRetryFetch,
+  createTokenSource,
+} from "@epcc-sdk/sdks-inventories"
+
+const source = createTokenSource(
+  clientCredentialsProvider({
     baseUrl: "https://euwest.api.elasticpath.com",
-    /**
-    * Set default headers only for requests made by this client.
-    */
-    headers: {
-        "Custom-Header": 'My Value',
-    },
-});
+    clientId: process.env.EPCC_CLIENT_ID!,
+    clientSecret: process.env.EPCC_CLIENT_SECRET!,
+  }),
+)
+
+const client = createClient(
+  createConfig({
+    baseUrl: "https://euwest.api.elasticpath.com",
+    auth: createAuthCallback(source),
+    fetch: createRetryFetch({ fetch: createAuthenticatedFetch(source) }),
+  }),
+)
 ```
 
-You can also pass this instance to any SDK function through the client option. This will override the default instance from `import { client } from "@epcc-sdk/sdks-inventories>".
+1. Make both wrappers from the same `source`. `createAuthenticatedFetch` replaces only a token that came from its own source.
+2. Put `createAuthenticatedFetch` inside `createRetryFetch`. In the other order, each retry sends the expired token again.
+
+Do not add the token with a request interceptor. An interceptor cannot see the response, so it cannot get a new token after a 401 response.
+
+## Zod schemas
+
+The `./zod` export has a Zod schema for each request and response. `zod` 4 is an optional peer dependency, so the main export does not import it.
 
 ```ts
-const response = await getStock({
-    client: myClient,
-});
+import { zListStockResponse } from "@epcc-sdk/sdks-inventories/zod"
+
+const result = zListStockResponse.safeParse(data)
 ```
 
-### Direct configuration
+A field that the spec gives as `int64` is a `number` in the types and in the schemas.
 
-Alternatively, you can pass the client configuration options to each SDK function. This is useful if you don't want to create a client instance for one-off use cases.
+## MCP tools
+
+The `./mcp` export has one Model Context Protocol (MCP) tool for each operation, for MCP SDK v2. You need `zod` 4 and `@modelcontextprotocol/server` 2 only for this export.
 
 ```ts
-const response = await getStock({
-    baseUrl: 'https://example.com', // <-- override default configuration
-});
+import { McpServer } from "@modelcontextprotocol/server"
+import { tools } from "@epcc-sdk/sdks-inventories/mcp"
+
+const server = new McpServer({ name: "inventories", version: "1.0.0" })
+
+for (const tool of tools({ client })) {
+  server.registerTool(tool.name, tool.config, tool.handler)
+}
 ```
 
-## Interceptors (Middleware)
+- Each tool sends its requests with the client that you give it. To send a header with each request, such as `EP-Store-Id`, set it in `config.headers` of the client.
+- For one tool, use its factory. The name of the factory is the operation name with `Tool` added, for example `listStockTool`.
+- The name of a tool is `inventories_` and the operation name in snake case, for example `inventories_list_stock`.
+- The arguments of a tool are in `path`, `query`, `headers` and `body`. The `Authorization` header comes from the client.
+- `tool.config._meta["com.elasticpath/operation"].risk` is `read`, `create`, `update` or `delete`. The tool annotations come from it. To register only the read tools, keep the tools where `risk` is `read`.
+- A tool returns an API error as an `isError` result. It does not throw.
 
-Interceptors (middleware) can be used to modify requests before they're sent or responses before they're returned to your application. They can be added with use and removed with eject. Below is an example request interceptor
+These operations have a risk that is different from the default for their HTTP method:
 
-```ts
-import { client } from "@epcc-sdk/sdks-inventories";
+- `getStockForProducts` is `read`, because it only reads data.
+- `createTransaction` is `update`, because it changes or removes existing data.
+- `createImport` is `update`, because it changes or removes existing data.
 
-// Supports async functions
-client.interceptors.request.use(async (request) => {
-    // do something
-    return request;
-});
-
-client.interceptors.request.eject((request) => {
-    // do something
-    return request;
-});
-
-```
-
-and an example response interceptor
-
-```ts
-import { client } from "@epcc-sdk/sdks-inventories";
-
-client.interceptors.response.use((response) => {
-    // do something
-    return response;
-});
-
-client.interceptors.response.eject((response) => {
-    // do something
-    return response;
-});
-```
-
-> **_Tip:_** To eject, you must provide a reference to the function that was passed to use().
-
-## Authentication
-
-We are working to provide helpers to handle auth easier for you but for now using an interceptor is the easiest method.
-
-```ts
-import { client } from "@epcc-sdk/sdks-inventories";
-
-client.interceptors.request.use((request, options) => {
-  request.headers.set('Authorization', 'Bearer MY_TOKEN');
-  return request;
-});
-```
-
-## Build URL
-
-If you need to access the compiled URL, you can use the buildUrl() method. It's loosely typed by default to accept almost any value; in practice, you will want to pass a type hint.
-
-```ts
-type FooData = {
-  path: {
-    fooId: number;
-  };
-  query?: {
-    bar?: string;
-  };
-  url: '/foo/{fooId}';
-};
-
-const url = client.buildUrl<FooData>({
-  path: {
-    fooId: 1,
-  },
-  query: {
-    bar: 'baz',
-  },
-  url: '/foo/{fooId}',
-});
-console.log(url); // prints '/foo/1?bar=baz'
-```
-
-
----
-
-
-
-
-
-## Operation Usage
-The following examples demonstrate how to use the operation function to make requests.
-
-```ts
-import { getStock } from "@epcc-sdk/sdks-inventories";
-
-const product = await getStock({
-  // client: localClient, // optional if you have a client instance you want to use otherwise the global client will be used
-  path: {
-    ...
-  },
-  query: {
-    ...
-  },
-});
-```
-
----
-
-
-
-## Available Operations
-
-
-
-- **`listStock`** (`GET /inventories`)
-
-- **`createStock`** (`POST /inventories`)
-
-- **`getStockForProducts`** (`POST /inventories/multiple`)
-
-- **`deleteStock`** (`DELETE /inventories/{product_uuid}`)
-
-- **`getStock`** (`GET /inventories/{product_uuid}`)
-
-- **`updateStock`** (`PUT /inventories/{product_uuid}`)
-
-- **`listTransactions`** (`GET /inventories/{product_uuid}/transactions`)
-
-- **`createTransaction`** (`POST /inventories/{product_uuid}/transactions`)
-
-- **`getTransaction`** (`GET /inventories/{product_uuid}/transactions/{transaction_uuid}`)
-
-- **`listLocations`** (`GET /inventories/locations`)
-
-- **`createLocation`** (`POST /inventories/locations`)
-
-- **`deleteLocation`** (`DELETE /inventories/locations/{location_uuid}`)
-
-- **`getLocation`** (`GET /inventories/locations/{location_uuid}`)
-
-- **`updateLocation`** (`PUT /inventories/locations/{location_uuid}`)
-
-
-
-
----
+`inventories_create_import` uploads a JSONL file. Give the file in `import_file` as a `data:` URI, for example `data:<media type>;base64,<data>`, and its name in `import_file_name`. The largest file is 8,388,608 bytes (8 MiB). If the file is larger, the URI is not valid, or the value is a URL, the tool returns an `isError` result and sends nothing. The tool never downloads a URL.

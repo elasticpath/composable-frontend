@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one invoice of a subscription. Returns the billing period, line items,
+  tax items, total price, and whether the invoice is outstanding or pro forma.
+  Use it when you know both the subscription and the invoice.

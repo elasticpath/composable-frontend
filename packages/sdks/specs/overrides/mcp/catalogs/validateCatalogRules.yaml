@@ -1,0 +1,6 @@
+x-mcp-risk: read
+x-mcp-description: >-
+  Checks catalog rules against a context you supply and returns the rules that
+  match, without changing anything. The match type picks the check: filter,
+  similarity, conflict (rules that would clash with a new rule) or
+  resolve_for_shopper (the rule a given shopper would get).

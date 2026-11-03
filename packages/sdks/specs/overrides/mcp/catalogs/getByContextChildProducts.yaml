@@ -1,0 +1,6 @@
+x-mcp-title: Get a Shopper Product's Child Products
+x-mcp-description: >-
+  Lists the live child products of one parent product in the catalog that the
+  shopper's context selects, using the catalog rule that best matches it. Any
+  product other than a base product returns a 422 error. Filter by name, sku,
+  slug or tags. For a bundle's components, list its component products instead.

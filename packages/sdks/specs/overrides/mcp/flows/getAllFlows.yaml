@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists flows, the older custom data feature (paths under /v2/flows). A flow
+  either extends a core resource such as customers or orders with extra fields,
+  or defines a new custom resource; in Product Experience Manager the same call
+  lists templates. Narrow the list with the filter parameter.

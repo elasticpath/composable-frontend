@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Signs an account member in and returns one account management token for each
+  account the member can act for. The body picks the mechanism: OpenID Connect,
+  username and password, one-time password, self signup, or switching account.
+  The response also gives the member's ID and each token's expiry.

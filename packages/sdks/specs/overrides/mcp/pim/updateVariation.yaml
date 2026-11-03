@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a variation's name or sort order. Send only the attributes to
+  change; an empty attributes section changes nothing. The body must carry the
+  variation ID, matching the one in the path. Rebuild products for sort order
+  changes to apply.

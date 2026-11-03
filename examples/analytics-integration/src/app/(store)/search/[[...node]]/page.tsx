@@ -41,8 +41,8 @@ export default async function SearchPage(props: {
     const products = await getByContextAllProducts({
       client,
       query: {
-        "page[limit]": BigInt(processLimit(limit)),
-        "page[offset]": BigInt(processOffset(offset)),
+        "page[limit]": processLimit(limit),
+        "page[offset]": processOffset(offset),
         include: ["main_image"],
       },
     });
@@ -69,8 +69,8 @@ export default async function SearchPage(props: {
         node_id: rootHierarchy.id!,
       },
       query: {
-        "page[limit]": BigInt(processLimit(limit)),
-        "page[offset]": BigInt(processOffset(offset)),
+        "page[limit]": processLimit(limit),
+        "page[offset]": processOffset(offset),
         include: ["main_image"],
       },
     });
@@ -108,7 +108,7 @@ async function findHierarchyFromSlug(
   const allHierarchies = await getByContextAllHierarchies({
     client,
     query: {
-      "page[limit]": BigInt(100),
+      "page[limit]": 100,
     },
   });
 
@@ -157,8 +157,8 @@ async function getNodeProducts(
       node_id: nodeId,
     },
     query: {
-      "page[limit]": BigInt(processLimit(limit)),
-      "page[offset]": BigInt(processOffset(offset)),
+      "page[limit]": processLimit(limit),
+      "page[offset]": processOffset(offset),
       include: ["main_image"],
     },
   });

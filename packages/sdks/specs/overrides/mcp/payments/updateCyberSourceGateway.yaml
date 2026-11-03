@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Configures the CyberSource gateway: the merchant ID (login) and SOAP key
+  (password), which are required, plus whether the gateway is enabled and
+  whether the test account is used. The merchant ID and key may differ between
+  live and test.

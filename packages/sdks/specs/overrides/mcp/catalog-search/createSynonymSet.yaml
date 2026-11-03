@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a synonym set, a named group of items that expand searches to related
+  terms. An item is multi-way (all terms equal) or one-way (a root term also
+  matches its synonyms) and can carry a locale. A set only takes effect once it
+  is attached to a search profile, and it is synced to search asynchronously.

@@ -1,0 +1,39 @@
+# Where the published spec and data-extensions.svc disagree, the service wins. Remove an entry
+# once the published spec agrees.
+components:
+  parameters:
+    # The spec requires If-Match. The service's entry handler compares it only when it is sent,
+    # and rejects it on an upsert.
+    IfMatch:
+      required: false
+  requestBodies:
+    # The spec leaves description optional; the service's request validation requires it and
+    # returns 400 without it.
+    # Lists merge by position, so it is restated in full.
+    CreateCustomAPI:
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                required:
+                  - type
+                  - name
+                  - description
+                  - slug
+                  - api_type
+  schemas:
+    # The spec puts the field bodies' required lists beside a oneOf, where the generator drops
+    # them, so every create and update property came out optional. Here they sit on the base
+    # schema each variant extends, which only those bodies use. Create also requires
+    # description, as for CreateCustomAPI.
+    BaseCreateCustomField:
+      required:
+        - type
+        - name
+        - description
+        - slug
+        - field_type
+    BaseUpdateCustomField:
+      required:
+        - type

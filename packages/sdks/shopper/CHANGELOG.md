@@ -1,5 +1,620 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.13.0
+
+### Minor Changes
+
+- 4794fe26: Keep a request out of analytics with `EP-Analytics: off`.
+
+  - `@epcc-sdk/visitor` exports `ANALYTICS_OFF` (`"off"`) beside the existing `ANALYTICS_HEADER`.
+  - `createShopperClient` takes an `analyticsOff` option beside `visitor`. When it is `true`, every call carries `EP-Analytics: off`, whatever the visitor state and with or without a `visitor` option. Without it, no `EP-Analytics` header is sent.
+  - `createAnalyticsOffInterceptor` is exported from the package root for clients built with `createClient`.
+
+- 4794fe26: Send the visitor id and its consent on every call.
+
+  - `createShopperClient` takes a third argument with a `visitor` option: a `Visitor` from `@epcc-sdk/visitor`, or a function that returns one for each call. Every call then carries `EP-Visitor-Id` and `EP-Visitor-Consent`. Without the option, no visitor headers are sent.
+  - `createVisitorInterceptor` is exported from the package root for clients built with `createClient`.
+  - `@epcc-sdk/sdks-shopper` now depends on `@epcc-sdk/visitor` and re-exports its whole API from the root (`resolveVisitor`, `visitorHeaders`, `hasGlobalPrivacyControl`, `readCookie`, the constants and the types), so a storefront installs only the shopper SDK.
+  - The README has a "Visitor id and analytics" section for the `visitor` and `analyticsOff` options and the two interceptors.
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+- Updated dependencies [abade3e3]
+- Updated dependencies [4794fe26]
+- Updated dependencies [4794fe26]
+  - @epcc-sdk/sdks-runtime@0.1.1
+  - @epcc-sdk/visitor@0.0.1
+
+## 0.12.1
+
+### Patch Changes
+
+- 371512aa: Regenerate from the upstream `cart_checkout` spec (spec version 26.1027.8397295, published 2026-10-27T18:02:18Z).
+
+## 0.12.0
+
+### Minor Changes
+
+- b8625bc8: Regenerate from the upstream `cart_checkout` spec (spec version 26.1023.8373549, published 2026-10-23T15:08:03Z).
+
+  Adds 68 exported symbols.
+
+## 0.11.0
+
+### Minor Changes
+
+- f60c460b: Regenerate from the upstream `cart_checkout` spec (spec version 26.1015.8328807, published 2026-10-15T15:01:20Z).
+
+  Adds 8 exported symbols.
+
+## 0.10.1
+
+### Patch Changes
+
+- 35c0f586: Regenerate from the upstream `files` spec (spec version 26.1019.8346818, published 2026-10-19T12:59:49Z).
+
+## 0.10.0
+
+### Minor Changes
+
+- eb7d13b9: `FeaturePlanConfigurationUpdate`, `NullablePaymentAuthority` and `NullablePaymentAuthorityWritable` now include `null`, as the API and the `./zod` schemas already did. An offering plan update can send `null` for a feature configuration to remove it, and a subscriber update can send `payment_authority: null` to clear it.
+
+## 0.9.0
+
+### Minor Changes
+
+- a58a7b47: Add the user authentication info update so an account member can change their own name or email. The request is a partial update: `type` is required, and `name` and `email` are optional. Updating email does not change the login username.
+
+## 0.8.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
+## 0.7.0
+
+### Minor Changes
+
+- b1c89251: The `/zod` schemas parse `int64` values as `number`, the type the TypeScript types already use, instead of `bigint`. A value validated with the schema can now be passed straight to the operation or field that takes it.
+
+  - `z.coerce.bigint()` becomes `z.number().int()` behind a step that turns a string into a number, so a query string value such as `"20"` still parses, to `20`.
+  - The bounds the specification declares stay, as plain numbers. The 64-bit range of the format itself is no longer emitted, because a `number` cannot hold it.
+  - A default declared on an `int64` field is a number, not a `BigInt(…)`.
+  - No `BigInt(…)` is left in the generated schemas.
+
+  The TypeScript types, the SDK functions and the exported names do not change.
+
+  Breaking in practice, although the version is a minor:
+
+  - `.parse()` returns a `number` where it returned a `bigint` for `zAmount`, `zReleaseIndexingCompleteData`, `zPageMeta`, `zBundleConfiguration`, `zReleaseMeta`, `zTieredAmount`, `zSingleCurrencyPrice`, `zNullablePrice`, `zPriceFormatting`, `zDunningRuleAttributes`, `zDunningRuleUpdateAttributes`, `zProrationPreviewAttributes`, `zSubscriptionInvoicePaymentRefundAttributes`, `zCreateInvoicePaymentRefund`, `zNotificationSchedule`, `zSubscriptionMeta`, `zProrationEvent`, `zSubscriptionInvoiceMeta`, `zNullableLocation`, `zStockCreateAttributes`, `zStockLocations`, `zStockResponseAttributes`, `zTransactionResponseAttributes`, `zTransactionCreateAttributes`, `zTextMatchInfo`, `zSubscriptionMetaWritable`, `zSubscriptionInvoiceMetaWritable`, `zLimit`, `zOffset`, `zSubscriptionsPageLimit`, `zSubscriptionsPageOffset`, `zPageLimit`, `zPageOffset`, `zAuthenticationRealmspageLimit`, `zAuthenticationRealmspageOffset`, `zFilespageOffset`, `zFilespageLimit`, `zGetByContextAllHierarchiesQuery`, `zGetByContextHierarchyNodesQuery`, `zGetByContextHierarchyChildNodesQuery`, `zGetByContextAllNodesQuery`, `zGetByContextChildNodesQuery`, `zGetByContextComponentProductIdsQuery`, `zGetCatalogsQuery`, `zGetRulesQuery`, `zValidateCatalogRulesQuery`, `zGetAllHierarchiesQuery`, `zGetHierarchyNodesQuery`, `zGetHierarchyChildNodesQuery`, `zGetAllNodesQuery`, `zGetChildNodesQuery`, `zGetComponentProductIdsQuery`, `zListOfferingsQuery`, `zListOfferingPricingOptionsQuery`, `zListOfferingFeaturesQuery`, `zListOfferingPlansQuery`, `zListSubscriptionsQuery`, `zListSubscriptionInvoicesQuery`, `zListSubscriptionInvoicePaymentsQuery`, `zListInvoicesQuery`, `zGetV2AccountsQuery`, `zGetV2AccountMembersQuery`, `zGetV2AccountsAccountIdAccountMembershipsQuery`, `zGetAllFilesQuery`, `zGetByContextAllProductsQuery`, `zGetByContextAllRelatedProductsQuery`, `zGetByContextChildProductsQuery`, `zGetByContextProductsForHierarchyQuery`, `zGetByContextProductsForNodeQuery`, `zGetAllProductsQuery`, `zGetAllRelatedProductsQuery`, `zGetChildProductsQuery`, `zGetProductsForHierarchyQuery` and `zGetProductsForNodeQuery`, and for the schemas built from them. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+  - Responses are affected too: `.parse()` of a response now returns `number` for price `amount` values, stock `available`, `allocated` and `total` quantities and transaction `quantity`, page `total`, `limit`, `offset` and `current` values, the quantities in a bundle's `selected_options`, catalog release counts and durations, dunning rule retry intervals and limits, subscription proration and refund amounts, and `num_tokens_dropped` on a search hit's `text_match_info`.
+  - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+  - `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.
+
+### Patch Changes
+
+- 0a4cc2cc: Regenerate from the upstream `subscriptions` spec (spec version 26.1001.8242253, published 2026-10-01T12:24:43Z).
+
+## 0.6.1
+
+### Patch Changes
+
+- 29081728: Move the input normalisation that keeps the read/write split from dropping properties into a
+  module shared with `@epcc-sdk/sdks-cart-checkout-order`. The generated client is unchanged.
+- d15ce589: `/zod` keeps the fields of valid cart and checkout payloads instead of stripping or rejecting them.
+
+  - `zCheckoutApiBody` keeps `data.account` and `data.contact` on an account checkout. A customer checkout now requires `data.customer` and an account checkout `data.contact`, as the service does, so `CustomerCheckout.data.customer` and `AccountCheckout.data.contact` are required in the TypeScript types too.
+  - `zManageCartsResponse`, `zCartsResponse` and `zCartItemsResponse` accept custom, subscription and promotion items and keep all their fields. `CustomItemCartObject`, `SubscriptionItemCartObject` and `PromotionItemCartObject` are now a `CartItemResponse` with a fixed `type` and a required `quantity`, not a request item shape, so they lose request-only fields such as `price` and `code`. `CartItemsResponse` items, which used the request wrappers, use these members.
+  - `CartsResponse.meta.display_price` keeps `shipping` and `shipping_discount`.
+  - `zCheckoutApiResponse` accepts an order item with an empty `product_id`, which the service returns for a custom item.
+
+## 0.6.0
+
+### Minor Changes
+
+- 201073f9: Regenerate the shopper SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61.1), move its
+  authentication onto `@epcc-sdk/sdks-runtime`, and publish Zod schemas. The joined shopper
+  specification and the build steps that produce it are unchanged.
+
+  What is new:
+
+  - `createShopperClient(config, authOpts)` and `configureClient(config, authOpts)` keep their
+    arguments and their `{ client, auth }` return, and now run on `@epcc-sdk/sdks-runtime`: a
+    caching token source, the `auth` hook, a `fetch` that replays once with a fresh token after
+    a 401, and backoff on a 429, a 408, and a 5xx or transport failure when the method is safe to
+    repeat. The backoff now applies in the browser too, for example in the InstantSearch adapter
+    and the SPA examples. Pass `retry: false` to keep authentication and drop the backoff, or
+    retry options to change its schedule. `retry` is the only new option on `AuthOptions`.
+
+    ```ts
+    const { client } = createShopperClient(
+      { baseUrl: "https://euwest.api.elasticpath.com" },
+      { clientId: "your-client-id" },
+    )
+    ```
+
+    Tokens stay under the `_store_ep_credentials` key in `localStorage` (or the cookie), and a
+    token stored by 0.5.x is read without a new token request. `wrapUserFetch: false` still
+    passes your `fetch` through untouched, and `auth` keeps `getValidAccessToken`, `refresh`,
+    `clear` and `getSnapshot`. `createTokenSource`, `createAuthenticatedFetch`,
+    `createRetryFetch`, `createConfiguredClient` and the other runtime helpers are re-exported
+    from the package root.
+
+  - Zod schemas for every request body, path, query and response are on the
+    `@epcc-sdk/sdks-shopper/zod` subpath. `zod` is an optional peer dependency (3.x) and the root
+    entry never imports it. The schemas coerce `int64` fields to `bigint`, so a parsed value
+    carries `bigint` where the TypeScript types say `number`.
+  - Request bodies leave out fields the server sets. Ten operations take a `*Writable` body
+    type: `addTaxItemToCart`, `addTaxItemToCartItemComponent`,
+    `updateTaxItemFromCartItemComponent`, `updateATaxItem`, `bulkAddTaxItemsToCart`,
+    `updateCustomDiscountForCart`, `updateCustomDiscountForCartItem`, `putV2SettingsCart`,
+    `putV2SettingsCartStoreId` and `manageCarts` (its subscription item). An object literal that
+    sends a read-only field, such as `id` in a cart settings update, stops compiling. A response
+    object passed back as a body still compiles. 82 `*Writable` types and schemas are added.
+
+  Breaking in practice, although the version is a minor:
+
+  - The `@hey-api/client-fetch` dependency is gone. The fetch client is vendored, and the root
+    exports `createClient`, `createConfig`, `client` and the `Client`, `Config`,
+    `CreateClientConfig`, `Options`, `RequestOptions`, `RequestResult` and `ClientOptions`
+    types. Import them from this package instead.
+  - A network failure now comes back as `{ error }` with no `response`, instead of being thrown,
+    as HTTP errors already did. Check `error` rather than only `data`, or pass
+    `throwOnError: true` to throw.
+  - The shared `client` defaults to `https://euwest.api.elasticpath.com`. Catalog, OAuth,
+    multi-search and `/v2` operations all resolve under that one host.
+  - The client's `next` request option is typed `never`. It never reached Next.js: the client
+    hands `fetch` a `Request`, which drops it. Remove `next: { tags }` from operation calls.
+  - `client.get`, `client.post` and the other method helpers take a map of status code to
+    response type: write `client.get<{ 200: MyType }>(...)`, not `client.get<MyType>(...)`.
+  - The 72 `date-time` fields are typed `string`, not `Date`. The old transformers were never
+    called, so the value at runtime was always the string the API sends. Wrap one in
+    `new Date(...)` where you need a `Date`. By resource, with the operations that carry them:
+
+    - Account Management Authentication: `AccountManagementAuthenticationTokenResponse["expires"]`. In `postV2AccountMembersTokens`.
+    - Cart Items: `CartItemCollectionResponse["included"]["promotions"]["end"]`, `CartItemCollectionResponse["included"]["promotions"]["start"]`. In `bulkUpdateItemsInCart`.
+    - Cart Management: `BaseCartResponse["snapshot_date"]`; `CartIncludedPromotion["start"]`, `CartIncludedPromotion["end"]`. In `createACart`, `createCartPaymentIntent`, `getACart`, `getCarts`, `updateACart`, `updateCartPaymentIntent`.
+    - Cart Shipping Groups: `DeliveryEstimate["start"]`, `DeliveryEstimate["end"]`; `ShippingGroupResponse["created_at"]`, `ShippingGroupResponse["updated_at"]`. In `createOrderShippingGroup`, `createShippingGroup`, `getOrderShippingGroups`, `getShippingGroupById`, `getShippingGroups`, `getShippingGroupsById`, `putShippingGroupById`, `updateShippingGroup`.
+    - Catalogs: `Catalog["attributes"]["created_at"]`, `Catalog["attributes"]["updated_at"]`. In `createCatalog`, `getCatalogById`, `getCatalogs`, `updateCatalog`.
+    - Exported but not returned by any operation: `Pricebook["attributes"]["created_at"]`, `Pricebook["attributes"]["updated_at"]`; `ProductDiff["attributes"]["diff_created_at"]`, `ProductDiff["attributes"]["updated_at"]["this"]`, `ProductDiff["attributes"]["updated_at"]["other"]`; `BuildSubscription["override_first_period_end_date"]`; `ScheduleMeta["scheduled_for"]`; `OidcProfileResponse["meta"]["created_at"]`, `OidcProfileResponse["meta"]["updated_at"]`; `UserAuthenticationInfoResponse["meta"]["created_at"]`, `UserAuthenticationInfoResponse["meta"]["updated_at"]`; `SearchRuleGroupMeta["created_at"]`, `SearchRuleGroupMeta["updated_at"]`; `SearchRuleMeta["created_at"]`, `SearchRuleMeta["updated_at"]`; `StopwordSetMeta["created_at"]`, `StopwordSetMeta["updated_at"]`, `StopwordSetMeta["last_synced_at"]`; `SynonymSetMeta["created_at"]`, `SynonymSetMeta["updated_at"]`, `SynonymSetMeta["last_synced_at"]`.
+    - Orders: `CondensedPromotionResponse["start"]`, `CondensedPromotionResponse["end"]`. In `getOrderItems`.
+    - Password Profiles: `OneTimePasswordTokenRequestResponse["expires_at"]`; `AuthenticationRealmsMetaTimestamps["created_at"]`, `AuthenticationRealmsMetaTimestamps["updated_at"]`. In `createOneTimePasswordTokenRequest`, `updatePasswordProfileInfo`.
+    - Releases: `Release["attributes"]["published_at"]`; `ReleaseMeta["created_at"]`, `ReleaseMeta["started_at"]`, `ReleaseMeta["updated_at"]`. In `getByContextRelease`, `getReleaseById`, `getReleases`, `publishRelease`.
+    - Rules: `Rule["attributes"]["created_at"]`, `Rule["attributes"]["updated_at"]`; `RuleSchedule["valid_from"]`, `RuleSchedule["valid_to"]`; `CatalogRuleValidatorRequest["data"]["schedules"]["valid_from"]`, `CatalogRuleValidatorRequest["data"]["schedules"]["valid_to"]`, `CatalogRuleValidatorRequest["data"]["match_date"]`. In `createRule`, `getRuleById`, `getRules`, `updateRule`, `validateCatalogRules`.
+    - Shopper Catalog API: `AlternativePrices["sale_expires"]`; `FileReference["created_at"]`; `HierarchyAttributes["created_at"]`, `HierarchyAttributes["published_at"]`, `HierarchyAttributes["updated_at"]`; `NodeAttributes["created_at"]`, `NodeAttributes["published_at"]`, `NodeAttributes["updated_at"]`; `ProductAttributes["published_at"]`, `ProductAttributes["created_at"]`, `ProductAttributes["updated_at"]`; `ProductMeta["sale_expires"]`, `ProductMeta["component_products"]["sale_expires"]`, `ProductMeta["tiers"]["sale_expires"]`; `Schedule["valid_from"]`, `Schedule["valid_to"]`. In `configureByContextProduct`, `getAllHierarchies`, `getAllNodes`, `getAllProducts`, `getAllRelatedProducts`, `getByContextAllHierarchies`, `getByContextAllNodes`, `getByContextAllProducts`, `getByContextAllRelatedProducts`, `getByContextChildNodes`, `getByContextChildProducts`, `getByContextHierarchy`, `getByContextHierarchyChildNodes`, `getByContextHierarchyNodes`, `getByContextNode`, `getByContextProduct`, `getByContextProductsForHierarchy`, `getByContextProductsForNode`, `getChildNodes`, `getChildProducts`, `getHierarchy`, `getHierarchyChildNodes`, `getHierarchyNodes`, `getNode`, `getProduct`, `getProductsForHierarchy`, `getProductsForNode`.
+    - Subscriptions: `TimePeriod["start"]`, `TimePeriod["end"]`; `SubscriptionPriceUpdateHistoryEntry["valid_until"]`; `InvoiceNotification["due"]`, `InvoiceNotification["sent_at"]`. In `getInvoice`, `getSubscription`, `getSubscriptionInvoice`, `listInvoices`, `listSubscriptionInvoices`, `listSubscriptions`.
+    - Operation parameters: `body.data.delivery_estimate.start` in `createOrderShippingGroup`; `body.data.delivery_estimate.end` in `createOrderShippingGroup`.
+
+  - `_Error` is renamed to `Error`. Rename the import; the shape is unchanged.
+  - The inline enum types are no longer exported, because `exportInlineEnums` does not exist in
+    0.99. Their unions are unchanged and written at each use site. Derive one where you need it:
+
+    - `Owner`: `NonNullable<ReleaseMeta["owner"]>`
+    - `ReleaseStatus`: `NonNullable<ReleaseMeta["release_status"]>`
+    - `MatchType`: `NonNullable<CatalogRuleValidatorRequest["data"]>["match_type"]`
+    - `Type`: `CustomAttributes[string]["type"]`
+    - `PromotionSource`: `NonNullable<CartItemResponse["promotion_source"]>`
+    - `Gateway`: `DataBasePayments["gateway"]`
+    - `Method`: `DataBasePayments["method"]`
+    - `Payment`: `NonNullable<OrderResponse["payment"]>`
+    - `Shipping`: `NonNullable<OrderResponse["shipping"]>`
+    - `TransactionType`: `NonNullable<TransactionResponse["transaction_type"]>`
+    - `CaptureMechanism`: `NonNullable<TransactionResponse["capture_mechanism"]>`
+    - `RefundMechanism`: `NonNullable<TransactionResponse["refund_mechanism"]>`
+    - `Unit`: `PriceUnits["unit"]`
+    - `PaymentRetryType`: `DunningRuleAttributes["payment_retry_type"]`
+    - `PaymentRetryUnit`: `NonNullable<DunningRuleAttributes["payment_retry_unit"]>`
+    - `Action`: `DunningRuleAttributes["action"]`
+    - `Rounding`: `ProrationPolicyAttributes["rounding"]`
+    - `BillingIntervalType`: `PricingOptionAttributes["billing_interval_type"]`
+    - `EndBehavior`: `PricingOptionAttributes["end_behavior"]`
+    - `RejectionReason`: `ProrationPreviewAttributes["rejection_reason"]`
+    - `JobType`: `JobCreateAttributes["job_type"]`
+    - `TotalMethod`: `NonNullable<PaginationResults["total_method"]>`
+    - `AccountMemberSelfManagement`: `NonNullable<AccountAuthenticationSettings["account_member_self_management"]>`
+    - `DuplicateEmailPolicy`: `NonNullable<AuthenticationRealm["duplicate_email_policy"]>`
+    - `UsernameFormat`: `NonNullable<PasswordProfile["username_format"]>`
+    - `Purpose`: `OneTimePasswordTokenRequestInput["purpose"]`
+    - `CreationStatus`: `NonNullable<NonNullable<UserAuthenticationInfoResponse["meta"]>["creation_status"]>`
+    - `Placement`: `MoveSearchRuleRequest["data"]["attributes"]["placement"]`
+    - `Match`: `NonNullable<SearchRuleTrigger["match"]>`
+    - `SyncStatus`: `StopwordSetMeta["sync_status"]`
+    - `SplitJoinTokens`: `NonNullable<NonNullable<TypoTolerance>["split_join_tokens"]>`
+    - `PageTotalMethod`: `NonNullable<NonNullable<GetV2AccountAddressesData["query"]>["page[total_method]"]>`
+    - `Sort`: `NonNullable<NonNullable<GetV2AccountsData["query"]>["sort"]>`
+
+  - `Status` now names the subscription status (`"active" | "inactive"`, previously `Status2`).
+    The catalog search indexing status it used to name (`"succeeded" | "failed"`) is no longer
+    exported.
+  - Fields widened by OpenAPI 3.1 type arrays: `ResponseErrorItem["status"]` is
+    `string | number` (was `number`), and `CustomAttributes[string]["value"]` is
+    `string | boolean | number` (was `number`). Narrow before numeric use, for example
+    `Number(error.status)`.
+  - `authentication_mechanism` is required on each variant of `postV2AccountMembersTokens`'
+    body. It was already required by the API.
+  - Six response fields the specification marks read-only gain `readonly`:
+    `CartItemResponse`'s `type`, `unit_price`, `value`, `promotion_source` and
+    `custom_attributes`, and `OrderItemResponse["custom_attributes"]`.
+  - `/react-query` no longer has query options or query keys for POST operations, only their
+    mutations: 62 names are removed, the `*Options` and `*QueryKey` of `addCustomDiscountToCartItem`, `addTaxItemToCart`, `addTaxItemToCartItemComponent`, `anonymizeOrders`, `bulkAddCustomDiscountsToCart`, `bulkAddTaxItemsToCart`, `cancelATransaction`, `captureATransaction`, `checkoutApi`, `configureByContextProduct`, `confirmOrder`, `confirmPayment`, `createACart`, `createAccountCartAssociation`, `createAnAccessToken`, `createCartPaymentIntent`, `createCatalog`, `createCustomerCartAssociation`, `createOneTimePasswordTokenRequest`, `createOrderShippingGroup`, `createRule`, `createShippingGroup`, `createSubscriptionState`, `manageCarts`, `paymentSetup`, `postV2AccountAddress`, `postV2AccountMembersTokens`, `postV2Accounts`, `publishRelease`, `refundATransaction`, `validateCatalogRules`. `postMultiSearch`,
+    a search sent as a POST, keeps both. Every other name, `getACartQueryKey` included, is
+    unchanged.
+  - A custom `tokenProvider` that returns no `access_token` now fails the request with an error,
+    instead of storing an empty token.
+
+  What is fixed:
+
+  - The 114 `int64` fields, and the 8 `int64` page-size aliases (`PageLimit`, `PageOffset`,
+    `Limit`, `Offset`, `SubscriptionsPageLimit`, `SubscriptionsPageOffset`,
+    `AuthenticationRealmspageLimit` and `AuthenticationRealmspageOffset`), are typed `number`,
+    not `BigInt`. The old transformers were never called, so the values at runtime were always
+    numbers, and a request body typed `BigInt` could not be serialised. A caller that passed
+    `BigInt(10)` or `10n` must pass `10`. By resource:
+
+    - Inventory: `StockResponseAttributes["available"]`, `StockResponseAttributes["allocated"]`, `StockResponseAttributes["total"]`; `StockLocations["available"]`, `StockLocations["allocated"]`, `StockLocations["total"]`. In `getStock`.
+    - Exported but not returned by any operation: `ReleaseIndexingCompleteData["data"]["duration_ms"]`; `NullablePrice["amount"]`; `DunningRuleAttributes["payment_retry_interval"]`, `DunningRuleAttributes["payment_retries_limit"]`; `DunningRuleUpdateAttributes["payment_retry_interval"]`, `DunningRuleUpdateAttributes["payment_retries_limit"]`; `ProrationPreviewAttributes["billing_cost_before_proration"]`, `ProrationPreviewAttributes["refunded_cost_for_unused_pricing_option_period"]`, `ProrationPreviewAttributes["new_pricing_option_cost"]`; `SubscriptionInvoicePaymentRefundAttributes["amount"]`; `CreateInvoicePaymentRefund["attributes"]["amount"]`; `TransactionResponseAttributes["quantity"]`; `NullableLocation["available"]`; `StockCreateAttributes["available"]`, `StockCreateAttributes["locations"]["available"]`; `TransactionCreateAttributes["quantity"]`.
+    - Offerings: `NotificationSchedule["amount"]`. In `getOffering`, `getSubscription`, `listOfferingPricingOptions`, `listOfferings`, `listSubscriptionPricingOptions`, `listSubscriptions`.
+    - Releases: `ReleaseMeta["total_products"]`, `ReleaseMeta["total_nodes"]`, `ReleaseMeta["indexing_duration_ms"]`. In `getByContextRelease`, `getReleaseById`, `getReleases`, `publishRelease`.
+    - Search: `TextMatchInfo["num_tokens_dropped"]`. In `postMultiSearch`.
+    - Shopper Catalog API: `Amount["amount"]`; `PageMeta["results"]["total"]`, `PageMeta["page"]["limit"]`, `PageMeta["page"]["offset"]`, `PageMeta["page"]["current"]`, `PageMeta["page"]["total"]`; `BundleConfiguration["selected_options"]`; `TieredAmount["amount"]`, `TieredAmount["tiers"]["amount"]`. In `configureByContextProduct`, `getAllHierarchies`, `getAllNodes`, `getAllProducts`, `getAllRelatedProducts`, `getByContextAllHierarchies`, `getByContextAllNodes`, `getByContextAllProducts`, `getByContextAllRelatedProducts`, `getByContextChildNodes`, `getByContextChildProducts`, `getByContextComponentProductIds`, `getByContextHierarchyChildNodes`, `getByContextHierarchyNodes`, `getByContextProduct`, `getByContextProductsForHierarchy`, `getByContextProductsForNode`, `getCatalogs`, `getChildNodes`, `getChildProducts`, `getComponentProductIds`, `getHierarchyChildNodes`, `getHierarchyNodes`, `getProduct`, `getProductsForHierarchy`, `getProductsForNode`, `getRules`, `validateCatalogRules`.
+    - Subscriptions: `SingleCurrencyPrice["amount"]`; `PriceFormatting["amount"]`; `SubscriptionInvoiceMeta["pro_rata_remaining_value"]`; `ProrationEvent["billing_cost_before_proration"]`, `ProrationEvent["refunded_amount_for_unused_pricing_option"]`, `ProrationEvent["new_pricing_option_cost"]`. In `getInvoice`, `getOffering`, `getSubscription`, `getSubscriptionInvoice`, `getSubscriptionInvoicePayment`, `listInvoices`, `listOfferingPlans`, `listOfferingPricingOptions`, `listOfferings`, `listSubscriptionInvoicePayments`, `listSubscriptionInvoices`, `listSubscriptionPlans`, `listSubscriptionPricingOptions`, `listSubscriptions`.
+    - Operation parameters: `page[limit]` in `getAllHierarchies`, `getAllNodes`, `getAllProducts`, `getAllRelatedProducts`, `getByContextAllHierarchies`, `getByContextAllNodes`, `getByContextAllProducts`, `getByContextAllRelatedProducts`, `getByContextChildNodes`, `getByContextChildProducts`, `getByContextComponentProductIds`, `getByContextHierarchyChildNodes`, `getByContextHierarchyNodes`, `getByContextProductsForHierarchy`, `getByContextProductsForNode`, `getCatalogs`, `getChildNodes`, `getChildProducts`, `getComponentProductIds`, `getHierarchyChildNodes`, `getHierarchyNodes`, `getProductsForHierarchy`, `getProductsForNode`, `getRules`, `getV2AccountMembers`, `getV2Accounts`, `getV2AccountsAccountIdAccountMemberships`, `listInvoices`, `listOfferingFeatures`, `listOfferingPlans`, `listOfferingPricingOptions`, `listOfferings`, `listSubscriptionInvoicePayments`, `listSubscriptionInvoices`, `listSubscriptions`, `validateCatalogRules`; `page[offset]` in `getAllHierarchies`, `getAllNodes`, `getAllProducts`, `getAllRelatedProducts`, `getByContextAllHierarchies`, `getByContextAllNodes`, `getByContextAllProducts`, `getByContextAllRelatedProducts`, `getByContextChildNodes`, `getByContextChildProducts`, `getByContextComponentProductIds`, `getByContextHierarchyChildNodes`, `getByContextHierarchyNodes`, `getByContextProductsForHierarchy`, `getByContextProductsForNode`, `getCatalogs`, `getChildNodes`, `getChildProducts`, `getComponentProductIds`, `getHierarchyChildNodes`, `getHierarchyNodes`, `getProductsForHierarchy`, `getProductsForNode`, `getRules`, `getV2AccountMembers`, `getV2Accounts`, `getV2AccountsAccountIdAccountMemberships`, `listInvoices`, `listOfferingFeatures`, `listOfferingPlans`, `listOfferingPricingOptions`, `listOfferings`, `listSubscriptionInvoicePayments`, `listSubscriptionInvoices`, `listSubscriptions`, `validateCatalogRules`.
+
+  - Catalog `links` (`self`, `first`, `last`, `prev`, `next`) accept the relative paths the API
+    sends, and an extension attribute (`Extension[string]`) accepts any value, as the API sends
+    strings, numbers, booleans and nulls. The specification says absolute URLs and objects, so
+    `/zod` rejected every catalog response and the extension type was wrong. Both are corrected
+    in the generator config until the specification is fixed.
+  - `JobResponseAttributes` no longer carries a stray `job_type: "JobResponseAttributes"`; the
+    job's real `job_type` comes from `JobCreateAttributes`.
+  - The `/react-query` declarations import the `dataTagSymbol` and `dataTagErrorSymbol` they use
+    as keys. With `skipLibCheck` off they no longer fail to compile, and with it on, a cache read
+    such as `getQueryData(getACartOptions(...).queryKey)` is typed as the cart again, not `{}`.
+
+  All 149 operations keep their names and their `Data`, `Response` and `Error` types. Apart
+  from the changes listed above, no exported type is renamed or removed and no property is
+  dropped.
+
+## 0.5.0
+
+### Minor Changes
+
+- 69223068: Regenerate from the upstream `authentication-realms` spec (spec version 1.0.6697305, published 2025-10-12T12:20:22Z).
+
+  Adds 234 exported symbols.
+
+  **Breaking.** Removes 184 exported symbols:
+
+  - `authentication-realms: AuthenticationRealmListResponse`
+  - `authentication-realms: AuthenticationRealmUpdateRequest`
+  - `authentication-realms: OidcProfileListResponse`
+  - `authentication-realms: OidcProfileCreateRequestWrapper`
+  - `authentication-realms: OidcProfileUpdateRequestWrapper`
+  - `authentication-realms: PasswordProfileListResponse`
+  - `authentication-realms: PasswordProfileCreateRequestWrapper`
+  - `authentication-realms: PasswordProfileUpdateRequestWrapper`
+  - `authentication-realms: OneTimePasswordTokenRequest`
+  - `authentication-realms: UserAuthenticationInfoListResponse`
+  - `authentication-realms: UserAuthenticationInfoCreateRequestWrapper`
+  - `authentication-realms: UserAuthenticationInfoUpdateRequestWrapper`
+  - `authentication-realms: UserAuthenticationOidcProfileInfoListResponse`
+  - `authentication-realms: UserAuthenticationOidcProfileInfoCreateRequestWrapper`
+  - `authentication-realms: UserAuthenticationOidcProfileInfoUpdateRequestWrapper`
+  - `authentication-realms: PasswordProfileInfo`
+  - `authentication-realms: PasswordProfileInfoResponse`
+  - `authentication-realms: PasswordProfileInfoListResponse`
+  - `authentication-realms: PasswordProfileInfoCreateRequestWrapper`
+  - `authentication-realms: PasswordProfileInfoCreateRequest`
+  - `authentication-realms: PasswordProfileInfoUpdateRequestWrapper`
+  - `authentication-realms: PasswordProfileInfoUpdateRequest`
+  - `authentication-realms: GetAllAuthenticationRealmsData`
+  - `authentication-realms: GetAllAuthenticationRealmsResponses`
+  - `authentication-realms: GetAllAuthenticationRealmsResponse`
+  - `authentication-realms: GetAuthenticationRealmData`
+  - `authentication-realms: GetAuthenticationRealmErrors`
+  - `authentication-realms: GetAuthenticationRealmResponses`
+  - `authentication-realms: GetAuthenticationRealmResponse`
+  - `authentication-realms: UpdateAuthenticationRealmData`
+  - `authentication-realms: UpdateAuthenticationRealmErrors`
+  - `authentication-realms: UpdateAuthenticationRealmResponses`
+  - `authentication-realms: UpdateAuthenticationRealmResponse`
+  - `authentication-realms: GetAllOidcProfilesData`
+  - `authentication-realms: GetAllOidcProfilesResponses`
+  - `authentication-realms: GetAllOidcProfilesResponse`
+  - `authentication-realms: CreateOidcProfileData`
+  - `authentication-realms: CreateOidcProfileResponses`
+  - `authentication-realms: CreateOidcProfileResponse`
+  - `authentication-realms: DeleteOidcProfileData`
+  - `authentication-realms: DeleteOidcProfileErrors`
+  - `authentication-realms: DeleteOidcProfileResponses`
+  - `authentication-realms: DeleteOidcProfileResponse`
+  - `authentication-realms: GetOidcProfileData`
+  - `authentication-realms: GetOidcProfileErrors`
+  - `authentication-realms: GetOidcProfileResponses`
+  - `authentication-realms: GetOidcProfileResponse`
+  - `authentication-realms: UpdateOidcProfileData`
+  - `authentication-realms: UpdateOidcProfileErrors`
+  - `authentication-realms: UpdateOidcProfileResponses`
+  - `authentication-realms: UpdateOidcProfileResponse`
+  - `authentication-realms: GetAllPasswordProfilesData`
+  - `authentication-realms: GetAllPasswordProfilesResponses`
+  - `authentication-realms: GetAllPasswordProfilesResponse`
+  - `authentication-realms: CreatePasswordProfileData`
+  - `authentication-realms: CreatePasswordProfileResponses`
+  - `authentication-realms: CreatePasswordProfileResponse`
+  - `authentication-realms: DeletePasswordProfileData`
+  - `authentication-realms: DeletePasswordProfileErrors`
+  - `authentication-realms: DeletePasswordProfileResponses`
+  - `authentication-realms: DeletePasswordProfileResponse`
+  - `authentication-realms: GetPasswordProfileData`
+  - `authentication-realms: GetPasswordProfileErrors`
+  - `authentication-realms: GetPasswordProfileResponses`
+  - `authentication-realms: GetPasswordProfileResponse`
+  - `authentication-realms: UpdatePasswordProfileData`
+  - `authentication-realms: UpdatePasswordProfileErrors`
+  - `authentication-realms: UpdatePasswordProfileResponses`
+  - `authentication-realms: UpdatePasswordProfileResponse`
+  - `authentication-realms: CreateOneTimePasswordTokenRequestData`
+  - `authentication-realms: CreateOneTimePasswordTokenRequestResponses`
+  - `authentication-realms: GetAllUserAuthenticationInfoData`
+  - `authentication-realms: GetAllUserAuthenticationInfoResponses`
+  - `authentication-realms: GetAllUserAuthenticationInfoResponse`
+  - `authentication-realms: CreateUserAuthenticationInfoData`
+  - `authentication-realms: CreateUserAuthenticationInfoResponses`
+  - `authentication-realms: CreateUserAuthenticationInfoResponse`
+  - `authentication-realms: DeleteUserAuthenticationInfoData`
+  - `authentication-realms: DeleteUserAuthenticationInfoErrors`
+  - `authentication-realms: DeleteUserAuthenticationInfoResponses`
+  - `authentication-realms: DeleteUserAuthenticationInfoResponse`
+  - `authentication-realms: GetUserAuthenticationInfoData`
+  - `authentication-realms: GetUserAuthenticationInfoErrors`
+  - `authentication-realms: GetUserAuthenticationInfoResponses`
+  - `authentication-realms: GetUserAuthenticationInfoResponse`
+  - `authentication-realms: UpdateUserAuthenticationInfoData`
+  - `authentication-realms: UpdateUserAuthenticationInfoErrors`
+  - `authentication-realms: UpdateUserAuthenticationInfoResponses`
+  - `authentication-realms: UpdateUserAuthenticationInfoResponse`
+  - `authentication-realms: GetAllUserAuthenticationOidcProfileInfoData`
+  - `authentication-realms: GetAllUserAuthenticationOidcProfileInfoResponses`
+  - `authentication-realms: GetAllUserAuthenticationOidcProfileInfoResponse`
+  - `authentication-realms: CreateUserAuthenticationOidcProfileInfoData`
+  - `authentication-realms: CreateUserAuthenticationOidcProfileInfoResponses`
+  - `authentication-realms: CreateUserAuthenticationOidcProfileInfoResponse`
+  - `authentication-realms: DeleteUserAuthenticationOidcProfileInfoData`
+  - `authentication-realms: DeleteUserAuthenticationOidcProfileInfoErrors`
+  - `authentication-realms: DeleteUserAuthenticationOidcProfileInfoResponses`
+  - `authentication-realms: DeleteUserAuthenticationOidcProfileInfoResponse`
+  - `authentication-realms: GetUserAuthenticationOidcProfileInfoData`
+  - `authentication-realms: GetUserAuthenticationOidcProfileInfoErrors`
+  - `authentication-realms: GetUserAuthenticationOidcProfileInfoResponses`
+  - `authentication-realms: GetUserAuthenticationOidcProfileInfoResponse`
+  - `authentication-realms: UpdateUserAuthenticationOidcProfileInfoData`
+  - `authentication-realms: UpdateUserAuthenticationOidcProfileInfoErrors`
+  - `authentication-realms: UpdateUserAuthenticationOidcProfileInfoResponses`
+  - `authentication-realms: UpdateUserAuthenticationOidcProfileInfoResponse`
+  - `authentication-realms: ListPasswordProfileInfosData`
+  - `authentication-realms: ListPasswordProfileInfosResponses`
+  - `authentication-realms: ListPasswordProfileInfosResponse`
+  - `authentication-realms: CreatePasswordProfileInfoData`
+  - `authentication-realms: CreatePasswordProfileInfoResponses`
+  - `authentication-realms: CreatePasswordProfileInfoResponse`
+  - `authentication-realms: DeletePasswordProfileInfoData`
+  - `authentication-realms: DeletePasswordProfileInfoErrors`
+  - `authentication-realms: DeletePasswordProfileInfoResponses`
+  - `authentication-realms: DeletePasswordProfileInfoResponse`
+  - `authentication-realms: GetPasswordProfileInfoData`
+  - `authentication-realms: GetPasswordProfileInfoErrors`
+  - `authentication-realms: GetPasswordProfileInfoResponses`
+  - `authentication-realms: GetPasswordProfileInfoResponse`
+  - `authentication-realms: UpdatePasswordProfileInfoData`
+  - `authentication-realms: UpdatePasswordProfileInfoErrors`
+  - `authentication-realms: UpdatePasswordProfileInfoResponses`
+  - `authentication-realms: UpdatePasswordProfileInfoResponse`
+  - `authentication-realms: getAllAuthenticationRealms`
+  - `authentication-realms: getAuthenticationRealm`
+  - `authentication-realms: updateAuthenticationRealm`
+  - `authentication-realms: getAllOidcProfiles`
+  - `authentication-realms: createOidcProfile`
+  - `authentication-realms: deleteOidcProfile`
+  - `authentication-realms: getOidcProfile`
+  - `authentication-realms: updateOidcProfile`
+  - `authentication-realms: getAllPasswordProfiles`
+  - `authentication-realms: createPasswordProfile`
+  - `authentication-realms: deletePasswordProfile`
+  - `authentication-realms: getPasswordProfile`
+  - `authentication-realms: updatePasswordProfile`
+  - `authentication-realms: createOneTimePasswordTokenRequest`
+  - `authentication-realms: getAllUserAuthenticationInfo`
+  - `authentication-realms: createUserAuthenticationInfo`
+  - `authentication-realms: deleteUserAuthenticationInfo`
+  - `authentication-realms: getUserAuthenticationInfo`
+  - `authentication-realms: updateUserAuthenticationInfo`
+  - `authentication-realms: getAllUserAuthenticationOidcProfileInfo`
+  - `authentication-realms: createUserAuthenticationOidcProfileInfo`
+  - `authentication-realms: deleteUserAuthenticationOidcProfileInfo`
+  - `authentication-realms: getUserAuthenticationOidcProfileInfo`
+  - `authentication-realms: updateUserAuthenticationOidcProfileInfo`
+  - `authentication-realms: listPasswordProfileInfos`
+  - `authentication-realms: createPasswordProfileInfo`
+  - `authentication-realms: deletePasswordProfileInfo`
+  - `authentication-realms: getPasswordProfileInfo`
+  - `authentication-realms: updatePasswordProfileInfo`
+  - `shopper: AuthenticationRealmListResponse`
+  - `shopper: AuthenticationRealmUpdateRequest`
+  - `shopper: OidcProfileListResponse`
+  - `shopper: OidcProfileCreateRequestWrapper`
+  - `shopper: OidcProfileUpdateRequestWrapper`
+  - `shopper: PasswordProfileListResponse`
+  - `shopper: PasswordProfileCreateRequestWrapper`
+  - `shopper: PasswordProfileUpdateRequestWrapper`
+  - `shopper: OneTimePasswordTokenRequest`
+  - `shopper: UserAuthenticationInfoListResponse`
+  - `shopper: UserAuthenticationInfoCreateRequestWrapper`
+  - `shopper: UserAuthenticationInfoUpdateRequestWrapper`
+  - `shopper: UserAuthenticationOidcProfileInfoListResponse`
+  - `shopper: UserAuthenticationOidcProfileInfoCreateRequestWrapper`
+  - `shopper: UserAuthenticationOidcProfileInfoUpdateRequestWrapper`
+  - `shopper: PasswordProfileInfo`
+  - `shopper: PasswordProfileInfoResponse`
+  - `shopper: PasswordProfileInfoListResponse`
+  - `shopper: PasswordProfileInfoCreateRequestWrapper`
+  - `shopper: PasswordProfileInfoCreateRequest`
+  - `shopper: PasswordProfileInfoUpdateRequestWrapper`
+  - `shopper: PasswordProfileInfoUpdateRequest`
+  - `shopper: CreateOneTimePasswordTokenRequestData`
+  - `shopper: CreateOneTimePasswordTokenRequestResponses`
+  - `shopper: UpdatePasswordProfileInfoData`
+  - `shopper: UpdatePasswordProfileInfoErrors`
+  - `shopper: UpdatePasswordProfileInfoResponses`
+  - `shopper: UpdatePasswordProfileInfoResponse`
+  - `shopper: createOneTimePasswordTokenRequest`
+  - `shopper: updatePasswordProfileInfo`
+
+- 6f468c6a: Regenerate from the upstream `catalog_search` spec (spec version 26.0825.8081263, published 2026-08-25T09:27:34Z).
+
+  Adds 481 exported symbols.
+
+### Patch Changes
+
+- 7acab406: Regenerate from the upstream `account_management` spec (spec version 26.0208.7165720, published 2026-02-08T16:13:08Z).
+
+## 0.4.0
+
+### Minor Changes
+
+- fe1fd88e: Pick up the corrected `user-authentication-info` model from
+  `specs/authentication-realms.yaml`, which the shopper spec joins.
+
+  `UserAuthenticationInfo` drops `username` — a field the API neither accepts nor returns on
+  this resource — and gains `name`, `email`, the nullable `given_name`, `family_name` and
+  `middle_name`, and `meta.creation_status`. Both request wrappers follow, and the update
+  wrapper requires only `type`, matching the partial update the service performs. A new inline enum type, `CreationStatus`, is exported.
+
+  None of the five `user-authentication-info` operations are in the shopper filter, so only
+  the schema types change; no operation was added or removed. Code that read or set
+  `username` on one of these types no longer compiles.
+
+- fda9bb3e: Regenerate from the upstream `account-addresses` spec (spec version 25.1126.6886238, published 2025-11-26T19:10:23Z).
+
+  The working spec had fallen behind the published one. What the refresh restores was
+  verified against the service source in `commerce-cloud/addresses.svc`:
+
+  - `getV2AccountAddresses` takes `page[offset]`, `page[limit]`, `page[total_method]` and
+    `filter`, and its response carries `meta.page`, `meta.results` and `links`. The service
+    has read and returned all of these all along; the spec did not describe them, so the
+    typed client could not reach them.
+  - `postV2AccountAddress` declares `201`, which is the status the service actually
+    returns.
+  - `400` responses are declared on create, update and list.
+
+  Adds 13 exported symbols, including `PaginationPage`, `PaginationResults`,
+  `PaginationMeta` and `PaginationLinks`.
+
+  **Breaking.** Removes 3 exported symbols:
+
+  - `accounts-addresses: _Error` — renamed `Error`.
+  - `accounts-addresses: ErrorBadRequest`, `shopper: ErrorBadRequest` — the published spec
+    models these as responses rather than schemas, so no type is generated under those
+    names. Use `ErrorResponse`, which is unchanged in shape.
+  - `accounts-addresses: ErrorNotFound`, `shopper: ErrorNotFound` — likewise.
+
+  The tool also reported `accounts-addresses: client` as removed. It is not: on generator
+  0.99 the shared instance moves from `client/sdk.gen.ts` to `client/client.gen.ts`, and
+  the package root still exports it.
+
+## 0.3.0
+
+### Minor Changes
+
+- 48fa2a2e: Regenerate from the upstream `inventories` spec (spec version 26.0701.7843571, published 2026-07-01T09:25:34Z).
+
+  Adds 47 exported symbols.
+
+- 9c857d1b: Regenerate from the upstream `subscriptions` spec (spec version 26.0825.8081050, published 2026-08-25T08:39:38Z).
+
+  Adds 136 exported symbols.
+
+### Patch Changes
+
+- 3a40fe97: Regenerate from the upstream `currencies` spec (spec version 26.0225.7248250, published 2026-02-25T21:31:11Z).
+- 9b7373e2: Regenerate from the upstream `files` spec (spec version 26.0708.7869251, published 2026-07-08T10:28:23Z).
+
+## 0.2.1
+
+### Patch Changes
+
+- 2d20887f: Keep `AccessTokenResponse` as a type this package owns, derived from the generated
+  `CreateAnAccessTokenResponses[200]`, so the name survives a spec refresh. Drops the
+  now-redundant `CreateAnAccessToken` redocly override.
+- dab1d9d9: Regenerate from the upstream `catalog_view` spec (spec version 26.0806.8000552, published 2026-08-06T08:10:44Z).
+
+## 0.2.0
+
+### Minor Changes
+
+- e755d2ce: Refresh the carts and accounts OpenAPI specs against the canonical specs in `elasticpath-dev`.
+
+  **`@epcc-sdk/sdks-accounts`** — adds the nine missing operations: five on `/v2/account-tags`
+  (`listAccountTags`, `createAnAccountTag`, `getAnAccountTag`, `updateAnAccountTag`,
+  `deleteAnAccountTag`), three on `/v2/accounts/{accountID}/relationships/account-tags`
+  (`getAnAccountTagsRelationship`, `addAccountTagsOnAccount`, `removeAccountTagsOnAccount`),
+  plus `putV2AccountMembersAccountMemberId`.
+
+  Note for callers: the canonical spec marks fields as `required` on five authentication request
+  bodies that previously had none — `PasswordRequest`, `PasswordlessRequest`, `SelfSignupRequest`,
+  `OpenIDConnectRequest` and `SwitchingAccountRequest`. Code that already sends a complete request
+  is unaffected; code that relied on these being fully optional will now need the documented
+  fields.
+
+  **`@epcc-sdk/sdks-cart-checkout-order`** — adds the three component-product tax operations
+  (`addTaxItemToCartItemComponent`, `updateTaxItemFromCartItemComponent`,
+  `deleteTaxItemFromCartItemComponent`) and four cart settings operations (`getV2SettingsCart`,
+  `putV2SettingsCart`, `getV2SettingsCartStoreId`, `putV2SettingsCartStoreId`).
+
+  **`@epcc-sdk/sdks-shopper`** — gains the same seven cart operations. The shopper accounts
+  surface is unchanged.
+
+  **No exported type or function is removed from any of the three packages.** The canonical carts
+  spec remodels a cart item as one flat `CartItemResponse` with a `type` discriminator, replacing
+  the four-way union our SDKs expose. That model is deliberately kept: `CartsResponse`,
+  `CartItemsResponse`, `CartItemObject` and `Data.StripeConnectPayment` are preserved, and
+  `manageCarts`, `deleteACartItem`, `updateACartItem` and `getCartItems` still return the union
+  wrappers. The divergence is now written down in `packages/sdks/specs/patches/README.md` so the
+  next refresh does not silently drop it.
+
+  The `commerce-extensions` spec is deliberately left untouched: its checked-in copy is a strict
+  superset of the canonical spec, so refreshing it would remove operations and rename exports for
+  no gain.
+
+## 0.1.0
+
+### Minor Changes
+
+- a363b78d: Regenerate from updated `catalog_view` spec. Adds pricebook segmentation, catalog rule validation and indexing completion types.
+
+  - New endpoint `validateCatalogRules` (`POST /catalogs/rules/validate`) with `match_type` of `filter`, `similarity`, `conflict`, or `resolve_for_shopper`.
+  - New product fields `available_prices`, `alternative_prices`, `available_pricebook_ids` on shopper-context product responses; component product metadata also gains `alternative_prices`.
+  - New `EP-Pricebook-IDs-Of-Available-Prices-To-Show` request header (comma-delimited pricebook IDs or `'all'`) on release/product endpoints.
+  - `getRules` filter now supports `pricebook_ids` (`eq()` and `in()`).
+  - New types: `AvailablePrices`, `AlternativePrices`, `RuleMeta`, `CatalogRuleValidatorRequest`, `ReleaseIndexingCompleteData`.
+
+### Patch Changes
+
+- a363b78d: Add `external_ref` field on shipping group request and response types (Cart Checkout). Optional string, max 64 characters, accepts alphanumeric/special characters/spaces, not required to be unique.
+
+## 0.0.43
+
+### Patch Changes
+
+- d6f7aa3b: Add `external_ref` field on shipping group request and response types (Cart Checkout). Optional string, max 64 characters, accepts alphanumeric/special characters/spaces, not required to be unique.
+
 ## 0.0.42
 
 ### Patch Changes

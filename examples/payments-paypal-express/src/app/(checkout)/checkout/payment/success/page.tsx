@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { createAnAccessToken, getAnOrder } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "../../../../../lib/create-elastic-path-client";
 import { OrderConfirmation } from "../../OrderConfirmation";
-import { TAGS } from "../../../../../lib/constants";
 
 export default async function PaymentSuccessPage({
   searchParams,
@@ -43,9 +42,6 @@ export default async function PaymentSuccessPage({
     },
     query: {
       include: ["items"],
-    },
-    next: {
-      tags: [TAGS.orders],
     },
   });
 

@@ -63,7 +63,9 @@ export default function MobileFilters({
                   </div>
 
                   <div className="flex w-full flex-col">
-                    <span className="pb-2 text-lg font-bold">Category</span>
+                    {nav && nav.length > 0 && (
+                      <span className="pb-2 text-lg font-bold">Category</span>
+                    )}
                     {nav && <NodeMenu nav={nav} />}
                     <PriceRangeSlider attribute={EP_ROUTE_PRICE} />
                     <ProductSpecification />

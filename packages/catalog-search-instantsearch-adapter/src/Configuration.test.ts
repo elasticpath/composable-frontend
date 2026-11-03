@@ -51,6 +51,31 @@ describe("Configuration", () => {
         expect(subject.union).toBe(true)
       })
     })
+
+    describe("include parameter", () => {
+      it("defaults include to undefined when not provided", () => {
+        const subject = new Configuration({
+          additionalSearchParameters: { query_by: "name" },
+        })
+        expect(subject.include).toBeUndefined()
+      })
+
+      it("preserves the configured include array", () => {
+        const subject = new Configuration({
+          additionalSearchParameters: { query_by: "name" },
+          include: ["main_image", "files"],
+        })
+        expect(subject.include).toEqual(["main_image", "files"])
+      })
+
+      it("preserves an explicitly empty include array", () => {
+        const subject = new Configuration({
+          additionalSearchParameters: { query_by: "name" },
+          include: [],
+        })
+        expect(subject.include).toEqual([])
+      })
+    })
   })
 
   describe(".validate", () => {

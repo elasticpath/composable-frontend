@@ -1,0 +1,169 @@
+# The extensions endpoint, /v2/extensions/{custom-api-slug}, is the one the documentation tells
+# clients to use, and data-extensions.svc serves it, but the published spec describes it only in
+# prose. These five operations keep the names @epcc-sdk/commerce-extensions already ships them
+# under.
+#
+# Added with override/path-add, which fails the bundle once the published spec gains either
+# path. Delete this file then.
+paths:
+  /v2/extensions/{custom-api-slug}:
+    parameters:
+      - $ref: '#/components/parameters/CustomAPISlug'
+    get:
+      tags:
+        - Custom API Entries
+      summary: List Custom API Entries using the extensions endpoint
+      operationId: GetCustomEntriesSettings
+      description: |
+        Retrieves a list of Custom API Entries for the Custom API with this slug. Filtering,
+        sorting and paging work as they do on List Custom API Entries.
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/PageTotalMethod'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/CustomAPIEntrySort'
+        - name: timeout
+          description: |
+            Specifies how long in milliseconds the request should be allowed to take. The service will return a 422 if the request takes longer than the specified timeout.
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20000
+      responses:
+        '200':
+          $ref: '#/components/responses/ListOfCustomAPIEntries'
+        '400':
+          $ref: '#/components/responses/BadFilterError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContentError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Custom API Entries
+      summary: Create a Custom API Entry using the extensions endpoint
+      operationId: CreateACustomEntrySettings
+      description: Create a Custom API Entry in the Custom API with this slug.
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCustomAPIEntry'
+      responses:
+        '201':
+          $ref: '#/components/responses/CustomAPIEntry'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '413':
+          $ref: '#/components/responses/PayloadTooLargeError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /v2/extensions/{custom-api-slug}/{custom-api-entry-identifier}:
+    parameters:
+      - $ref: '#/components/parameters/CustomAPISlug'
+      - $ref: '#/components/parameters/CustomAPIEntryIdentifier'
+    get:
+      tags:
+        - Custom API Entries
+      summary: Get a Custom API Entry using the extensions endpoint
+      operationId: GetACustomEntrySettings
+      description: Get a Custom API Entry from the Custom API with this slug.
+      responses:
+        '200':
+          $ref: '#/components/responses/CustomAPIEntry'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Custom API Entries
+      summary: Update a Custom API Entry using the extensions endpoint
+      operationId: PutACustomEntrySettings
+      description: |
+        Update a Custom API Entry in the Custom API with this slug. When the Custom API has
+        `allow_upserts` set, an entry that does not exist is created (201); send no `If-Match`
+        header on an upsert.
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCustomAPIEntry'
+      responses:
+        '200':
+          $ref: '#/components/responses/CustomAPIEntry'
+        '201':
+          $ref: '#/components/responses/CustomAPIEntry'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '412':
+          $ref: '#/components/responses/PreConditionError'
+        '413':
+          $ref: '#/components/responses/PayloadTooLargeError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      tags:
+        - Custom API Entries
+      summary: Delete a Custom API Entry using the extensions endpoint
+      operationId: DeleteACustomEntrySettings
+      description: Delete a Custom API Entry from the Custom API with this slug.
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '412':
+          $ref: '#/components/responses/PreConditionError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  parameters:
+    CustomAPISlug:
+      name: custom-api-slug
+      description: The slug of the Custom API.
+      in: path
+      required: true
+      schema:
+        type: string
+      example: wishlists
+    CustomAPIEntryIdentifier:
+      name: custom-api-entry-identifier
+      description: |
+        The id of the Custom API Entry. When one of the Custom API's fields has
+        `use_as_url_slug` set, that field's value instead; the id is then not accepted.
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 7e067539-6f6c-46e1-8c55-940031b36c6a

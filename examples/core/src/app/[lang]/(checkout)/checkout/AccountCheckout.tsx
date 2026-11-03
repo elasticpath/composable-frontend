@@ -11,7 +11,6 @@ import {
 } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { getACart } from "@epcc-sdk/sdks-shopper";
-import { TAGS } from "src/lib/constants";
 import { AccountCheckoutForm } from "./AccoutCheckoutForm";
 
 export async function AccountCheckout({
@@ -38,9 +37,6 @@ export async function AccountCheckout({
     path: {
       accountMemberID: accountMemberCookie?.accountMemberId,
     },
-    next: {
-      tags: [TAGS.account],
-    },
   });
 
   if (!account.data?.data) {
@@ -53,9 +49,6 @@ export async function AccountCheckout({
     client,
     path: {
       accountID: selectedAccount.account_id,
-    },
-    next: {
-      tags: [TAGS.accountAddresses],
     },
   });
 

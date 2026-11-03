@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one subscription offering by its ID. Add plans, pricing options or
+  features to the include parameter to return them with the offering. To list
+  those resources on their own, list the offering's plans, pricing options or
+  features.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Replaces the stopwords in an existing stopword set with the list you send,
+  which must have at least one entry. The locale cannot be changed. The change
+  is synced to search asynchronously. It returns 403 when the set is not yours
+  to modify.

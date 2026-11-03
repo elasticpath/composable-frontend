@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Attaches up to 5 custom relationships to a product, by slug. The custom
+  relationships and the product must already exist. Relating the product to
+  other products under a relationship is a separate action. It returns the
+  attached relationships.

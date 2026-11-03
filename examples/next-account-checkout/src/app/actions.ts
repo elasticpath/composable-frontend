@@ -13,7 +13,7 @@ import {
   ShippingAddress,
   initializeCart as sdkInitializeCart,
   manageCarts,
-  getCart,
+  getACart,
   deleteACartItem,
   updateACartItem,
   deleteAllCartItems,
@@ -22,6 +22,7 @@ import {
 import { configureClient } from "../lib/api-client"
 
 import { retrieveAccountMemberCredentials } from "../lib/auth"
+import { safeReturnPath } from "../lib/return-url"
 
 configureClient()
 
@@ -107,7 +108,7 @@ export async function login(formData: FormData) {
     }
   }
 
-  redirect(returnUrl ?? "/")
+  redirect(safeReturnPath(returnUrl, "/"))
 }
 
 export async function logout() {
@@ -162,7 +163,7 @@ export async function addToCart(productId: string, cartId: string) {
 
 export async function getCartDetails(cartId: string) {
   try {
-    const response = await getCart({
+    const response = await getACart({
       path: {
         cartID: cartId,
       },

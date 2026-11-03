@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Adds a custom discount to one cart item. Custom discounts cannot be combined
+  with Elastic Path promotions, so remove any promotions from the cart first. To
+  add several discounts at once, add them to the cart in bulk.

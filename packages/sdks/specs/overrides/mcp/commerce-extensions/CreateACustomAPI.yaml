@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a Custom API, a custom data table whose entries are served at a path
+  built from its slug. Provide a name, description, slug and an api_type ending
+  in _ext; the api_type becomes the type of its entries. Add fields afterwards
+  to define the entries' structure. Optionally set allow_upserts or parent
+  Custom APIs.

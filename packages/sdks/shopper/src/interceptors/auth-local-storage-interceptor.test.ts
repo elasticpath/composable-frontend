@@ -1,334 +1,151 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { createAuthLocalStorageInterceptor } from "./auth-local-storage-interceptor"
-import { createAnAccessToken } from "../client"
-import { CREDENTIALS_STORAGE_KEY } from "../constants/credentials"
-import { tokenExpired } from "../utils/token-expired"
-import type { Client } from "@hey-api/client-fetch"
+import { afterEach, describe, expect, it } from "vitest"
+import {
+  client,
+  createAuthLocalStorageInterceptor,
+  getByContextAllProducts,
+} from "../index"
+import { productListFromTheSpec } from "../test/fixtures"
+import {
+  implicitTokenEndpoint,
+  isTokenRequest,
+  json,
+  stubFetch,
+} from "../test/stub-fetch"
 
-// Mock modules
-vi.mock("../client", () => ({
-  createAnAccessToken: vi.fn(),
-}))
+const baseUrl = "https://useast.api.elasticpath.com"
+const storedCredentialsKey = "_store_ep_credentials"
 
-vi.mock("../utils/token-expired", () => ({
-  tokenExpired: vi.fn(),
-}))
+const secondsFromNow = (seconds: number) =>
+  Math.floor(Date.now() / 1000) + seconds
+
+function interceptSharedClient(
+  options: Parameters<typeof createAuthLocalStorageInterceptor>[0],
+  route = implicitTokenEndpoint(() => json(productListFromTheSpec)),
+) {
+  const stub = stubFetch(route)
+  client.setConfig({ baseUrl, fetch: stub.transport })
+  client.interceptors.request.use(createAuthLocalStorageInterceptor(options))
+  return stub
+}
+
+const operationRequests = (requests: Request[]) =>
+  requests.filter((r) => !isTokenRequest(r))
+
+afterEach(() => {
+  client.interceptors.request.clear()
+})
 
 describe("createAuthLocalStorageInterceptor", () => {
-  // Type for mocking the Request object
-  type MockRequestHeaders = {
-    set: ReturnType<typeof vi.fn>
-    get: ReturnType<typeof vi.fn>
-  }
+  it("leaves the token request without an Authorization header", async () => {
+    const { requests } = interceptSharedClient({ clientId: "client-id" })
 
-  type MockRequest = {
-    url: string
-    headers: MockRequestHeaders
-    // Additional properties needed for the Request interface
-    method: string
-    credentials?: string
-    [key: string]: any
-  }
+    await getByContextAllProducts()
 
-  // Mock request options using compatible method type
-  const mockOptions = {
-    url: "https://api.example.com",
-    method: "GET" as const, // Use const assertion to ensure correct type
-    headers: {},
-  }
-
-  // Mock request
-  const mockRequest: MockRequest = {
-    url: "https://api.example.com/products",
-    headers: {
-      set: vi.fn(),
-      get: vi.fn(),
-    },
-    method: "GET",
-  }
-
-  // Setup before each test
-  beforeEach(() => {
-    // Clear all mocks
-    vi.clearAllMocks()
-
-    // Default tokenExpired mock
-    vi.mocked(tokenExpired).mockReturnValue(false)
-
-    // Default createAnAccessToken mock with minimal required properties
-    vi.mocked(createAnAccessToken).mockResolvedValue({
-      data: {
-        access_token: "new-token-123",
-        token_type: "Bearer",
-        expires: Date.now() + 3600000, // 1 hour in the future
-      },
-      request: {} as any,
-      response: {} as any,
-    })
+    const tokenRequest = requests.find(isTokenRequest)
+    expect(tokenRequest!.headers.get("Authorization")).toBeNull()
   })
 
-  it("should bypass token logic for oauth requests", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
-    })
+  it("mints and stores a token when none is stored", async () => {
+    const { requests } = interceptSharedClient({ clientId: "client-id" })
 
-    const oauthRequest: MockRequest = {
-      ...mockRequest,
-      url: "https://api.example.com/oauth/access_token",
-      headers: { set: vi.fn(), get: vi.fn() },
-    }
+    await getByContextAllProducts()
 
-    const result = await interceptor(oauthRequest as any, mockOptions)
-
-    // Should not call localStorage or token creation
-    expect(localStorage.getItem).not.toHaveBeenCalled()
-    expect(createAnAccessToken).not.toHaveBeenCalled()
-    expect(result).toBe(oauthRequest)
-  })
-
-  it("should create a new token when one does not exist and autoStoreCredentials is true", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
-      autoStoreCredentials: true,
-    })
-
-    vi.mocked(localStorage.getItem).mockReturnValueOnce("{}")
-
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should create a new token
-    expect(createAnAccessToken).toHaveBeenCalledWith({
-      body: {
-        grant_type: "implicit",
-        client_id: "test-client",
-      },
-    })
-
-    // Should store the new token - check with more flexible matcher
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      CREDENTIALS_STORAGE_KEY,
-      expect.any(String),
-    )
-
-    // Verify token data structure in saved token
-    const setItemCall = vi.mocked(localStorage.setItem).mock.calls[0]
-    const savedToken = JSON.parse(setItemCall[1])
-    expect(savedToken).toEqual(
-      expect.objectContaining({
-        access_token: "new-token-123",
-        token_type: "Bearer",
-        expires: expect.any(Number),
-      }),
-    )
-
-    // Should set the Authorization header
-    expect(mockRequest.headers.set).toHaveBeenCalledWith(
-      "Authorization",
-      "Bearer new-token-123",
+    expect(requests.filter(isTokenRequest)).toHaveLength(1)
+    expect(
+      JSON.parse(localStorage.getItem(storedCredentialsKey)!),
+    ).toMatchObject({ access_token: "implicit-1", token_type: "Bearer" })
+    expect(operationRequests(requests)[0]!.headers.get("Authorization")).toBe(
+      "Bearer implicit-1",
     )
   })
 
-  it("should not create a new token when one does not exist and autoStoreCredentials is false", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
+  it("sends no token when none is stored and autoStoreCredentials is false", async () => {
+    const { requests } = interceptSharedClient({
+      clientId: "client-id",
       autoStoreCredentials: false,
     })
 
-    vi.mocked(localStorage.getItem).mockReturnValueOnce("{}")
+    await getByContextAllProducts()
 
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should not create a new token
-    expect(createAnAccessToken).not.toHaveBeenCalled()
-
-    // Should not store anything
-    expect(localStorage.setItem).not.toHaveBeenCalled()
-
-    // Should not set the Authorization header
-    expect(mockRequest.headers.set).not.toHaveBeenCalled()
+    expect(requests.filter(isTokenRequest)).toHaveLength(0)
+    expect(localStorage.getItem(storedCredentialsKey)).toBeNull()
+    expect(requests[0]!.headers.get("Authorization")).toBeNull()
   })
 
-  it("should refresh expired token when autoRefresh is true", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
-      autoRefresh: true,
-    })
-
-    // Mock existing token in localStorage
-    const existingToken = {
-      access_token: "expired-token-123",
-      token_type: "Bearer",
-      expires: Date.now() - 1000, // Expired token
-    }
-
-    vi.mocked(localStorage.getItem).mockReturnValueOnce(
-      JSON.stringify(existingToken),
+  it("uses a stored token that has not expired", async () => {
+    localStorage.setItem(
+      storedCredentialsKey,
+      JSON.stringify({ access_token: "stored", expires: secondsFromNow(3600) }),
     )
+    const { requests } = interceptSharedClient({ clientId: "client-id" })
 
-    // Mock token expired check
-    vi.mocked(tokenExpired).mockReturnValueOnce(true)
+    await getByContextAllProducts()
 
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should refresh the token
-    expect(createAnAccessToken).toHaveBeenCalled()
-
-    // Should store the new token - check with more flexible matcher
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      CREDENTIALS_STORAGE_KEY,
-      expect.any(String),
-    )
-
-    // Verify token data structure in saved token
-    const setItemCall = vi.mocked(localStorage.setItem).mock.calls[0]
-    const savedToken = JSON.parse(setItemCall[1])
-    expect(savedToken).toEqual(
-      expect.objectContaining({
-        access_token: "new-token-123",
-        token_type: "Bearer",
-        expires: expect.any(Number),
-      }),
-    )
-
-    // Should set the Authorization header with the new token
-    expect(mockRequest.headers.set).toHaveBeenCalledWith(
-      "Authorization",
-      "Bearer new-token-123",
-    )
+    expect(requests.filter(isTokenRequest)).toHaveLength(0)
+    expect(requests[0]!.headers.get("Authorization")).toBe("Bearer stored")
   })
 
-  it("should not refresh expired token when autoRefresh is false", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
+  it("replaces an expired token when autoRefresh is on", async () => {
+    localStorage.setItem(
+      storedCredentialsKey,
+      JSON.stringify({ access_token: "expired", expires: secondsFromNow(-1) }),
+    )
+    const { requests } = interceptSharedClient({ clientId: "client-id" })
+
+    await getByContextAllProducts()
+
+    expect(operationRequests(requests)[0]!.headers.get("Authorization")).toBe(
+      "Bearer implicit-1",
+    )
+    expect(
+      JSON.parse(localStorage.getItem(storedCredentialsKey)!),
+    ).toMatchObject({ access_token: "implicit-1" })
+  })
+
+  it("keeps sending an expired token when autoRefresh is off", async () => {
+    localStorage.setItem(
+      storedCredentialsKey,
+      JSON.stringify({ access_token: "expired", expires: secondsFromNow(-1) }),
+    )
+    const { requests } = interceptSharedClient({
+      clientId: "client-id",
       autoRefresh: false,
     })
 
-    // Mock existing token in localStorage
-    const existingToken = {
-      access_token: "expired-token-123",
-      token_type: "Bearer",
-      expires: Date.now() - 1000, // Expired token
-    }
+    await getByContextAllProducts()
 
-    vi.mocked(localStorage.getItem).mockReturnValueOnce(
-      JSON.stringify(existingToken),
-    )
-
-    // Mock token expired check
-    vi.mocked(tokenExpired).mockReturnValueOnce(true)
-
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should not refresh the token
-    expect(createAnAccessToken).not.toHaveBeenCalled()
-
-    // Should not store a new token
-    expect(localStorage.setItem).not.toHaveBeenCalled()
-
-    // Should still set the Authorization header with the expired token
-    expect(mockRequest.headers.set).toHaveBeenCalledWith(
-      "Authorization",
-      "Bearer expired-token-123",
-    )
+    expect(requests.filter(isTokenRequest)).toHaveLength(0)
+    expect(requests[0]!.headers.get("Authorization")).toBe("Bearer expired")
   })
 
-  it("should use valid existing token without refreshing", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
+  it("stores the token under a custom key", async () => {
+    interceptSharedClient({ clientId: "client-id", storageKey: "custom-key" })
+
+    await getByContextAllProducts()
+
+    expect(JSON.parse(localStorage.getItem("custom-key")!)).toMatchObject({
+      access_token: "implicit-1",
     })
-
-    // Mock existing valid token in localStorage
-    const existingToken = {
-      access_token: "valid-token-123",
-      token_type: "Bearer",
-      expires: Date.now() + 3600000, // Valid token (1 hour in the future)
-    }
-
-    vi.mocked(localStorage.getItem).mockReturnValueOnce(
-      JSON.stringify(existingToken),
-    )
-
-    // Mock token expired check
-    vi.mocked(tokenExpired).mockReturnValueOnce(false)
-
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should not create a new token
-    expect(createAnAccessToken).not.toHaveBeenCalled()
-
-    // Should not store anything new
-    expect(localStorage.setItem).not.toHaveBeenCalled()
-
-    // Should set the Authorization header with existing token
-    expect(mockRequest.headers.set).toHaveBeenCalledWith(
-      "Authorization",
-      "Bearer valid-token-123",
-    )
+    expect(localStorage.getItem(storedCredentialsKey)).toBeNull()
   })
 
-  it("should use custom storage key when provided", async () => {
-    const customKey = "custom-storage-key"
+  it("fails the operation when the client ID is missing", async () => {
+    const { requests } = interceptSharedClient({ clientId: "" })
 
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
-      storageKey: customKey,
-    })
+    const { error } = await getByContextAllProducts()
 
-    vi.mocked(localStorage.getItem).mockReturnValueOnce("{}")
-
-    await interceptor(mockRequest as any, mockOptions)
-
-    // Should check the custom storage key
-    expect(localStorage.getItem).toHaveBeenCalledWith(customKey)
-
-    // Should store with the custom key and any string value
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      customKey,
-      expect.any(String),
-    )
-
-    // Verify token structure in the saved token
-    const setItemCall = vi.mocked(localStorage.setItem).mock.calls[0]
-    const savedToken = JSON.parse(setItemCall[1])
-    expect(savedToken).toEqual(
-      expect.objectContaining({
-        access_token: expect.any(String),
-        token_type: expect.any(String),
-      }),
-    )
+    expect((error as Error).message).toBe("Missing storefront client id")
+    expect(requests).toHaveLength(0)
   })
 
-  it("should throw error if clientId is missing", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "",
-      autoStoreCredentials: true,
-    })
-
-    vi.mocked(localStorage.getItem).mockReturnValueOnce("{}")
-
-    await expect(interceptor(mockRequest as any, mockOptions)).rejects.toThrow(
-      "Missing storefront client id",
+  it("fails the operation when the token request fails", async () => {
+    const { requests } = interceptSharedClient({ clientId: "client-id" }, () =>
+      json({ errors: [] }, 400),
     )
-  })
 
-  it("should throw error if token creation fails", async () => {
-    const interceptor = createAuthLocalStorageInterceptor({
-      clientId: "test-client",
-      autoStoreCredentials: true,
-    })
+    const { error } = await getByContextAllProducts()
 
-    vi.mocked(localStorage.getItem).mockReturnValueOnce("{}")
-
-    // Mock token creation failure
-    vi.mocked(createAnAccessToken).mockResolvedValueOnce({
-      data: undefined,
-      request: {} as any,
-      response: {} as any,
-      error: { message: "Failed to get access token" } as any,
-    })
-
-    await expect(interceptor(mockRequest as any, mockOptions)).rejects.toThrow(
-      "Failed to get access token",
-    )
+    expect((error as Error).message).toBe("Failed to get access token")
+    expect(requests.every(isTokenRequest)).toBe(true)
   })
 })

@@ -16,6 +16,7 @@ export enum PDFDisplayStyle {
   pdfJs = "pdfJs",
 }
 interface IPDF {
+  fileId: string;
   url: string;
   filename?: string;
 }
@@ -63,6 +64,7 @@ const PDFFiles = ({ files, pdfDisplayStyle }: IPDFFilesProps): JSX.Element => {
             key={file.id}
             onClick={() =>
               setSelectedPdf({
+                fileId: file.id,
                 url: addPDFToolConfig(file.link.href),
                 filename: file.file_name,
               })
@@ -75,8 +77,7 @@ const PDFFiles = ({ files, pdfDisplayStyle }: IPDFFilesProps): JSX.Element => {
 
       {pdfDisplayStyle === PDFDisplayStyle.pdfJs && selectedPdf && (
         <PDFModal
-          url={selectedPdf.url}
-          filename={selectedPdf.filename}
+          fileId={selectedPdf.fileId}
           onClose={() => setSelectedPdf(null)}
         />
       )}

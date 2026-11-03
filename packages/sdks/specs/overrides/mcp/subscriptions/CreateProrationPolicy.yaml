@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a proration policy with a name and a rounding mode (up, down or
+  nearest), and optionally allows an automatic gateway refund when a proration
+  would net negative. Creating it changes nothing on its own: once attached to
+  an offering, it applies to subscriptions created on that offering after it is
+  attached, not to existing subscriptions.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a variation option's name, description or sort order. The body must
+  carry the option ID, matching the one in the path, and both attributes.name
+  and attributes.description are required. Rebuild products for the change to
+  apply.

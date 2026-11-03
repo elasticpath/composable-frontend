@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets the store's global settings in one call: page length, calculation method
+  for cart and order totals, mandatory address fields, shopper address limit,
+  additional languages, and the read-only limits such as currency, promotion and
+  page offset limits.

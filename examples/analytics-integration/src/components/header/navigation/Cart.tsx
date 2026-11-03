@@ -5,7 +5,6 @@ import { createElasticPathClient } from "../../../lib/create-elastic-path-client
 import { cookies } from "next/headers";
 import { CART_COOKIE_NAME } from "../../../lib/cookie-constants";
 import { getACart } from "@epcc-sdk/sdks-shopper";
-import { TAGS } from "../../../lib/constants";
 
 export async function Cart() {
   const client = createElasticPathClient();
@@ -23,9 +22,6 @@ export async function Cart() {
     },
     query: {
       include: ["items"],
-    },
-    next: {
-      tags: [TAGS.cart],
     },
   });
 

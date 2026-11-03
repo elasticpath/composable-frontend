@@ -1,5 +1,7 @@
 // This file is used to test that CommonJS requires work correctly
-const uinventories = require('./dist/index.cjs');
+const Inventories = require("./dist/index.cjs")
+const mcp = require("./dist/mcp.cjs")
 
-console.log('uinventories:', Object.keys(uinventories));
-console.log('Test successful!');
+console.log("Inventories:", Object.keys(Inventories))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

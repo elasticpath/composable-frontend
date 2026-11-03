@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Deletes an indexable fields configuration by ID, removing its custom fields
+  and settings from the search index definition. Reindex the catalog releases
+  afterwards for the change to apply. It returns 403 for organization-owned
+  fields and 409 while a reindex is queued or running.

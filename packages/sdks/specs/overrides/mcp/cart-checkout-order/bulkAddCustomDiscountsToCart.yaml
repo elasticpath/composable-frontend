@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Adds several custom discounts to a cart in one request. Custom discounts
+  cannot be combined with Elastic Path promotions in the same cart. Unless the
+  store sets another limit, the cart and each cart item can hold at most 5
+  custom discounts.

@@ -1,0 +1,8 @@
+x-mcp-risk: read
+x-mcp-title: Run Multiple Searches on a Catalog Release
+x-mcp-description: >-
+  Runs one or more searches in a single request against a named catalog and
+  release, which can be a release ID or latestPublished. Use it to preview or
+  test a release instead of resolving the catalog from shopper context. Catalog
+  rule search profiles are ignored, and price book headers preview prices. A
+  POST that only reads; it changes nothing.

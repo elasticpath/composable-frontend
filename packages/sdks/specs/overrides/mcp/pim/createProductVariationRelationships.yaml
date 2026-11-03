@@ -1,0 +1,5 @@
+x-mcp-title: Attach Variations to a Product
+x-mcp-description: >-
+  Attaches the variations listed in the body to a product. After attaching
+  them, build the product's child products to create the variants. The body
+  lists variation IDs.

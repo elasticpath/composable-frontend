@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Deletes a search rule group by ID, and deletes every rule in it. A group that a
+  search profile still uses cannot be deleted and returns 409, so remove it from
+  the profile's rule groups first. Deleting a group that is already gone
+  succeeds.

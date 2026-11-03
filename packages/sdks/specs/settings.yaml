@@ -1,51 +1,53 @@
 openapi: 3.1.0
 info:
-  version: '1.0'
+  version: 26.0224.7243587
+  x-version-timestamp: 2026-02-24T23:34:24Z
   title: Settings Introduction
   description: |
     The Settings API allow you to configure global settings for your project. You can define:
-    
+
     - [page length when paginating results](/docs/api/settings/settings-introduction#page-length)
     - [the calculation method you want to use for cart and order totals](/docs/api/settings/settings-introduction#calculation-method)
     - [mandatory address fields](/docs/api/settings/settings-introduction#address-mandatory-fields)
+    - [shopper address limit](/docs/api/settings/settings-introduction#shopper-address-limit)
     - [readonly store settings for internal stores](/docs/api/settings/settings-introduction#readonly-settings)
-    
+
     ### Page Length
-    
+
     This defines the number of results per page when paginating results (max: 100).
-    
+
     | Name          | Type      | Default | Max |
     |--------------|-----------|--------- |-----|
     | `page_length` | `integer` | 25       | 100 |
-    
+
     For more information on pagination including a list of which resources support pagination, see [Pagination](/guides/Getting-Started/pagination).
-    
+
     ### Calculation Method
-    
+
     This option defines the method used to calculate cart and order totals. Currently there are two methods: `simple` and `line`.
-    
+
     The `simple` method is our previous method for calculating cart and order totals which focuses on the total value of the cart. This should only be used in the case where Composable Commerce is not used for tax calculations. The `line` method treats each line item individually resulting in more accurate figures after taxes and promotions are applied.
-    
+
     | Name         | Type      | Value |
     |--------------|-----------|-------|
     | `calculation_method` | `string` | `line`   |
     | `calculation_method` | `string` | `simple` |
-    
+
     :::note
-    
+
     - For stores created since February 2020, `line` is the default calculation method. Stores created before February 2020 use `simple` as their calculation method.
     - Line-item discount promotions, such as item percent discount and item fixed discount, are only supported by the line calculation method. For more information, see [Promotions Standard](/docs/api/promotions/promotions-standard-introduction).
-    
+
     :::
-    
+
     ### Address Mandatory Fields
-    
+
     You can create an address to associate with an account in your storefront. This defines the address fields that you can use when creating an address in Commerce Manager. For more information, see [Addresses](/docs/api/addresses/addresses-introduction).
-    
+
     Address fields can be required or optional. You can choose which optional address fields to use in your address, depending on your requirements. To change which fields are mandatory for creating an address, see [Update Settings](/docs/api/settings/put-v-2-settings). Changing the mandatory fields does not impact the addresses of customers made before the change.
-    
+
     The following table describes the address fields, their type and whether they are required by default.
-    
+
     | Name | Type | Required |
     | :--- | :--- |:---------|
     | `type` |`string` | Default  |
@@ -62,16 +64,28 @@ info:
     | `region` |`string` | Optional |
     | `postcode` |`string` | Default  |
     | `country` |`string` | Default  |
-    
-    ### Readonly Settings
-    
-    For internal store configurations, read-only settings are used and updating these settings fails without returning any error.
-    
+
+    ### Shopper Address Limit
+
+    This defines the maximum number of addresses a shopper can create per resource (account). This helps prevent abuse and maintains database performance.
+
+    | Name          | Type      | Default | Min | Max   |
+    |--------------|-----------|---------|-----|-------|
+    | `shopper_address_limit` | `integer` | 25  | 1   | 25000 |
+
     :::note
-    
+    Only values up to 500 can be set by callers. Please [contact Support](https://support.elasticpath.com/hc/en-us#composable_commerce) if you require a higher limit. 
+    :::
+
+    ### Readonly Settings
+
+    For internal store configurations, read-only settings are used and updating these settings fails without returning any error.
+
+    :::note
+
     - Refer to the [Performance](/guides/Getting-Started/pagination#performance) section in the Pagination documentation, which outlines patterns for retrieving all documents without using a higher page offset limit.
     - To change any predefined configuration, contact [Elastic Path support team](https://support.elasticpath.com/hc/en-us).
-    
+
     :::
 
 
@@ -86,18 +100,17 @@ info:
     | `promotions_limit`      | `integer` | `1000`                                               |
     | `promotion_codes_limit` | `integer` | `1000`                                               |
     | `page_offset_limit`     | `integer` | `10000`                                              |
-
   contact:
     name: Elastic Path
-    url: 'https://www.elasticpath.com'
+    url: https://www.elasticpath.com
     email: support@elasticpath.com
   license:
-    url: 'https://elasticpath.dev'
+    url: https://elasticpath.dev
     name: MIT
 servers:
-  - url: 'https://useast.api.elasticpath.com'
+  - url: https://useast.api.elasticpath.com
     description: US East
-  - url: 'https://euwest.api.elasticpath.com'
+  - url: https://euwest.api.elasticpath.com
     description: EU West
 security:
   - BearerToken: []
@@ -112,11 +125,11 @@ paths:
       summary: Get Project Settings
       description: |-
         You can get all of the project settings via one API call using a `client_credential` token. The response is in object format as shown in the following example.
-        
+
         :::note
-        
+
         The default `calculation_method` is `line`.
-        
+
         :::
       operationId: get-v2-settings
       responses:
@@ -134,8 +147,7 @@ paths:
       tags:
         - Settings
       summary: Update Project Settings
-      description: |-
-        You can use the Settings endpoint to update your project settings at any time. These global settings take immediate effect.
+      description: You can use the Settings endpoint to update your project settings at any time. These global settings take immediate effect.
       operationId: put-v2-settings
       requestBody:
         content:
@@ -157,8 +169,7 @@ paths:
       tags:
         - Settings
       summary: Delete Project Settings
-      description: |-
-        Deletes a store setting. Organization settings cannot be deleted.
+      description: Deletes a store setting. Organization settings cannot be deleted.
       operationId: delete-v2-settings
       responses:
         '204':
@@ -167,77 +178,49 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         default:
           $ref: '#/components/responses/InternalServerError'
-  /v2/settings/cart:
-    get:
-      tags:
-        - Settings
-      summary: Get Cart Settings
-      description: |-
-        Retrieves cart settings
-      operationId: get-v2-settings-cart
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SettingsCart'
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        default:
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      tags:
-        - Settings
-      summary: Update Cart Settings
-      description: |-
-        You can modify the cart expiry settings to set it to any number of days up to 365. Any existing carts default to the expiry of 7 days. To update cart settings in Commerce Manager, see [Updating Cart setting](/docs/commerce-manager/settings/general-settings#updating-cart-settings).
-
-        With update cart settings endpoint, you can:
-
-        - Enable or disable custom discounts by setting the `custom_discounts_enabled` field to `true`. This allows you to activate your custom discounts from external services. By default, this setting is determined by the cart settings configured for the store.
-        - Enable or disable the use of rule promotions within the cart. You can apply this setting either at the store level using the update cart setting endpoint or individually to a specific cart using the [update a cart](/docs/api/carts/update-a-cart) endpoint.
-        
-        :::note
-        
-        You cannot use both custom discounts and rule promotions at the same time.
-        
-        :::
-        
-        ### Errors
-        
-        The following error is received if you enable a cart to use both custom discounts and rule promotions:
-        
-        ```json
-        {
-            "status": 422,
-            "title": "Cannot use both discounts together",
-            "detail": "Only one discount setting can be set to true at a time."
-        }
-        ```
-      operationId: put-v2-settings-cart
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SettingsCart'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SettingsCart'
-        '400':
-          $ref: '#/components/responses/BadRequestError'
-        default:
-          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     BearerToken:
       type: http
       scheme: bearer
   schemas:
+    Error:
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - Bad Request
+        status:
+          type: integer
+          description: The HTTP response code of the error.
+          examples:
+            - 400
+        code:
+          type: integer
+          description: An application-specific error code.
+          examples:
+            - 10
+        source:
+          type: string
+          description: The field that caused the validation error.
+          examples:
+            - data.page_length
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - The field 'name' is required
+    ErrorResponse:
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
     Settings:
       type: object
       properties:
@@ -247,7 +230,7 @@ components:
           example: settings
         page_length:
           type: integer
-          description: " Indicates the number of results per page (max: `100`)."
+          description: ' Indicates the number of results per page (max: `100`).'
           example: 25
         list_child_products:
           type: boolean
@@ -258,7 +241,10 @@ components:
           type: array
           items:
             type: string
-          example: ["es", "fr", "de"]
+          example:
+            - es
+            - fr
+            - de
         calculation_method:
           type: string
           description: Displays the method used to calculate card and order totals.
@@ -269,9 +255,23 @@ components:
         address_mandatory_fields:
           type: array
           description: Indicates an array of fields that are required for creating an [address](/docs/api/addresses/account-addresses).
+          example:
+            - first_name
+            - last_name
+            - line_1
+            - city
+            - region
+            - postcode
+            - country
+            - instructions
           items:
             type: string
-            example: ["first_name", "last_name", "line_1", "city", "region", "postcode", "country", "instructions"]
+        shopper_address_limit:
+          type: integer
+          description: The maximum number of addresses a shopper can have per resource. API clients can only set values up to 500, for a higher limit please contact support.
+          example: 25
+          minimum: 1
+          maximum: 25000
       required:
         - type
     SettingsData:
@@ -281,6 +281,22 @@ components:
             - $ref: '#/components/schemas/Settings'
             - type: object
               properties:
+                id:
+                  description: The unique identifier for the settings.
+                  type: string
+                  example: 61daaa08-9z05-4497-b9ca-626cd0f9932b
+                include_organization_resources:
+                  description: Whether to include organization resources.
+                  type: boolean
+                  example: false
+                cart_item_limit:
+                  description: The cart item limit.
+                  type: integer
+                  example: 100
+                custom_discount_limit:
+                  description: The custom discount limit.
+                  type: integer
+                  example: 5
                 currency_limit:
                   description: The currency limit.
                   type: integer
@@ -328,62 +344,6 @@ components:
                 owner:
                   type: string
                   example: store
-    SettingsCart:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              description: Describes the type of request payload you’re sending. Set this value to `settings`.
-              example: settings
-            cart_expiry_days:
-              type: integer
-              description: Indicates the number of days before a cart expires.
-              example: 25
-            discounts:
-              type: object
-              properties:
-                custom_discounts_enabled:
-                  description: When `true`, custom discounts are enabled. Default is false. This setting only affects the new empty carts while the existing active carts will not be affected.
-                  type: boolean
-                  example: false
-                use_rule_promotions:
-                  description: When set to `true`, this parameter allows the cart to use rule promotions.
-                  type: boolean
-                  example: false
-          required:
-            - type
-    Error:
-      required:
-        - status
-        - title
-      properties:
-        title:
-          type: string
-          description: A brief summary of the error.
-          examples:
-            - "Bad Request"
-        status:
-          type: string
-          format: string
-          description: The HTTP response code of the error.
-          examples:
-            - "400"
-        detail:
-          type: string
-          description: Optional additional detail about the error.
-          examples:
-            - "The field 'name' is required"
-    ErrorResponse:
-      required:
-        - errors
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Error'
   responses:
     InternalServerError:
       description: Internal server error.
@@ -394,7 +354,6 @@ components:
           examples:
             internal-server-error:
               summary: Internal server error
-              # language=JSON
               value: |
                 {
                   "errors": [
@@ -402,25 +361,6 @@ components:
                       "title": "Internal Server Error",
                       "status": "500",
                       "detail": "there was a problem processing your request"
-                    }
-                  ]
-                }
-    BadRequestError:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-          examples:
-            bad-request-error:
-              # language=JSON
-              value: |
-                {
-                  "errors": [
-                    {
-                      "title": "enum",
-                      "source": "data.type",
-                      "detail": "data.type must be one of the following: \"settings\""
                     }
                   ]
                 }
@@ -432,13 +372,30 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
           examples:
             unauthorized-error:
-              # language=JSON
               value: |
                 {
                   "errors": [
                     {
                       "title": "Unauthorized",
                       "status": "401"
+                    }
+                  ]
+                }
+    BadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              value: |
+                {
+                  "errors": [
+                    {
+                      "title": "enum",
+                      "source": "data.type",
+                      "detail": "data.type must be one of the following: \"settings\""
                     }
                   ]
                 }

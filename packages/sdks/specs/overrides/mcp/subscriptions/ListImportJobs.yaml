@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists import jobs with their status (pending, started, success or failed) and
+  the number of records uploaded and imported. Imports are processed one at a
+  time, earliest first, so use it to see which imports are still queued.

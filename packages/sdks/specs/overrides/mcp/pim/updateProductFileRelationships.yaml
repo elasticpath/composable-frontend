@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Replaces all the files related to a product with the list in the request. Send
+  the complete list you want; any existing file relationship missing from it is
+  removed. To relate more files without touching the current ones, create file
+  relationships instead.

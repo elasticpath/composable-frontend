@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Sets the store prefix on a merchant realm mapping, which administrators use
+  during single sign-on to find the store's authentication realm. The prefix is
+  required, and the request fails with a conflict if another mapping already
+  uses it.

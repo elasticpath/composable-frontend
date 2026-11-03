@@ -1,0 +1,2703 @@
+openapi: 3.1.0
+info:
+  title: Single Sign On API
+  description: |
+    Single sign-on allows authentication with Commerce using an external authentication provider. Using an existing authentication provider allows for integration with company-specific or customizable authentication systems. In some cases, it can also simplify the log-in experience because they don’t need to remember another password.
+
+    Commerce supports two types of single sign-on users:
+
+    - End users, that is, customers of your store.
+    - Administrators, who can use single sign-on to log on to Commerce Manager.
+
+    When users need to authenticate, they are redirected to the single sign-on provider, which then communicates the result of the authentication process back to Commerce.
+
+    You can set up Commerce to allow single sign-on for end users, using the *OpenID Connect* standard.
+
+    :::note
+    When users authenticate using an external authentication provider, authentication details, such as username and password, are neither stored on nor sent through Commerce.
+    :::
+
+
+    ## Authentication Providers and Composable Commerce
+
+    Commerce supports many OpenID Connect compatible authentication providers. For more information, see [Requirements for Authentication Providers](/guides/How-To/Authentication/get-single-sign-on-account-management-token#requirements-for-authentication-providers).
+
+    ## External Reference
+
+    - [What is OpenID?](https://openid.net/foundation/)
+    - [OpenID Connect Core](https://openid.net/specs/openid-connect-core-1_0.html)
+
+    ## Related Resources
+
+    - [Security](/docs/authentication/security)
+  contact:
+    name: Elastic Path
+    url: https://www.elasticpath.com
+    email: support@elasticpath.com
+  license:
+    name: MIT
+    url: assets/LICENSE
+  version: 1.0.6697305
+  x-version-timestamp: 2025-10-12T12:20:22Z
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East
+  - url: https://euwest.api.elasticpath.com
+    description: EU West
+security:
+  - BearerToken: []
+tags:
+  - name: Authentication Realms
+    description: |
+      An authentication realm is a container that consists of the following:
+
+        - Users -  Represented by [User Authentication Info](/docs/api/single-sign-on/user-authentication-infos) objects
+        - Authentication profiles - Ways for the users to authenticate, such as one or more [OpenID Connect Profiles](/docs/api/single-sign-on/oidc-profiles) or [Password Profiles](/docs/api/single-sign-on/password-profiles)
+        - Mappings between users and authentication profiles - [User Authentication OpenID Connect Profile Info](/docs/api/single-sign-on/user-authentication-oidc-profile-infos) or [User Authentication Password Profile Infos](/docs/api/single-sign-on/user-authentication-password-profile-infos)
+
+      Here's a domain diagram showing these relationships
+      ![authentication realm](/assets/authentication-realm-domain.png)
+
+      Composable Commerce comes with three per-store pre-set realms:
+        - Buyer Organization. For customers: users who buy products from your store.
+        - Merchant Organization. For administrators: users who log in to Commerce Manager to modify the store’s settings or catalog.
+        - Account Management Realm. For account members: users who buy products from your store on behalf of accounts. Password profiles are only available for account management realm.
+    externalDocs:
+      url: https://elasticpath.dev/docs/commerce-cloud/authentication/single-sign-on/authentication-realms
+  - name: OIDC Profiles
+    description: |
+      An OpenID Connect Profile resource represents a specific configuration of an OpenID Connect Provider.
+
+      An authentication realm can have multiple OpenID Connect Profiles. This allows shoppers to authenticate using multiple OpenID providers. In the example shown below, Jane can login using both Apple and Google, whereas Joan can only login using Google.
+
+      ![oidc profiles](/assets/oidc-profiles.png)
+  - name: Password Profiles
+    description: |
+      A `password_profile` resource represents a specific configuration that allows users to authenticate through username and password.
+
+      Password Profiles support One-Time Password Tokens, which can be used to use passwordless login or password reset.
+
+      An authentication realm can have multiple Password Profiles. You can use this flexibility in many ways. For instance, if you want to migrate an existing pool of users from another system with their own usernames and passwords, they can use one profile, while the rest of the users use another.
+
+      Another use case is enabling shopper impersonation, where shoppers can authenticate using their own username and password in one profile. Meanwhile, admins can have a different username and password for the same user in a separate profile, shown as the "Impersonation Profile". This process can be automated using a Backend-For-Frontend (BFE) or One-Time Password Tokens. In the example shown below, both John and Joan can log in with their credentials, and an admin can also log in as Joan using the "Impersonation Profile".
+
+      ![password profiles](/assets/password-profiles.png)
+  - name: User Authentication Infos
+    description: |
+
+      A `user-authentication-info` represents a user. This object contains information, such as the name and email address, and has sub-resources for each mechanism that the user can use to log in./single-sign-on/authentication-realm-api/authentication-realm-api-overview) and the user is configured to authenticate through that profile, then the `user-authentication-info` object is associated with a [User Authentication OpenID Connect Profile Info](/docs/api/single-sign-on/user-authentication-oidc-profile-infos) subresource.
+
+      [Account Members](/docs/api/accounts/get-v-2-account-members-account-member-id) reference User Authentication Infos directly (i.e., for every account member there is an user authentication info with the same id) and the User Authentication Info API is how you manage and configure the authentication options for that user.
+
+      [Customers (that login via OIDC)](/docs/customer-management/customer-management-api/get-a-customer) also use the User Authentication Info.
+  - name: User Authentication OIDC Profile Infos
+    description: |
+      The `user-authentication-oidc-profile-info` object is the information object about the relationship between a [User Authentication Info](/docs/api/single-sign-on/user-authentication-infos) and an [OpenID Connect Profile](/docs/api/single-sign-on/oidc-profiles).
+  - name: User Authentication Password Profile Infos
+    description: The `user-authentication-password-profile-info` object is the information object about the relationship between a [User Authentication Info](/docs/api/single-sign-on/user-authentication-infos) and a [Password Profile](/docs/api/single-sign-on/password-profiles) object.
+  - name: OIDC Authentication
+    description: |
+      The OIDC IDP Login endpoints handle the initiation of OpenID Connect authentication flows.
+
+      When a user needs to authenticate via OIDC, they are redirected to these endpoints which then redirect them to the configured OIDC provider for authentication.
+paths:
+  /oidc-idp/login/stores/{storeId}/authentication-realms/{realmId}:
+    get:
+      tags:
+        - OIDC Authentication
+      summary: Initiate OIDC Login
+      description: |-
+        Initiate the OIDC login flow for a specific store and authentication realm
+        ::: note This is not an **API Endpoint**, but the [Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) of the OpenID Connect Authentication Flow.
+        To initiate an OpenID Connect authentication you must change the location in the Browser to this URL, not call it asynchronously. :::
+      operationId: get-oidc-idp-login-stores-storeId-authentication-realms-realmId
+      parameters:
+        - name: storeId
+          in: path
+          description: The ID of the store.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: client_id
+          in: query
+          description: The Client ID, for Account Management Authentication see the `meta.client_id` field on [Account Authentication Settings](/docs/api/accounts/get-v-2-settings-account-authentication).
+          required: true
+          schema:
+            type: string
+        - name: redirect_uri
+          in: query
+          description: Redirection URI to which the response will be sent. Must exactly match a pre-registered redirect URI for the client in the `redirect_uris` of the [Authentication Realm](/docs/api/single-sign-on/get-v-2-authentication-realms-realm-id).
+          required: true
+          schema:
+            type: string
+            format: uri
+        - name: response_type
+          in: query
+          description: OIDC/OAuth 2.0 response type, this must be "code" in Commerce.
+          required: true
+          schema:
+            type: string
+            const: code
+        - name: scope
+          in: query
+          description: Space-delimited list of scopes. Must include "openid", "email", and "name".
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: Opaque value used to maintain state between the request and the callback. Helps prevent CSRF.
+          required: true
+          schema:
+            type: string
+            maxLength: 2048
+        - name: code_challenge_method
+          in: query
+          description: '[Proof Key for Code Exchange (PKCE)](https://datatracker.ietf.org/doc/html/rfc7636) transformation method that was used to derive code_challenge.'
+          required: true
+          schema:
+            type: string
+            enum:
+              - S256
+              - plain
+          example: S256
+        - name: code_challenge
+          in: query
+          description: '[Proof Key for Code Exchange (PKCE)](https://datatracker.ietf.org/doc/html/rfc7636) Code Challenge.'
+          required: true
+          schema:
+            type: string
+        - name: prompt
+          in: query
+          description: Space-delimited, case-sensitive list that specifies whether the Authorization Server prompts the End-User for re-authentication and consent.  This value is passed to the configured IdP. See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+          required: false
+          schema:
+            type: string
+        - name: display
+          in: query
+          description: ASCII string value that specifies how the Authorization Server displays the authentication and consent user interface. This value is passed to the configured IdP. See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+          required: false
+          schema:
+            type: string
+        - name: ui_locales
+          in: query
+          description: End-User's preferred languages and scripts for the user interface, represented as space-separated list of BCP47 language tag values. This value is forwarded to the configured IdP.  See [Section 3.1.2.1. Authentication Request - OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+          required: false
+          schema:
+            type: string
+          example: fr-CA fr en
+        - name: elasticpath_commerce_cloud_profile_id
+          in: query
+          description: Selects the specific OIDC Profile within the realm to use for authentication.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: ep_report_callback_replay_error
+          in: query
+          description: Custom boolean flag. If true, if the user attempts to hit back in their browser, we will redirect them back to the store front
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '303':
+          description: See Other - Redirects to the IdP provider for authentication
+          headers:
+            Location:
+              description: The URL of the IdP provider to redirect to
+              schema:
+                type: string
+                format: uri
+        '307':
+          description: Temporary Redirect - Redirects the user back to the caller.
+          headers:
+            Location:
+              description: The location to redirect to, typically the store front.
+              schema:
+                type: string
+                format: uri
+        '400':
+          description: |
+            In some cases the OAuth 2.0 specification does not permit us to redirect the user back to the caller, in which case they will see a 4xx.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: OAuth 2.0 error code
+                  errorDescription:
+                    type: string
+                    description: Human-readable error description (camelCase)
+                  error_description:
+                    type: string
+                    description: Human-readable error description (snake_case, OAuth 2.0 standard)
+                required:
+                  - error
+              examples:
+                invalid_client:
+                  summary: Invalid client_id
+                  value:
+                    error: invalid_request
+                    errorDescription: The field [client_id] with value [unknownClient] is invalid.
+                    error_description: The field [client_id] with value [unknownClient] is invalid.
+      security: []
+  /oidc-idp/stores/{storeId}/authentication-realms/{realmId}/.well-known/openid-configuration:
+    get:
+      tags:
+        - OIDC Authentication
+      summary: OpenID Connect Discovery
+      description: |-
+        Returns the OpenID Connect discovery document for the authentication realm.
+        This endpoint provides metadata about the OIDC provider's configuration, including endpoints, supported features, and capabilities. Some libraries might require an OIDC discovery document in order to work.
+        For more information see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
+      operationId: get-oidc-idp-stores-storeId-authentication-realms-realmId-well-known-openid-configuration
+      parameters:
+        - name: storeId
+          in: path
+          description: The ID of the store.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: elasticpath_commerce_cloud_profile_id
+          in: query
+          description: The ID of the [OIDC profile](/docs/api/single-sign-on/oidc-profiles) that you would like to authenticate with
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK - OpenID Connect discovery document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuer:
+                    type: string
+                    format: uri
+                    description: The issuer identifier for this OIDC provider
+                  authorization_endpoint:
+                    type: string
+                    format: uri
+                    description: URL of the authorization endpoint
+                  token_endpoint:
+                    type: string
+                    format: uri
+                    description: URL of the token endpoint, note that this endpoint is not public, and clients will not call it.
+                  jwks_uri:
+                    type: string
+                    format: uri
+                    description: URL of the JSON Web Key Set document
+                  response_types_supported:
+                    type: array
+                    items:
+                      type: string
+                    description: List of OAuth 2.0 response_type values supported
+                  subject_types_supported:
+                    type: array
+                    items:
+                      type: string
+                    description: List of subject identifier types supported
+                  id_token_signing_alg_values_supported:
+                    type: array
+                    items:
+                      type: string
+                    description: List of JWS signing algorithms supported for ID Tokens
+                  scopes_supported:
+                    type: array
+                    items:
+                      type: string
+                    description: List of OAuth 2.0 scope values supported
+                  token_endpoint_auth_methods_supported:
+                    type: string
+                    description: Authentication methods supported by the token endpoint
+                required:
+                  - issuer
+                  - authorization_endpoint
+                  - token_endpoint
+                  - jwks_uri
+                  - response_types_supported
+                  - subject_types_supported
+                  - id_token_signing_alg_values_supported
+              examples:
+                discovery_document:
+                  summary: OpenID Connect discovery document
+                  value:
+                    authorization_endpoint: http://euwest.api.elasticpath.com/oidc-idp/login/stores/88888888-4444-4333-8333-111111111111/authentication-realms/45928070-44a6-448b-8246-a85aa35320af
+                    id_token_signing_alg_values_supported:
+                      - RS256
+                    issuer: http://euwest.api.elasticpath.com/oidc-idp/stores/88888888-4444-4333-8333-111111111111/authentication-realms/45928070-44a6-448b-8246-a85aa35320af
+                    jwks_uri: http://euwest.api.elasticpath.com/oidc-idp/.well-known/jwks.json
+                    response_types_supported:
+                      - code
+                    scopes_supported:
+                      - profile
+                      - openid
+                      - email
+                    subject_types_supported:
+                      - public
+                    token_endpoint: http://euwest.api.elasticpath.com/oidc-idp/token/stores/88888888-4444-4333-8333-111111111111/authentication-realms/45928070-44a6-448b-8246-a85aa35320af
+                    token_endpoint_auth_methods_supported: client_secret_basic
+      security: []
+  /v2/authentication-realms:
+    get:
+      tags:
+        - Authentication Realms
+      summary: Get all Authentication Realms
+      description: |
+        Retrieve a list of all authentication realms configured for your store.
+        Authentication Realms allow you to configure authentication options and manage single sign-on settings. Each realm contains users, authentication profiles, and mappings between users and authentication profiles.
+      operationId: get-v2-authentication-realms
+      parameters:
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuthenticationRealmResponse'
+                  meta:
+                    $ref: '#/components/schemas/MetaList'
+                  links:
+                    type: object
+                    properties:
+                      current:
+                        description: Always the current page.
+                        type: string
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/?page[offset]=0&page[limit]=25
+                      first:
+                        description: Always the first page.
+                        type: string
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/?page[offset]=0&page[limit]=25
+                      last:
+                        description: Always null if there is only one page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/?page[offset]=0&page[limit]=25
+                      next:
+                        description: Always null if there is only one page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: null
+                      prev:
+                        description: Always null if the user is on the first page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: null
+              examples:
+                list_authentication_realms:
+                  summary: List of authentication realms
+                  value:
+                    data:
+                      - id: 45928070-44a6-448b-8246-a85aa35320af
+                        type: authentication-realm
+                        name: Buyer Organization
+                        duplicate_email_policy: allowed
+                        redirect_uris:
+                          - https://example-shop.com/oidc/callback
+                        relationships:
+                          origin:
+                            data:
+                              id: '0'
+                              type: customer-authentication-settings
+                      - id: bbd4a3f8-6a93-44a2-8f4f-2a1e3f8b3b9c
+                        type: authentication-realm
+                        name: Merchant Organization
+                        duplicate_email_policy: disallowed
+                        redirect_uris:
+                          - https://cm.example.com/oidc/callback
+                        relationships:
+                          origin:
+                            data:
+                              id: '1'
+                              type: merchant-realm-mappings
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}:
+    get:
+      tags:
+        - Authentication Realms
+      summary: Get an Authentication Realm
+      description: Retrieve a specific authentication realm by its ID.
+      operationId: get-v2-authentication-realms-realmId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm to retrieve.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AuthenticationRealmResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+              examples:
+                get_authentication_realm:
+                  summary: Authentication realm
+                  value:
+                    data:
+                      id: 45928070-44a6-448b-8246-a85aa35320af
+                      type: authentication-realm
+                      name: Buyer Organization
+                      duplicate_email_policy: allowed
+                      redirect_uris:
+                        - https://example-shop.com/oidc/callback
+                      relationships:
+                        origin:
+                          data:
+                            id: '0'
+                            type: customer-authentication-settings
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Authentication Realms
+      summary: Update an Authentication Realm
+      description: Update a specific authentication realm by its ID.
+      operationId: put-v2-authentication-realms-realmId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm to update.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/AuthenticationRealm'
+              required:
+                - data
+            examples:
+              Update an authentication realm:
+                value:
+                  data:
+                    type: authentication-realm
+                    name: updated-auth-realm
+                    duplicate_email_policy: disallowed
+                    redirect_uris:
+                      - https://updated-example.com/callback
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AuthenticationRealmResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/oidc-profiles:
+    post:
+      tags:
+        - OIDC Profiles
+      summary: Create an OIDC Profile
+      description: Create an OpenID Connect profile for the specified authentication realm.
+      operationId: post-v2-authentication-realms-realmId-oidc-profiles
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OidcProfile'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OidcProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/OidcProfileLinks'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - OIDC Profiles
+      summary: Get OIDC Profiles
+      description: Retrieve OIDC profiles for the specified authentication realm.
+      operationId: get-v2-authentication-realms-realmId-oidc-profiles
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OidcProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              examples:
+                list_oidc_profiles:
+                  summary: List of OIDC profiles
+                  value:
+                    data:
+                      - id: c8849022-c9c6-4888-9ca8-2bb78f445fb0
+                        type: oidc-profile
+                        name: Google
+                        issuer: https://accounts.google.com
+                        client_id: google-client-id
+                      - id: 21be087e-faa6-41fc-9b51-6763a363ec2d
+                        type: oidc-profile
+                        name: Apple
+                        issuer: https://appleid.apple.com
+                        client_id: apple-client-id
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/oidc-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/oidc-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/oidc-profiles/{profileId}:
+    get:
+      tags:
+        - OIDC Profiles
+      summary: Get OIDC Profile
+      description: Retrieve a specific OIDC profile by ID.
+      operationId: get-v2-authentication-realms-realmId-oidc-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the OIDC profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OidcProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/OidcProfileLinks'
+              examples:
+                get_oidc_profile:
+                  summary: OIDC profile
+                  value:
+                    data:
+                      id: c8849022-c9c6-4888-9ca8-2bb78f445fb0
+                      type: oidc-profile
+                      name: Google
+                      issuer: https://accounts.google.com
+                      client_id: google-client-id
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/oidc-profiles/c8849022-c9c6-4888-9ca8-2bb78f445fb0
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - OIDC Profiles
+      summary: Update OIDC Profile
+      description: Update a specific OIDC profile by ID.
+      operationId: put-v2-authentication-realms-realmId-oidc-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the OIDC profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OidcProfile'
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OidcProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/OidcProfileLinks'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - OIDC Profiles
+      summary: Delete OIDC Profile
+      description: Delete a specific OIDC profile by ID.
+      operationId: delete-v2-authentication-realms-realmId-oidc-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the OIDC profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/password-profiles:
+    get:
+      tags:
+        - Password Profiles
+      summary: Get Password Profiles
+      description: Retrieve password profiles for the specified authentication realm.
+      operationId: get-v2-authentication-realms-realmId-password-profiles
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PasswordProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              examples:
+                list_password_profiles:
+                  summary: List of password profiles
+                  value:
+                    data:
+                      - id: a2f6d4c0-1d2b-4b3a-9e5a-2f4b1c7d8e9f
+                        type: password_profile
+                        name: Default Passwords
+                        require_uppercase: true
+                        require_numbers: true
+                        min_length: 10
+                      - id: b3e7f5a1-2c3d-4e4b-8f6a-3e5c2d8f9a0b
+                        type: password_profile
+                        name: Impersonation Profile
+                        require_uppercase: false
+                        require_numbers: false
+                        min_length: 8
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/password-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/password-profiles?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Password Profiles
+      summary: Create Password Profile
+      description: Create a password profile for the specified authentication realm.
+      operationId: post-v2-authentication-realms-realmId-password-profiles
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PasswordProfile'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PasswordProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/password-profiles/{profileId}:
+    get:
+      tags:
+        - Password Profiles
+      summary: Get Password Profile
+      description: Retrieve a specific password profile by ID.
+      operationId: get-v2-authentication-realms-realmId-password-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the password profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PasswordProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+              examples:
+                get_password_profile:
+                  summary: Password profile
+                  value:
+                    data:
+                      id: a2f6d4c0-1d2b-4b3a-9e5a-2f4b1c7d8e9f
+                      type: password_profile
+                      name: Default Passwords
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/password-profiles/a2f6d4c0-1d2b-4b3a-9e5a-2f4b1c7d8e9f
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Password Profiles
+      summary: Update Password Profile
+      description: Update a specific password profile by ID.
+      operationId: put-v2-authentication-realms-realmId-password-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the password profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/PasswordProfile'
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PasswordProfileResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Password Profiles
+      summary: Delete Password Profile
+      description: Delete a specific password profile by ID.
+      operationId: delete-v2-authentication-realms-realmId-password-profiles-profileId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the password profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request:
+    post:
+      tags:
+        - Password Profiles
+      summary: Create One-Time Password Token Request
+      description: Create a one-time password token request for the specified password profile.
+      operationId: post-v2-authentication-realms-realmId-password-profiles-profileId-one-time-password-token-request
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: profileId
+          in: path
+          description: The ID of the password profile.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/OneTimePasswordTokenRequestInput'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OneTimePasswordTokenRequestResponse'
+        '202':
+          description: Accepted
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info:
+    get:
+      tags:
+        - User Authentication Infos
+      summary: Get User Authentication Info List
+      description: |-
+        Retrieve user authentication information for the specified authentication realm.
+        ### Filtering
+
+
+            The following operators and attributes are available for
+            [filtering](/guides/Getting-Started/filtering) unassigned account members.
+
+
+            | Operator | Description   |
+            | :------- |:--------------------------------------------------------------------------------------------------- |
+            | `eq`     | Matches record where the field matches the value (case insensitive) |
+            | `ge`  | Matches results where the value is greater than or equal to the operand |
+            | `gt`  | Matches results where the value is greater than the operand |
+            | `le`  | Matches results where the value is less than or equal to the operand |
+            | `lt`  | Matches results where the value is less than the operand |
+            | `in`  | Matches results where the value is in one of a set of values |
+            | `ilike`  | Checks whether the operand contains the specified string. You can use wildcard characters at the start or end. (Case Insensitive) |
+            | `is_null`  | Matches records where the field is null. |
+
+
+            | Attribute | Type     | Operator      | Example
+            | :-------- | :------- | :------------ | :---------------------------------   |
+            | `email`   | `string` | `eq`,`ilike` | `eq(email,ronswanson@example.com)`   |
+            | `name`    | `string` | `eq`,`ilike` | `ilike(name,*swan*)`       |
+            | `created_at`    | `string` | `lt`, `le`, `eq`, `gt`, `ge` | `lt(created_at,"2025-09-10T22:08:47.992Z")`       |
+            | `updated_at`    | `string` | `lt`, `le`, `eq`, `gt`, `ge` | `gt(updated_at,"2025-09-10T22:08:47.992Z")`       |
+            | `given_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('given_name')`       |
+            | `middle_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('middle_name')`       |
+            | `family_name`    | `string` | `eq`,`ilike`,`is_null`  | `is_null('family_name')`       |
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+        - $ref: '#/components/parameters/filter'
+        - name: sort
+          in: query
+          description: Specifies the order in which account members will be returned. For more information, see [Sorting](/guides/Getting-Started/sorting).
+          required: false
+          schema:
+            type: string
+            enum:
+              - created_at
+              - '-created_at'
+              - id
+              - '-id'
+              - updated_at
+              - '-updated_at'
+            x-enumDescriptions:
+              created_at: Sort in increasing order of creation
+              '-created_at': Sort in decreasing order of creation
+              id: Sort in increasing order of ID
+              '-id': Sort in decreasing order of ID
+              updated_at: Sort in increasing order of last update
+              '-updated_at': Sort in decreasing order of last update
+            example: id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+                  meta:
+                    $ref: '#/components/schemas/MetaList'
+                  links:
+                    type: object
+                    properties:
+                      current:
+                        description: Always the current page.
+                        type: string
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/{realmId}/user-authentication-info?page[offset]=0&page[limit]=25
+                      first:
+                        description: Always the first page.
+                        type: string
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/{realmId}/user-authentication-info?page[offset]=0&page[limit]=25
+                      last:
+                        description: Always null if there is only one page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: https://euwest.api.elasticpath.com/v2/authentication-realms/{realmId}/user-authentication-info?page[offset]=0&page[limit]=25
+                      next:
+                        description: Always null if there is only one page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: null
+                      prev:
+                        description: Always null if the user is on the first page.
+                        type:
+                          - string
+                          - 'null'
+                        format: uri
+                        example: null
+              examples:
+                list_user_authentication_info:
+                  summary: List of user authentication info
+                  value:
+                    data:
+                      - id: 40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c
+                        type: user_authentication_info
+                        name: Jane Doe
+                        email: jane.doe@example.com
+                      - id: ddb47241-2c69-42cd-b65f-32717cdcf9c1
+                        type: user_authentication_info
+                        name: John Smith
+                        email: john.smith@example.com
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - User Authentication Infos
+      summary: Create User Authentication Info
+      description: Create user authentication information for the specified authentication realm.
+      operationId: post-v2-authentication-realms-realmId-user-authentication-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationInfo'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        description: A URL to the specific resource.
+                        type: string
+                        format: uri
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}:
+    get:
+      tags:
+        - User Authentication Infos
+      summary: Get User Authentication Info
+      description: Retrieve specific user authentication information by ID.
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+              examples:
+                get_user_authentication_info:
+                  summary: User authentication info
+                  value:
+                    data:
+                      id: 40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c
+                      type: user_authentication_info
+                      name: Jane Doe
+                      email: jane.doe@example.com
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User Authentication Infos
+      summary: Update User Authentication Info
+      description: Update specific user authentication information by ID.
+      operationId: put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationInfo'
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User Authentication Infos
+      summary: Delete User Authentication Info
+      description: Delete specific user authentication information by ID.
+      operationId: delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info:
+    get:
+      tags:
+        - User Authentication Password Profile Infos
+      summary: Get User Authentication Password Profile Info List
+      description: Retrieve a list of password profile information for a user.
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              examples:
+                list_user_auth_password_profile_info:
+                  summary: List of Password Profile Info for a user
+                  value:
+                    data:
+                      - id: 9f8e7d6c-5b4a-3a2f-1e0d-c9b8a7f6e5d4
+                        type: user_authentication_password_profile_info
+                        username: uauppinamepestupdate@test.com
+                        password_profile_id: a2f6d4c0-1d2b-4b3a-9e5a-2f4b1c7d8e9f
+                      - id: 0c9b8a7f-6e5d-4c3b-2a1f-0e9d8c7b6a5f
+                        type: user_authentication_password_profile_info
+                        username: another.user@example.com
+                        password_profile_id: b3e7f5a1-2c3d-4e4b-8f6a-3e5c2d8f9a0b
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-password-profile-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-password-profile-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - User Authentication Password Profile Infos
+      summary: Create User Authentication Password Profile Info
+      description: Create password profile information for a specific user authentication info.
+      operationId: post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoInput'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoResponse'
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        description: A URL to the specific resource.
+                        type: string
+                        format: uri
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info:
+    post:
+      tags:
+        - User Authentication OIDC Profile Infos
+      summary: Create User Authentication OIDC Profile Info
+      description: Create OIDC profile information for a specific user authentication info.
+      operationId: post-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationOidcProfileInfo'
+              required:
+                - data
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationOidcProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - User Authentication OIDC Profile Infos
+      summary: Get User Authentication OIDC Profile Info
+      description: Retrieve OIDC profile information for a specific user authentication info.
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/page-limit'
+        - $ref: '#/components/parameters/page-offset'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserAuthenticationOidcProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+              examples:
+                list_user_auth_oidc_profile_info:
+                  summary: List of OIDC Profile Info for a user
+                  value:
+                    data:
+                      - id: f1a2b3c4-d5e6-47f8-9a0b-c1d2e3f4a5b6
+                        type: user_authentication_oidc_profile_info
+                        oidc_profile_id: c8849022-c9c6-4888-9ca8-2bb78f445fb0
+                        subject: subject-123
+                        issuer: https://accounts.google.com
+                      - id: 0a1b2c3d-4e5f-6071-8a9b-bc0d1e2f3a4b
+                        type: user_authentication_oidc_profile_info
+                        oidc_profile_id: 21be087e-faa6-41fc-9b51-6763a363ec2d
+                        subject: subject-456
+                        issuer: https://appleid.apple.com
+                    meta:
+                      results:
+                        total: 2
+                      page:
+                        limit: 25
+                        offset: 0
+                    links:
+                      current: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-oidc-profile-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      first: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-oidc-profile-info?page%5Boffset%5D=0&page%5Blimit%5D=25
+                      last: null
+                      next: null
+                      prev: null
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-oidc-profile-info/{oidcInfoId}:
+    get:
+      tags:
+        - User Authentication OIDC Profile Infos
+      summary: Get User Authentication OIDC Profile Info by ID
+      description: Retrieve specific OIDC profile information by ID for a user.
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: oidcInfoId
+          in: path
+          description: The ID of the OIDC profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationOidcProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+              examples:
+                get_user_auth_oidc_profile_info:
+                  summary: OIDC Profile Info for a user
+                  value:
+                    data:
+                      id: f1a2b3c4-d5e6-47f8-9a0b-c1d2e3f4a5b6
+                      type: user_authentication_oidc_profile_info
+                      oidc_profile_id: c8849022-c9c6-4888-9ca8-2bb78f445fb0
+                      subject: subject-123
+                      issuer: https://accounts.google.com
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-oidc-profile-info/f1a2b3c4-d5e6-47f8-9a0b-c1d2e3f4a5b6
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User Authentication OIDC Profile Infos
+      summary: Update User Authentication OIDC Profile Info
+      description: Update specific OIDC profile information by ID for a user.
+      operationId: put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: oidcInfoId
+          in: path
+          description: The ID of the OIDC profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationOidcProfileInfo'
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationOidcProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User Authentication OIDC Profile Infos
+      summary: Delete User Authentication OIDC Profile Info
+      description: Delete specific OIDC profile information by ID for a user.
+      operationId: delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-oidc-profile-info-oidcInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: oidcInfoId
+          in: path
+          description: The ID of the OIDC profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}:
+    get:
+      tags:
+        - User Authentication Password Profile Infos
+      summary: Get User Authentication Password Profile Info by ID
+      description: Retrieve specific password profile information by ID for a user.
+      operationId: get-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: passwordProfileInfoId
+          in: path
+          description: The ID of the password profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+              examples:
+                get_user_auth_password_profile_info:
+                  summary: Password Profile Info for a user
+                  value:
+                    data:
+                      id: 9f8e7d6c-5b4a-3a2f-1e0d-c9b8a7f6e5d4
+                      type: user_authentication_password_profile_info
+                      username: uauppinamepestupdate@test.com
+                      password_profile_id: a2f6d4c0-1d2b-4b3a-9e5a-2f4b1c7d8e9f
+                    links:
+                      self: https://euwest.api.elasticpath.com/v2/authentication-realms/45928070-44a6-448b-8246-a85aa35320af/user-authentication-info/40c8ecfa-0d1a-43b2-8d62-2bbbb6c4207c/user-authentication-password-profile-info/9f8e7d6c-5b4a-3a2f-1e0d-c9b8a7f6e5d4
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - User Authentication Password Profile Infos
+      summary: Update User Authentication Password Profile Info
+      description: Update specific password profile information by ID for a user.
+      operationId: put-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: passwordProfileInfoId
+          in: path
+          description: The ID of the password profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoInput'
+              required:
+                - data
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfoResponse'
+                  links:
+                    $ref: '#/components/schemas/SelfLink'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - User Authentication Password Profile Infos
+      summary: Delete User Authentication Password Profile Info
+      description: Delete specific password profile information by ID for a user.
+      operationId: delete-v2-authentication-realms-realmId-user-authentication-info-userAuthInfoId-user-authentication-password-profile-info-passwordProfileInfoId
+      parameters:
+        - name: realmId
+          in: path
+          description: The ID of the authentication realm.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userAuthInfoId
+          in: path
+          description: The ID of the user authentication info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: passwordProfileInfoId
+          in: path
+          description: The ID of the password profile info.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntityError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    page-limit:
+      name: page[limit]
+      in: query
+      description: The number of records per page.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+        maximum: 100
+        default: 25
+    page-offset:
+      name: page[offset]
+      in: query
+      description: The number of records to offset the results by.
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 0
+        default: 0
+    filter:
+      name: filter
+      in: query
+      description: Specifies the filter attributes.
+      required: false
+      schema:
+        type: string
+  schemas:
+    AuthenticationRealm:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `authentication-realm`.
+          const: authentication-realm
+        name:
+          type: string
+          description: Specifies the name of the authentication realm.
+          example: my-auth-realm
+        duplicate_email_policy:
+          type: string
+          description: The values permitted for this parameter are, `allowed` or `api_only`. In Single Sign On (SSO) each user in the Identity Provider (IdP) has a unique identifier, but different IdPs might differ in whether distinct users can share the same email address. For the `allowed` setting, when a user with a new unique identifier signs in through SSO for the first time, the system creates a new user. However, for the `api_only` setting, the system assigns the new unique identifier to the existing user in the system, in this case both the old and new unique identifier from the IdP points to the same user in Commerce. The `api_only` setting is recommended only when all configured identity providers treat e-mail address as a unique identifier for the user, otherwise a user might get access to another user’s account and data. Thus the `api_only` value can simplify administration of users.
+          enum:
+            - allowed
+            - disallowed
+            - api_only
+          example: allowed
+        redirect_uris:
+          type: array
+          description: An array of Storefront URIs that can start Single Sign On authentication. These URIs must follow the rules for [redirection endpoints in OAuth 2.0.](https://tools.ietf.org/html/rfc6749#section-3.1.2) All URIs must start with https:// except for http://localhost.
+          items:
+            type: string
+            format: uri
+          example:
+            - https://example.com/callback
+        relationships:
+          type: object
+          description: Specifies the relationships for this authentication realm.
+          properties:
+            origin:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the origin entity.
+                      example: '0'
+                    type:
+                      type: string
+                      description: The type of the origin entity.
+                      enum:
+                        - customer-authentication-settings
+                        - merchant-realm-mappings
+                        - account_authentication_settings
+      required:
+        - type
+        - name
+    UUID:
+      type: string
+      description: The unique identifier.
+      format: uuid
+      example: deb6b25f-8451-4211-9a22-95610333df23
+    MetaTimestamps:
+      type: object
+      properties:
+        created_at:
+          description: The date the resource is created.
+          type: string
+          format: date-time
+          example: '2021-02-23T09:40:33.882Z'
+        updated_at:
+          description: The date the resource is updated.
+          type: string
+          format: date-time
+          example: '2021-02-23T09:40:33.882Z'
+    AuthenticationRealmResponse:
+      allOf:
+        - $ref: '#/components/schemas/AuthenticationRealm'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for an Authentication Realm.
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+              description: Additional information for this realm.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23
+    MetaListPage:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: The maximum number of records per page for this response. You can set this value up to 100.
+          example: 25
+        current:
+          type: integer
+          description: The current page.
+          example: 0
+        offset:
+          type: integer
+          description: The current offset by number of records, not pages. Offset is zero-based.
+          example: 0
+        total:
+          type: integer
+          description: The total page count.
+          example: 1
+    MetaListResults:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: The total number of results after applying filters, if any, or all results.
+          example: 1
+    MetaList:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/MetaListPage'
+        results:
+          $ref: '#/components/schemas/MetaListResults'
+    Error:
+      type: object
+      required:
+        - status
+        - title
+      properties:
+        title:
+          type: string
+          description: A brief summary of the error.
+          examples:
+            - Bad Request
+        status:
+          type: string
+          format: string
+          description: The HTTP response code of the error.
+          examples:
+            - '400'
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+          examples:
+            - The field 'name' is required
+    SelfLink:
+      type: object
+      properties:
+        self:
+          description: A URL to the specific resource.
+          type: string
+          format: uri
+    ErrorResponse:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+        links:
+          $ref: '#/components/schemas/SelfLink'
+    OidcProfile:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `oidc-profile`.
+          const: oidc-profile
+        name:
+          type: string
+          description: Specifies the name of the OIDC profile.
+          example: my-oidc-profile
+        discovery_url:
+          type: string
+          description: The OIDC discovery URL.
+          format: uri
+          example: https://example.com/.well-known/openid_configuration
+        client_id:
+          type: string
+          description: The client ID for the OpenID Provider.
+          example: my-client-id
+        client_secret:
+          type: string
+          description: The client secret for the OpenID Provider.
+          example: my-client-secret
+      required:
+        - type
+        - name
+    OidcProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/OidcProfile'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for an OIDC Profile.
+            meta:
+              type: object
+              properties:
+                created_at:
+                  description: The date the resource is created.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:58:56.355Z'
+                updated_at:
+                  description: The date the resource is updated.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:58:56.355Z'
+                issuer:
+                  description: The OIDC issuer URL.
+                  type: string
+                  format: uri
+                  example: https://test.issuer.com
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/oidc-profiles/abc123
+                authorization-endpoint:
+                  description: The authorization endpoint URL.
+                  type: string
+                  format: uri
+                callback-endpoint:
+                  description: The callback endpoint URL.
+                  type: string
+                  format: uri
+                client-discovery-url:
+                  description: The client discovery URL.
+                  type: string
+                  format: uri
+    PaginationLinks:
+      type: object
+      properties:
+        current:
+          type: string
+          format: uri
+          description: The current page of data.
+        first:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The first page of data.
+        last:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The last page of data.
+        next:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The next page of data.
+        prev:
+          type:
+            - string
+            - 'null'
+          format: uri
+          description: The previous page of data.
+        self:
+          type: string
+          format: uri
+          description: The current resource URL.
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: object
+          properties:
+            current:
+              type: integer
+              description: The current page number.
+              example: 1
+            limit:
+              type: integer
+              description: The number of items per page.
+              example: 25
+            offset:
+              type: integer
+              description: The number of items to offset by.
+              example: 0
+            total:
+              type: integer
+              description: The total number of pages.
+              example: 1
+        results:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: The total number of results after applying filters, if any, or all results.
+              example: 1
+    OidcProfileLinks:
+      allOf:
+        - $ref: '#/components/schemas/SelfLink'
+        - type: object
+          properties:
+            authorization-endpoint:
+              description: The link that front-end applications should use to authenticate the OpenID Connect profile. The front-end application is responsible for appending all of the [required parameters](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) to the request. The endpoint also forwards some optional parameters, `display`, `prompt` and `ui_locales` to the configured Identity Provider. These parameters allow you to control the behavior of the authentication process on the Identity Provider. Additionally the query parameter `ep_report_callback_replay_error` can be set to `true` in which case if the user revisits the `callback-endpoint` multiple times (e.g., if they hit their Back button), we will redirect the user back to the front end with an [Authentication error response](https://openid.net/specs/openid-connect-core-1_0.html#AuthError) of `callback_replay`.
+              type: string
+              format: uri
+            callback-endpoint:
+              description: The link that should be supplied as the callback URL to the upstream authentication provider.
+              type: string
+              format: uri
+            client-discovery-url:
+              description: The link to the [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) document for this provider, see [here](/docs/api/single-sign-on/get-oidc-idp-stores-store-id-authentication-realms-realm-id-well-known-openid-configuration).
+              type: string
+              format: uri
+    PasswordProfile:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `password_profile`.
+          const: password_profile
+        name:
+          type: string
+          description: Specifies the name of the password profile.
+          example: my-password-profile
+        username_format:
+          type: string
+          description: The format the `username` field must be in when creating or updating a [User Authentication Password Profile Info](/docs/api/single-sign-on/post-v-2-authentication-realms-realm-id-user-authentication-info-user-auth-info-id-user-authentication-password-profile-info). You can change the `username_format` setting, however, the changes apply only to the users created or updated after changing this setting. The new setting does not change the `username_format` for existing users.
+          enum:
+            - email
+            - any
+          x-enumDescriptions:
+            email: The `username` must be a valid e-mail.
+            any: The `username` can be any string.
+          example: email
+        enable_one_time_password_token:
+          type: boolean
+          description: This enables one time password token requests and events for authentication. This feature is disabled by default.
+          example: true
+      required:
+        - type
+        - name
+    PasswordProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/PasswordProfile'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for a Password Profile.
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+              description: Additional information for this password profile.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/password-profiles/abc123
+    OneTimePasswordTokenRequestInput:
+      type: object
+      properties:
+        type:
+          const: one-time-password-token-request
+        purpose:
+          type: string
+          description: An information field indicating why the user submitted this request. Your [integration](/docs/api/integrations/integrations-introduction) can inspect this field and can change subsequent processing.
+          enum:
+            - reset_password
+            - passwordless_authentication
+          x-enumDescriptions:
+            reset_password: This request is because the user does not known their password.
+            passwordless_authentication: This request is because the user wants to authenticate with passwordless authentication
+          example: password_reset
+        username:
+          type: string
+          description: The username for the token request.
+          example: user@example.com
+      required:
+        - type
+        - purpose
+        - username
+    OneTimePasswordTokenRequestResponse:
+      allOf:
+        - $ref: '#/components/schemas/OneTimePasswordTokenRequestInput'
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The unique identifier for the one-time password token request.
+              example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+            token:
+              type: string
+              description: The generated one-time password token.
+              example: '123456'
+            expires_at:
+              type: string
+              format: date-time
+              description: The expiration time of the token.
+              example: '2023-12-01T10:30:00Z'
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+    UserAuthenticationInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `user_authentication_info`.
+          const: user_authentication_info
+        name:
+          type: string
+          description: Specifies the name of the user.
+          example: Ron Swanson
+        given_name:
+          type:
+            - string
+            - 'null'
+          description: Specifies the given name of the user.
+          example: Ron
+        family_name:
+          type:
+            - string
+            - 'null'
+          description: Specifies the family name of the user.
+          example: Swanson
+        middle_name:
+          type:
+            - string
+            - 'null'
+          description: Specifies the given name of the user.
+          example: Ulysses
+        email:
+          type: string
+          description: Specifies the email address of the user.
+          format: email
+          example: ron@swanson.com
+      required:
+        - type
+        - name
+        - email
+    UserAuthenticationInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationInfo'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for User Authentication Info.
+            meta:
+              type: object
+              properties:
+                created_at:
+                  description: The date the resource is created.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:29:42.282Z'
+                updated_at:
+                  description: The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.The last updated date of this `user-authentication-info` object. This value also changes if subresources such as the `user-authentication-oidc-profile-info`, or `user-authentication-password-profile-info` change.
+                  type: string
+                  format: date-time
+                  example: '2025-09-08T20:29:42.282Z'
+                creation_status:
+                  description: The creation status of the user authentication info.
+                  type: string
+                  enum:
+                    - COMPLETE
+                    - IN_PROGRESS
+                  x-enumDescriptions:
+                    COMPLETED: The user authentication info has been created successfully.
+                    IN_PROGRESS: The creation of the user authentication info is in progress (this can happen in some edge cases, if for instance the user presses refresh while signing in for the first time). Occasionally these users may be rolled back by the system.
+                  example: COMPLETE
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123
+    UserAuthenticationPasswordProfileInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `user_authentication_password_profile_info`.
+          const: user_authentication_password_profile_info
+        username:
+          type: string
+          description: The username used to authenticate.
+          example: uauppinamepestupdate@test.com
+        password_profile_id:
+          type: string
+          description: The ID of the associated password profile.
+          format: uuid
+          example: 767e6763-014e-4b6e-8a0e-59b863ab3262
+      required:
+        - type
+        - username
+        - password_profile_id
+    UserAuthenticationPasswordProfileInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfo'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for User Authentication Password Profile Info.
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+              description: Additional information for this resource.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123/user-authentication-password-profile-info/def456
+    UserAuthenticationPasswordProfileInfoInput:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationPasswordProfileInfo'
+        - type: object
+          properties:
+            password:
+              type: string
+              description: The password used to authenticate.
+              format: password
+              minLength: 8
+              example: P@ssw0rd123!
+          required:
+            - password
+    UserAuthenticationOidcProfileInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `user_authentication_oidc_profile_info`.
+          const: user_authentication_oidc_profile_info
+        oidc_profile_id:
+          type: string
+          description: The ID of the associated [OIDC profile](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview).
+          format: uuid
+          example: f1a2932f-3579-46f0-92e1-a4a80cd26e37
+        subject:
+          type: string
+          description: The identifier within the issuer for the `user-authentication-info` object. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+          example: subject-123
+        issuer:
+          type: string
+          description: The identifier for the issuer of the ID Token. For more information, see the [OpenID Connect specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) section.
+          format: uri
+          example: https://test.issuer.com
+      required:
+        - type
+        - oidc_profile_id
+    UserAuthenticationOidcProfileInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/UserAuthenticationOidcProfileInfo'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+              description: The unique identifier for User Authentication OIDC Profile Info.
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+              description: Additional information for this resource.
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  format: uri
+                  example: https://useast.api.elasticpath.com/v2/authentication-realms/deb6b25f-8451-4211-9a22-95610333df23/user-authentication-info/abc123/user-authentication-oidc-profile-info/def456
+  responses:
+    BadRequestError:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              value:
+                errors:
+                  - title: Bad Request
+                    status: '400'
+                    detail: 'Validation failed: field ''Name'' on the ''min'' tag.'
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized-error:
+              value:
+                errors:
+                  - title: Unauthorized
+                    status: '401'
+    UnprocessableEntityError:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unprocessable-entity-error:
+              value:
+                errors:
+                  - title: Unprocessable Entity
+                    status: '422'
+                    detail: Constraint violation
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal-server-error:
+              summary: Internal server error
+              value:
+                errors:
+                  - title: Internal Server Error
+                    status: '500'
+                    detail: there was a problem processing your request
+    NotFoundError:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not-found-error:
+              value:
+                errors:
+                  - title: Not Found
+                    status: '404'
+                    detail: Resource not found

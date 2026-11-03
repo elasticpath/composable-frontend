@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the files in the store, such as product images, videos and documents,
+  with each file's link, name, type and size. Filter by file name, width,
+  height or file size, or get several files at once by ID with the in operator;
+  IDs that do not exist are left out without an error. Returns at most 100
+  files per page.

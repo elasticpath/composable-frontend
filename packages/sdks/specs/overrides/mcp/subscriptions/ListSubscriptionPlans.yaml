@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the plans associated with a subscription. Use it to see which plan is
+  currently active: the plan with active_plan set to true is the active one. If
+  active_plan is null, the plan is not active on the subscription.

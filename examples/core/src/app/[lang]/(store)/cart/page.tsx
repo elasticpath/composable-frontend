@@ -7,7 +7,6 @@ import { getACart, getAllCurrencies, getByContextProduct } from "@epcc-sdk/sdks-
 import { CART_COOKIE_NAME } from "src/lib/cookie-constants";
 import { cookies } from "next/headers";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
-import { TAGS } from "src/lib/constants";
 import { getPreferredCurrency } from "src/lib/i18n";
 
 export default async function CartPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -21,9 +20,6 @@ export default async function CartPage({ params }: { params: Promise<{ lang: str
 
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
   const currency = getPreferredCurrency(lang, currencies.data?.data || []);
 
@@ -35,9 +31,6 @@ export default async function CartPage({ params }: { params: Promise<{ lang: str
       include: ["items", "promotions", "tax_items", "custom_discounts"],
     },
     client,
-    next: {
-      tags: [TAGS.cart],
-    },
     headers: {
       "Accept-Language": lang,
       "X-Moltin-Currency": currency?.code,

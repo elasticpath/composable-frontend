@@ -1,0 +1,6 @@
+x-mcp-title: Get a Draft or Live Product
+x-mcp-description: >-
+  Gets one product or bundle by ID from Product Experience Manager, whatever
+  its status, so it can be a draft. It returns the admin attributes, build
+  rules, variations and relationships, and can include main images, files or
+  bundle component products.

@@ -1,0 +1,6 @@
+x-mcp-name: promotions_standard_get_promotion_job_file
+x-mcp-title: Get a Promotion Job's Exported Codes File
+x-mcp-description: >-
+  Gets the download link for the CSV of codes exported by a code_export job on a
+  Promotions Standard promotion. Check that the job's status is completed
+  first; list the promotion's jobs to see it.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one catalog rule by its ID. Use it to stop a rule from selecting a
+  catalog, or to free a catalog that a rule references so the catalog can be
+  deleted.

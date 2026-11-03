@@ -1,4 +1,3 @@
-import React from "react"
 import type { OrderResponse } from "@epcc-sdk/sdks-shopper"
 
 type Props = {

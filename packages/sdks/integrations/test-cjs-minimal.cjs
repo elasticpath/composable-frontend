@@ -1,5 +1,7 @@
 // This file is used to test that CommonJS requires work correctly
-const uintegrations = require('./dist/index.cjs');
+const Integrations = require("./dist/index.cjs")
+const mcp = require("./dist/mcp.cjs")
 
-console.log('uintegrations:', Object.keys(uintegrations));
-console.log('Test successful!');
+console.log("Integrations:", Object.keys(Integrations))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

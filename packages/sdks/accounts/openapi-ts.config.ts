@@ -1,24 +1,24 @@
-import { defaultPlugins, defineConfig } from "@hey-api/openapi-ts"
-import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
+import { $, defineConfig } from "@hey-api/openapi-ts"
+import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
+// `@hey-api/transformers` is deliberately absent. Enabling it makes the
+// typescript plugin type `date-time` as `Date` and `int64` as `bigint` while
+// nothing wires the transformers into the SDK, so the types would contradict the
+// runtime values. The transformers it emits for this spec are also wrong: each
+// resource collapses to `.attributes`.
 export default defineConfig({
-  client: "@hey-api/client-fetch",
-  experimentalParser: true,
-  input: "../specs/account_management.yaml",
-  output: { path: "src/client", format: "prettier" },
+  input: "../specs/bundled/accounts_standalone.yaml",
+  output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
-    ...defaultPlugins,
+    { name: "@hey-api/client-fetch" },
+    { name: "@hey-api/typescript" },
+    { name: "@hey-api/sdk" },
     {
-      exportInlineEnums: true,
-      name: "@hey-api/typescript",
+      $resolvers: { number: int64AsNumber },
+      metadata: true,
+      name: "zod",
     },
-    {
-      dates: true,
-      name: "@hey-api/transformers",
-    },
-    defineReadmeConfig({
-      name: "generate-readme",
-      targetOperation: "getV2Accounts",
-    }),
+    mcpTools($, { api: "accounts" }),
   ],
 })

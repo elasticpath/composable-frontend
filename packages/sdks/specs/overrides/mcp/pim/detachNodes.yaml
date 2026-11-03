@@ -1,0 +1,6 @@
+x-mcp-risk: update
+x-mcp-title: Detach Products from Multiple Nodes
+x-mcp-description: >-
+  Removes the products matching a filter from the hierarchy nodes you list,
+  and from their child nodes. The products themselves are not deleted. It
+  returns the number of nodes detached and any node IDs not found.

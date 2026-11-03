@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists delivery logs across all the integrations of the store. Each shows
+  whether the attempt succeeded, the attempt number, status code, response body,
+  error detail and the integration and job it belongs to. To see one
+  integration only, list that integration's logs.

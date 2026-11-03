@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the live child products of one parent product in a published catalog
+  release; pass a release ID, or latestPublished for the newest release. Any
+  product other than a base product returns a 422 error. Filter by name, sku,
+  slug or tags. For a bundle's components, list its component products instead.

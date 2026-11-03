@@ -1,0 +1,9 @@
+# The published spec derives its operationIds from paths, which generate names of 85 and 126
+# characters. These are the names these two operations already ship under.
+paths:
+  /v2/authentication-realms/{realmId}/password-profiles/{profileId}/one-time-password-token-request:
+    post:
+      operationId: createOneTimePasswordTokenRequest
+  /v2/authentication-realms/{realmId}/user-authentication-info/{userAuthInfoId}/user-authentication-password-profile-info/{passwordProfileInfoId}:
+    put:
+      operationId: updatePasswordProfileInfo

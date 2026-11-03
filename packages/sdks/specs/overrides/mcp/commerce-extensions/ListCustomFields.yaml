@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the fields of one Custom API, identified by its ID. Use it to see the
+  structure of an entry before creating or updating entries. Filter by name,
+  slug or field_type, sort, and page.

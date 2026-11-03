@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a shipping group from a cart. It fails while any cart item is attached
+  to the group, so remove the group from those items first. This is for carts
+  only, not orders.

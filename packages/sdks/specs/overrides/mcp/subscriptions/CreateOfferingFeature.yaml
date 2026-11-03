@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a new feature directly inside an offering, as an access, promotion or
+  usage feature with its configuration. To attach a feature that already exists,
+  attach it to the offering instead. The change applies to new subscriptions
+  only.

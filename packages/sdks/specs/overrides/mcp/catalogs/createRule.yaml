@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a catalog rule, which decides which catalog a shopper sees by account,
+  customer, channel or tag. Only needed when a store has more than one catalog.
+  Rules cannot be created for organization catalogs, and a new rule can take 5
+  minutes to apply. To check a new rule against existing ones, validate the
+  rules with the conflict match type.

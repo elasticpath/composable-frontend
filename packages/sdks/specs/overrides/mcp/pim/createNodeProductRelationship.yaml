@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Attaches one or more existing products to a node, by product ID. It returns
+  the updated node. To remove products from a node, delete the node's product
+  relationships. This works on draft data in Product Experience Manager, not a
+  published catalog release.

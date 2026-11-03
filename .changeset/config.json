@@ -7,11 +7,14 @@
   "access": "restricted",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  },
   "ignore": [
     "algolia",
     "simple",
     "payments",
-    "memberships",
+    "subscriptions",
     "composable-cli-docs",
     "commerce-essentials-storefront",
     "spa-cart",
@@ -31,6 +34,9 @@
     "core",
     "pdf-viewer-example",
     "google-analytics-example",
-    "recommendations-example"
+    "recommendations-example",
+    "commerce-extensions-saved-list",
+    "account-carts",
+    "seat-count"
   ]
 }

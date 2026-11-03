@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates an offering together with its plans, pricing options, features and the
+  links between them in one request. The plans can be subscription plans or ones
+  whose external reference is a Product Experience Manager product ID. An
+  offering needs at least one pricing option. To change an existing offering,
+  update it or its plans and pricing options instead.

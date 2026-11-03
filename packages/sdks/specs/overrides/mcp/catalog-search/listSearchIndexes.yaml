@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the search indexes of the store, one per catalog release, with the
+  catalog ID, release ID and whether each is out of sync. Filter by out_of_sync
+  to find indexes that need a reindex.

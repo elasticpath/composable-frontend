@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Deletes several codes from one rule promotion in one request; the body lists
+  the codes. Deletion is permanent, though past uses may still show in
+  historical transactions. To delete one code by its ID, delete that single code
+  instead.

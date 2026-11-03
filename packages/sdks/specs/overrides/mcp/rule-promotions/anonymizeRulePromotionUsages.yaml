@@ -1,0 +1,5 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Anonymizes the user data in rule promotion usage records, for GDPR or other
+  privacy requests. The body lists the usage IDs to anonymize. Historical
+  transactions and applied discounts are not changed.

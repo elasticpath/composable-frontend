@@ -495,6 +495,98 @@ describe("SearchRequestAdapter", () => {
         })
       })
 
+      it("forwards configured `include` as the postMultiSearch `query.include`", async () => {
+        const configuration = new Configuration({
+          additionalSearchParameters: {
+            query_by: "name",
+          },
+          include: ["main_image", "files"],
+        })
+
+        const instantsearchRequests = [
+          {
+            indexName: "products",
+            params: { query: "test" },
+          },
+        ]
+
+        const subject = new SearchRequestAdapter(
+          instantsearchRequests,
+          client,
+          configuration,
+        )
+        await subject.request()
+
+        expect(postMultiSearch).toHaveBeenCalledWith({
+          client,
+          body: {
+            searches: [
+              {
+                type: "products",
+                q: "test",
+                page: 1,
+                query_by: "name",
+                highlight_full_fields: "name",
+              },
+            ],
+          },
+          headers: {},
+          query: { include: ["main_image", "files"] },
+        })
+      })
+
+      it("omits `query.include` from postMultiSearch when `include` is not configured", async () => {
+        const configuration = new Configuration({
+          additionalSearchParameters: {
+            query_by: "name",
+          },
+        })
+
+        const instantsearchRequests = [
+          {
+            indexName: "products",
+            params: { query: "test" },
+          },
+        ]
+
+        const subject = new SearchRequestAdapter(
+          instantsearchRequests,
+          client,
+          configuration,
+        )
+        await subject.request()
+
+        const call = (postMultiSearch as any).mock.calls.at(-1)?.[0]
+        expect(call).toBeDefined()
+        expect(call).not.toHaveProperty("query")
+      })
+
+      it("omits `query.include` from postMultiSearch when `include` is an empty array", async () => {
+        const configuration = new Configuration({
+          additionalSearchParameters: {
+            query_by: "name",
+          },
+          include: [],
+        })
+
+        const instantsearchRequests = [
+          {
+            indexName: "products",
+            params: { query: "test" },
+          },
+        ]
+
+        const subject = new SearchRequestAdapter(
+          instantsearchRequests,
+          client,
+          configuration,
+        )
+        await subject.request()
+
+        const call = (postMultiSearch as any).mock.calls.at(-1)?.[0]
+        expect(call).not.toHaveProperty("query")
+      })
+
       it("does not include union parameter in multisearch request when union is not configured", async () => {
         const configuration = new Configuration({
           additionalSearchParameters: {

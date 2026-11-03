@@ -1,0 +1,6 @@
+x-mcp-title: Delete a Dunning Rule
+x-mcp-description: >-
+  Deletes a dunning rule by ID. Payment runs use only the default rule, so
+  deleting a non-default rule changes nothing. Deleting the default rule reverts
+  payment runs to the behavior when no rule is set: one retry a day for 10 days,
+  11 payments in total.

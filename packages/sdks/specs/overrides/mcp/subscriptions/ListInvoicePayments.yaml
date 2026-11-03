@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the payment attempts recorded against one invoice. Each shows the
+  gateway, amount, whether it succeeded or is pending, and the failure reason if
+  it failed. Use it to find out why an invoice is still outstanding.

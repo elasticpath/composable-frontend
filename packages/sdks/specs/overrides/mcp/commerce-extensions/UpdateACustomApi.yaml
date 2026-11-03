@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a Custom API's definition by its ID, such as its name, description,
+  slug, allow_upserts setting, presentation or parent Custom APIs. Send the type
+  and the properties to set. To change a field or an entry, update that field or
+  entry instead.

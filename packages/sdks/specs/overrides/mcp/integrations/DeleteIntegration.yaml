@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes an integration by ID. The response returns only the deleted ID. To
+  pause delivery without deleting, update the integration to disable it
+  instead.

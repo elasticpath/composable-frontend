@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the files related to a product, giving each file's ID and the tags set
+  on the relationship. Use it to see which files a product has before changing
+  them. It reads draft product data in Product Experience Manager, not a
+  published catalog release.

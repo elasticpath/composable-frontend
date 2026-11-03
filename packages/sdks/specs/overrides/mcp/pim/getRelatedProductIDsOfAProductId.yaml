@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the IDs of the products related to a product under one custom
+  relationship, with each one's sort order, paginated up to 100 per page. Use it
+  when IDs are enough. To get names, SKUs and other product details, get the
+  related products instead.

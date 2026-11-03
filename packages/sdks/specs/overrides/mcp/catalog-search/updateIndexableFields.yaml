@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates an indexable fields configuration by ID: its custom fields, core field
+  overrides and index-wide stem, token separator and symbol settings. The ID in
+  the body must match the ID in the path. Reindex the catalog releases
+  afterwards for the change to apply. It returns 403 for organization-owned
+  fields and 409 while a reindex is running.

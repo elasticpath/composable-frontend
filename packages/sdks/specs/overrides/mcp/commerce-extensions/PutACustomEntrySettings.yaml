@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates an entry in the Custom API with this slug, through the extensions
+  endpoint. The identifier is the entry ID, or the URL-slug field's value if the
+  Custom API has one. When the Custom API allows upserts, a missing entry is
+  created (201); send no If-Match on an upsert. Otherwise If-Match is optional,
+  and a mismatch returns 412.

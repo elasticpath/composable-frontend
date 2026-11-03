@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import { AccountCheckout } from "./AccountCheckout";
-import { CART_COOKIE_NAME } from "src/lib/cookie-constants";
+import {
+  ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  CART_COOKIE_NAME,
+} from "src/lib/cookie-constants";
 import { GuestCheckout } from "./GuestCheckout";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -8,7 +11,6 @@ import { CheckoutViews } from "./CheckoutViews";
 import { getAllCurrencies, getACart, getByContextProduct } from "@epcc-sdk/sdks-shopper";
 import { createElasticPathClient } from "src/lib/create-elastic-path-client";
 import { OrderConfirmationProvider } from "./OrderConfirmationProvider";
-import { TAGS } from "src/lib/constants";
 import { isAccountAuthenticated } from "@epcc-sdk/sdks-nextjs";
 import { getPreferredCurrency } from "src/lib/i18n";
 
@@ -26,9 +28,6 @@ export default async function CheckoutPage({ params }: { params: Promise<{ lang:
 
   const currencies = await getAllCurrencies({
     client,
-    next: {
-      tags: [TAGS.currencies],
-    },
   });
   const currency = getPreferredCurrency(lang, currencies.data?.data || []);
 
@@ -39,9 +38,6 @@ export default async function CheckoutPage({ params }: { params: Promise<{ lang:
     },
     query: {
       include: ["items"],
-    },
-    next: {
-      tags: [TAGS.cart],
     },
     headers: {
       "Accept-Language": lang,
@@ -80,7 +76,9 @@ export default async function CheckoutPage({ params }: { params: Promise<{ lang:
     notFound();
   }
 
-  const isAccount = await isAccountAuthenticated();
+  const isAccount = await isAccountAuthenticated(
+    ACCOUNT_MEMBER_TOKEN_COOKIE_NAME,
+  );
   return (
     <OrderConfirmationProvider>
       <CheckoutViews

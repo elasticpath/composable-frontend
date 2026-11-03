@@ -1,0 +1,3 @@
+x-mcp-description: >-
+  Attaches one or more templates to a product. The body lists the template
+  IDs. It returns the created product template relationship.

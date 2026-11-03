@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Refunds an order transaction. Either mark it refunded after refunding through
+  your own payment provider, which is a full refund, or send a full or partial
+  refund amount to a supported gateway.

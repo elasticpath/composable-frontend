@@ -1,0 +1,6 @@
+x-mcp-title: Get a Shopper Node's Child Nodes
+x-mcp-description: >-
+  Lists the child nodes directly under one node in the catalog that the
+  shopper's context selects, using the catalog rule that best matches it. Use it
+  to walk a hierarchy one level down from a node, and filter by name, slug or
+  id. To read a specific catalog and release by ID, use the catalog node reads.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the addresses saved on one account. Filter by name, recipient, phone,
+  company, instructions, address lines, city, county, region, postcode or
+  country, and page through the results. To fetch one address whose ID you
+  know, get that address instead.

@@ -1,0 +1,4 @@
+x-mcp-title: List Bundle Component Products
+x-mcp-description: >-
+  Lists the products that are components of a bundle, as product IDs. Use it
+  to see which products make up a bundle.

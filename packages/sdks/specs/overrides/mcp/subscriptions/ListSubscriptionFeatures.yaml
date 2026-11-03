@@ -1,0 +1,4 @@
+x-mcp-title: List a Subscription's Features
+x-mcp-description: >-
+  Lists the features of a subscription, which define what the subscriber is
+  entitled to. To get a single feature, get it by ID on the subscription.

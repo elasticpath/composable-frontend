@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one code from a Promotions Standard promotion, given the promotion ID
+  and the code string. Other codes and the promotion are unchanged. Returns 404
+  if the promotion is not found.

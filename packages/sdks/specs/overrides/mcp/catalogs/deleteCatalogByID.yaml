@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes a catalog that is not published. Delete its releases first, one at a
+  time or all at once. If catalog rules reference the catalog, update those
+  rules to remove it before deleting.

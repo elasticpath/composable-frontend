@@ -1,0 +1,7 @@
+x-mcp-risk: read
+x-mcp-description: >-
+  Applies a shopper's option choices to a bundle in the catalog that the
+  shopper's context selects, and returns the bundle with those selections in its
+  bundle configuration and their metadata. Send the bundle configuration with
+  selected_options as the body. Products must be live. Use it to show the
+  shopper a summary of their selection.

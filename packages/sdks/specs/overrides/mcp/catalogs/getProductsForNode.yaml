@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the live products associated with one hierarchy node in a published
+  catalog release; pass a release ID, or latestPublished for the newest release.
+  If the node has curated products, they come back in the curated order, flagged
+  curated_product: true. For a whole hierarchy, read the hierarchy's products
+  instead.

@@ -54,6 +54,7 @@ describe("validation-schema", () => {
     };
 
     const validData = {
+      productId: "5d3b2c1e-0f4a-4c6b-9a7d-1e2f3a4b5c6d",
       quantity: 1,
       selectedOptions: {
         plants: ['{"a158ffa0-5d16-4325-8dcc-be8acd55eecf":1}'],

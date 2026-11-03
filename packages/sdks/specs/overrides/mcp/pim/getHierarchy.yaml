@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists all hierarchies, filterable and paginated up to 100 per page. Use it to
+  find a hierarchy ID or slug, or the copy made by a duplicate job. It returns
+  hierarchies as edited, not those of a published catalog release.

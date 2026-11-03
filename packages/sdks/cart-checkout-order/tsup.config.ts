@@ -6,9 +6,14 @@ import {
 } from "esbuild-fix-imports-plugin"
 
 export default defineConfig({
-  entry: ["src/**/*.ts"],
+  entry: [
+    "src/**/*.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test-d.ts",
+    "!src/test/**",
+  ],
   format: ["esm", "cjs"],
-  dts: true,
+  dts: { entry: ["src/index.ts", "src/zod.ts", "src/mcp.ts"] },
   splitting: false,
   sourcemap: true,
   clean: true,
@@ -19,7 +24,7 @@ export default defineConfig({
     fixFolderImportsPlugin(),
     fixExtensionsPlugin(),
   ],
-  external: ["@hey-api/client-fetch"],
+  external: ["zod", "zod/v3"],
   outDir: "dist",
   outExtension(ctx) {
     return {

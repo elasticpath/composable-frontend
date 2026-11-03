@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates one cart's own properties, such as its name, custom attributes, and
+  whether custom discounts or deferred inventory checks apply. It does not
+  change the cart's items; update the cart items for that.

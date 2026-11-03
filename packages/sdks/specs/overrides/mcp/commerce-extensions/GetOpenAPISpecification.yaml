@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Generates an OpenAPI specification, as JSON, from the Custom APIs and fields
+  configured in the current store. Use it to learn the typed schemas of the
+  entry endpoints under /v2/extensions before creating or updating entries. It
+  reads configuration and changes nothing.

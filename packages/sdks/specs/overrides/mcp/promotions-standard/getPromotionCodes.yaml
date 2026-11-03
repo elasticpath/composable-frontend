@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the codes of one Promotions Standard promotion. Filter by code, which is
+  case-insensitive, with eq or gt. The max_uses field is the maximum usage of a
+  code and uses is the number of times it can still be used. Codes made before
+  27 April 2023 have only the uses field, not max_uses.

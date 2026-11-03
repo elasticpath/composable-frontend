@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a modifier on a variation option. The body must carry the modifier
+  ID, matching the one in the path, and attributes.type. Other attributes you
+  leave out keep their values. Rebuild products for the change to apply.

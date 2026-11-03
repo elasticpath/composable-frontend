@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Detaches the listed products from a node, by product ID in the request body.
+  The products themselves are not deleted. It returns the updated node. This
+  works on draft data in Product Experience Manager, not a published catalog
+  release.

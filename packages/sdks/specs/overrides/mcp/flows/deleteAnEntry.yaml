@@ -1,0 +1,4 @@
+x-mcp-title: Delete a Flow Entry
+x-mcp-description: >-
+  Deletes an entry from a flow by the flow slug and entry ID, or in Product
+  Experience Manager from a template. Returns no content on success.

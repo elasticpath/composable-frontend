@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists every product that has stock, with its available, allocated and total
+  quantities and the figures per location. The list is paginated and can be
+  filtered. To look up specific products, get the stock for several products or
+  for a single product instead.

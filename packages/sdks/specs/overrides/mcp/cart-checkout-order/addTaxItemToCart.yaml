@@ -1,0 +1,5 @@
+x-mcp-title: Add Tax Item to Cart Item
+x-mcp-description: >-
+  Adds a tax item to one cart item. Use it for a single cart item, not a bundle
+  component or many items at once. A cart item can have up to 5 unique tax
+  items.

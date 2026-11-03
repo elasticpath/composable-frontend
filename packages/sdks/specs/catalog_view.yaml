@@ -15,7 +15,8 @@ info:
     - Product sales. Offer sale items for a limited time.
 
     Scenarios are created by defining the context within which a catalog is displays. Contexts can be a customer ID, a channel, or any other user-defined tag that can be passed to the APIs from the front-end shopper experiences.
-  version: 1.0.0
+  version: 26.0806.8000552
+  x-version-timestamp: 2026-08-06T08:10:44Z
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -1472,8 +1473,8 @@ paths:
 
         | Operator | Description | Supported Attributes | Example |
         |:--- |:--- |:--- |:--- |
-        | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=eq(id,some-id)` | 
-        | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags` | `filter=in(account_ids,some-id,another-id)` |
+        | `eq` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. | `id`,`catalog_id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug` | `filter=eq(id,some-id)` | 
+        | `in` | Checks if the values are included in the specified string. If they are, the condition is true. | `id`,`account_ids`,`customer_ids`,`channels`,`tags`,`pricebook_ids`,`search_profile_slug` | `filter=in(account_ids,some-id,another-id)` | 
       operationId: getRules
       parameters:
         - $ref: '#/components/parameters/filter-rule'
@@ -1566,6 +1567,36 @@ paths:
       responses:
         '204':
           description: A 204 response indicates that the catalog rule has been deleted.
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+  /catalogs/rules/validate:
+    post:
+      tags:
+        - Rules
+      summary: Validate catalog rules for a given context
+      description: |
+        Validates catalog rules for a given context and returns a list of matching catalog rules.
+      operationId: validateCatalogRules
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/catalog-rule-validator-request'
+        required: true
+      responses:
+        '200':
+          description: List of matching catalog rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rule-list-data'
         default:
           description: Unexpected error.
           content:
@@ -2101,6 +2132,7 @@ paths:
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/filter-product'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2160,6 +2192,7 @@ paths:
         - $ref: '#/components/parameters/accept-language'
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2203,6 +2236,7 @@ paths:
         - $ref: '#/components/parameters/accept-language'
         - $ref: '#/components/parameters/filter-product'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2269,6 +2303,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2350,6 +2385,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2436,6 +2472,7 @@ paths:
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/accept-language'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2528,6 +2565,7 @@ paths:
         - $ref: '#/components/parameters/filter-product'
         - $ref: '#/components/parameters/include'
         - $ref: '#/components/parameters/pricebook-ids-for-price-segmentation-preview'
+        - $ref: '#/components/parameters/pricebook-ids-of-available-prices-to-show'
         - description: The catalog ID.
           name: catalog_id
           in: path
@@ -2566,13 +2604,22 @@ components:
     pricebook-ids-for-price-segmentation-preview:
       in: header
       name: EP-Pricebook-IDs-For-Price-Segmentation-Preview
-      description: Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper contetx lookup.
+      description: Supply a comma delimited list of pricebook ids to be used to lookup product prices from when the catalog supports price segmentation. The first pricebook will be highest priority (if more than one is supplied) and the rest in descending priority order. Used only for admin endpoints that dont support shopper context lookup.
       style: simple
       schema:
         type: array
         items:
           type: string
         maxItems: 5
+    pricebook-ids-of-available-prices-to-show:
+      in: header
+      name: EP-Pricebook-IDs-Of-Available-Prices-To-Show
+      description: Supply a comma delimited list of pricebook ids to be listed in meta sections available prices . 'all' is a permitted value and will ensure all available prices for a product are shown. 'all' is not recommended if there are lots(10+) of available prices due the large response size.
+      style: simple
+      schema:
+        type: array
+        items:
+          type: string
     channel:
       description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
       in: header
@@ -2624,7 +2671,7 @@ components:
         format: int64
         minimum: 1
     offset:
-      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+      description: The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
       name: page[offset]
       in: query
       required: false
@@ -2692,8 +2739,6 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      name: Authorization
-      in: header
       scheme: bearer
   schemas:
     amount:
@@ -2715,6 +2760,79 @@ components:
           default: false
           x-go-name: IncludesTax
       x-go-name: PriceAmount
+    available-prices:
+      description: If pricebook segmentation is enabled, this will show all the available prices for the product in the CV delta file and will show selected available prices via the admin api
+      type: array
+      items:
+        type: object
+        x-go-name: AvailablePrice
+        properties:
+          pricebook_id:
+            description: A unique identifier of a price book.
+            type: string
+          shopper_attributes:
+            $ref: '#/components/schemas/shopper_attributes'
+          sales:
+            type: object
+            title: Sales
+            description: A set of sale specifications
+            additionalProperties:
+              $ref: '#/components/schemas/sale'
+          price:
+            $ref: '#/components/schemas/currencies'
+          tiers:
+            $ref: '#/components/schemas/tiers'
+    alternative-prices:
+      description: If pricebook segmentation is enabled, this will show all the alternative prices for the product. Will just include 'List Price' initially
+      type: array
+      items:
+        type: object
+        x-go-name: alternativePrice
+        properties:
+          name:
+            description: A name to signify what the alternative price means to the shopper... i.e. 'List Price'
+            type: string
+          pricebook_id:
+            description: A unique identifier of a price book.
+            type: string
+          shopper_attributes:
+            $ref: '#/components/schemas/shopper_attributes'
+          sale_id:
+            description: The unique identifier of a sale.
+            type: string
+            x-go-name: SaleID
+          sale_expires:
+            description: The expiration date and time of the sale, provided in UTC.
+            type: string
+            format: date-time
+            example: '2025-07-07T14:30:00Z'
+            x-go-name: SaleExpires
+            nullable: true
+          price:
+            $ref: '#/components/schemas/currencies'
+          display_price:
+            $ref: '#/components/schemas/display-price'
+          original_display_price:
+            $ref: '#/components/schemas/display-price'
+          original_price:
+            $ref: '#/components/schemas/currencies'
+          tiers:
+            description: You can use tiers to allow your store to offer different pricing for minimum quantities of items that your shoppers purchase.
+            type: object
+            additionalProperties:
+              description: The name of the tier, such as `Pencils`.
+              type: object
+              properties:
+                original_price:
+                  $ref: '#/components/schemas/currencies'
+                price:
+                  $ref: '#/components/schemas/currencies'
+                display_price:
+                  $ref: '#/components/schemas/display-price'
+                original_display_price:
+                  $ref: '#/components/schemas/display-price'
+              x-go-name: AlternativePriceTier
+            x-go-name: AlternativePriceTiers
     prioritized-pricebooks:
       description: If you want multiple price books for different scenarios, such as seasonal sales, business versus retail pricing, and reward programs, when creating a catalog, you can specify up to five price books. You must configure a priority for your price books. Product prices are displayed in the catalog according to the priority of the price books.
       type: array
@@ -2798,6 +2916,12 @@ components:
               example: true
               default: false
               x-go-name: EnablePriceSegmentation
+            include_draft_products:
+              description: When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+              type: boolean
+              example: false
+              default: false
+              x-go-name: IncludeDraftProducts
           required:
             - name
             - hierarchy_ids
@@ -2882,6 +3006,12 @@ components:
                   example: true
                   default: false
                   x-go-name: EnablePriceSegmentation
+                include_draft_products:
+                  description: When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+                  type: boolean
+                  example: false
+                  default: false
+                  x-go-name: IncludeDraftProducts
               required:
                 - name
                 - hierarchy_ids
@@ -2971,6 +3101,12 @@ components:
                   example: true
                   default: false
                   x-go-name: EnablePriceSegmentation
+                include_draft_products:
+                  description: When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
+                  type: boolean
+                  example: false
+                  default: false
+                  x-go-name: IncludeDraftProducts
             id:
               description: The unique identifier of the catalog to be updated.
               type: string
@@ -3286,6 +3422,11 @@ components:
           description: The format of the price for display.
           type: string
           example: $475.00
+        float_price:
+          description: The price in displayable float format
+          type: number
+          x-omitempty: false
+          example: 475
     hierarchy:
       type: object
       title: Hierarchy
@@ -3663,6 +3804,29 @@ components:
           example: '1970-01-01T00:00:00.000'
           x-go-name: UpdatedAt
       x-go-name: NodeAttributes
+    release-indexing-complete-data:
+      type: object
+      title: ReleaseIndexingCompleteData
+      description: The response body for a successful release indexing complete request.
+      properties:
+        data:
+          type: object
+          required:
+            - status
+          properties:
+            status:
+              description: The final status of the search indexing process.
+              type: string
+              enum:
+                - succeeded
+                - failed
+            duration_ms:
+              description: The elapsed time in milliseconds spent indexing the release.
+              type: integer
+              format: int64
+              minimum: 0
+              x-go-name: DurationMS
+              nullable: true
     node-create-data:
       type: object
       title: NodeCreateData
@@ -4425,10 +4589,10 @@ components:
           type: string
           x-go-name: SaleID
         sale_expires:
-          description: The date and time a sale expires.
+          description: The expiration date and time of the sale, provided in UTC.
           type: string
           format: date-time
-          example: '1970-01-01T00:00:00.000'
+          example: '2025-07-07T14:30:00Z'
           x-go-name: SaleExpires
           nullable: true
         original_price:
@@ -4448,10 +4612,10 @@ components:
                 type: string
                 x-go-name: SaleID
               sale_expires:
-                description: The date and time a sale expires.
+                description: The expiration date and time of the sale, provided in UTC.
                 type: string
                 format: date-time
-                example: '1970-01-01T00:00:00.000'
+                example: '2025-07-07T14:30:00Z'
                 x-go-name: SaleExpires
                 nullable: true
               price:
@@ -4467,6 +4631,8 @@ components:
                 example: f5466169-0037-460c-b181-b02682b6f4de
                 x-go-name: PricebookID
                 nullable: true
+              alternative_prices:
+                $ref: '#/components/schemas/alternative-prices'
             x-go-name: ComponentProductMeta
         component_product_data:
           description: This will contain the component product details (with bundle specific pricing) in the configure bundle response for the selected options.
@@ -4504,10 +4670,10 @@ components:
                 type: string
                 x-go-name: SaleID
               sale_expires:
-                description: The date and time a sale expires.
+                description: The expiration date and time of the sale, provided in UTC.
                 type: string
                 format: date-time
-                example: '1970-01-01T00:00:00.000'
+                example: '2025-07-07T14:30:00Z'
                 x-go-name: SaleExpires
                 nullable: true
               display_price:
@@ -4555,7 +4721,7 @@ components:
              - **standard** - Standard products are a standalone products.
              - **parent** - A parent product is a product that has child products that have been built using the `Build Child Products` endpoint.
               - **child** - When you configure product variations and variation options for parent products, the child products derived from the parent products are automatically created in Commerce.
-             - **bundle** - A bundle is a purchasable product, comprising two or more standalone products (in other words, components) to be sold together.
+             - **bundle** - A bundle is a purchasable product, comprising two or more standalone products (in other words, components) to be sold together. 
           type: array
           items:
             type: string
@@ -4578,6 +4744,20 @@ components:
               - CRP-Frequently-Bought-Together-Products
           x-omitempty: true
           x-go-name: CustomRelationships
+        available_prices:
+          $ref: '#/components/schemas/available-prices'
+        alternative_prices:
+          $ref: '#/components/schemas/alternative-prices'
+        available_pricebook_ids:
+          description: An array of all pricebooks that have prices for this product
+          type: array
+          items:
+            type: string
+            example:
+              - 8dbb35b2-ef04-477e-974d-e5f3abe6faae
+              - 6ddf2a66-d805-449c-a0e1-8e81335e31a6
+          x-omitempty: true
+          nullable: true
       x-go-name: ProductMeta
       x-omitempty: true
     variation_option:
@@ -4952,6 +5132,19 @@ components:
         price_segmentation_enabled:
           description: This indicates whether the catalog release will support price segmentation using catalog rules to define which pricebook(s) to use for pricing
           type: boolean
+        indexing_duration_ms:
+          description: The elapsed time in milliseconds Catalog Search spent indexing this release.
+          type: integer
+          format: int64
+          minimum: 0
+          x-go-name: IndexingDurationMS
+          nullable: true
+        includes_draft_products:
+          description: When `true`, this catalog release includes `draft` products in its published data. This reflects the catalog `include_draft_products` attribute at the time of publish.
+          type: boolean
+          example: false
+          default: false
+          x-go-name: IncludesDraftProducts
       x-go-name: ReleaseMeta
       x-omitempty: true
     release-relationships:
@@ -5008,6 +5201,12 @@ components:
               items:
                 type: string
               x-omitempty: true
+            account_tag_ids:
+              description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
+              type: array
+              items:
+                type: string
+              x-omitempty: true
             customer_ids:
               description: The list of customers who are eligible to see this catalog. If empty, the rule matches all customers.
               type: array
@@ -5056,12 +5255,17 @@ components:
               type: string
               example: '2020-09-22T09:00:00'
               format: date-time
-            pricebook_id:
-              description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-              type: string
-              nullable: true
             pricebook_ids:
               $ref: '#/components/schemas/prioritized-pricebooks'
+            search_profile_slug:
+              type: string
+              description: |
+                Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+                This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+                Omitted from responses when unset.
+              example: vip-search
+              x-omitempty: true
+              nullable: true
           required:
             - name
             - catalog_id
@@ -5073,10 +5277,54 @@ components:
           example: catalog_rule
           enum:
             - catalog_rule
+        meta:
+          $ref: '#/components/schemas/rule-meta'
       required:
         - id
         - type
         - attributes
+    rule-meta:
+      type: object
+      title: ruleMeta
+      description: A rule's metadata.
+      properties:
+        similarity_score:
+          description: |
+            Indicates the similarity score of the rule to the supplied validation request. 
+            The score is calculated based on matching criteria:
+            - **Name match**: 100 points (exact match)
+            - **Account IDs**: 5 points per matching account
+            - **Customer IDs**: 5 points per matching customer  
+            - **Channels**: 5 points per matching channel
+            - **Tags**: 5 points per matching tag
+            - **Catalog ID**: 3 points (exact match)
+            - **Pricebook IDs**: 2 points per matching pricebook
+            - **Schedules**: 2 points per overlapping schedule
+
+            Higher scores indicate greater similarity. Rules are sorted by similarity score in descending order.
+          type: integer
+          example: 100
+          x-go-name: SimilarityScore
+          x-omitempty: true
+          nullable: true
+        active:
+          description: will the rule be active at the supplied match date/time?
+          type: boolean
+          example: false
+          default: false
+          x-go-name: Active
+        resolved_for_shopper:
+          description: Indicates whether this rule will be the one resolved for a shopper viewing the catalog at the supplied match date/time
+          type: boolean
+          example: true
+          default: false
+        release_id:
+          type: string
+          description: The unique identifier of the published release of the catalog for the rule
+          x-omitempty: true
+          nullable: true
+      x-go-name: ruleMeta
+      x-omitempty: true
     rule-create-data:
       type: object
       title: CatalogRuleCreateData
@@ -5101,6 +5349,12 @@ components:
                   nullable: true
                 account_ids:
                   description: The list of accounts who are eligible to see this catalog. If this field is empty, the rule matches all accounts.
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                account_tag_ids:
+                  description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
                   type: array
                   items:
                     type: string
@@ -5143,12 +5397,15 @@ components:
                   type: string
                   description: The unique identifier of a catalog.
                   example: d09b4e16-08a5-4f42-817c-6e0d98acbb63
-                pricebook_id:
-                  description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-                  type: string
-                  nullable: true
                 pricebook_ids:
                   $ref: '#/components/schemas/prioritized-pricebooks'
+                search_profile_slug:
+                  type: string
+                  description: |
+                    Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+                    This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+                  example: vip-search
+                  nullable: true
               required:
                 - name
                 - catalog_id
@@ -5242,6 +5499,12 @@ components:
                   items:
                     type: string
                   nullable: true
+                account_tag_ids:
+                  description: The list of account tag UUIDs. Accounts must have at least one of these tags to see this catalog. If this field is empty, the rule matches all accounts regardless of tags.
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
                 customer_ids:
                   description: The list of customers who are eligible to see this catalog. If empty, the rule matches all customers.
                   type: array
@@ -5281,12 +5544,16 @@ components:
                   description: The unique identifier of a catalog rule.
                   example: d09b4e16-08a5-4f42-817c-6e0d98acbb63
                   nullable: true
-                pricebook_id:
-                  description: The unique identifier of a price book to associate with a rule. You can specify a `pricebook_id` or a `pricebook_ids` but not both. If you specify both, a `422 unprocessable entity` error is displayed.
-                  type: string
-                  nullable: true
                 pricebook_ids:
                   $ref: '#/components/schemas/prioritized-pricebooks'
+                search_profile_slug:
+                  type: string
+                  description: |
+                    Optional slug of a Catalog Search profile to apply when this rule is selected for a shopper.
+                    This is configuration on the rule (same role as `pricebook_ids`), not a shopper-context matching dimension.
+                    Omit the field to leave unchanged. Send an empty string to clear. Invalid format or SYSTEMS_DEFAULT_PROFILE is rejected with 400.
+                  example: vip-search
+                  nullable: true
             type:
               description: This represents the type of object being returned. Always `catalog_rule`.
               type: string
@@ -5298,6 +5565,103 @@ components:
             - type
       required:
         - data
+    catalog-rule-validator-request:
+      type: object
+      properties:
+        data:
+          type: object
+          required:
+            - match_type
+          properties:
+            match_type:
+              type: string
+              enum:
+                - filter
+                - similarity
+                - conflict
+                - resolve_for_shopper
+              description: |
+                The type of matching operation to perform on catalog rules:
+
+                - **filter**: Advanced rule filtering with AND logic. Returns rules that match ALL specified criteria.
+
+                - **similarity**: Finds rules similar to the supplied rule using OR logic. Returns rules sorted by similarity score (highest first) with metadata indicating:
+                  - Similarity score based on matching criteria (name: 100pts, account/customer/channel/tags: 5pts each, catalog: 3pts, pricebooks: 2pts, schedules: 2pts)  
+                  - Whether the rule is active at the supplied match_date
+                  - Whether the rule would be resolved for a shopper context
+
+                - **conflict**: Checks for conflicts between the supplied rule and existing rules. Returns rules that would conflict if the new rule were created.
+
+                - **resolve_for_shopper**: Determines the exact catalog rule that would be applied for a given shopper context. Returns the single most specific matching rule or defaults to "Default Catalog Resolution".
+            channels:
+              description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+              type: array
+              items:
+                type: string
+              nullable: true
+            tags:
+              description: A list of user-defined tags that can be used to further restrict the eligibility criteria for this rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+              type: array
+              items:
+                type: string
+              nullable: true
+            account_ids:
+              type: array
+              items:
+                type: string
+              description: List of account IDs.
+              nullable: true
+            account_tag_ids:
+              type: array
+              items:
+                type: string
+              description: List of account tag UUIDs.
+              nullable: true
+            customer_ids:
+              type: array
+              items:
+                type: string
+              description: List of customer IDs.
+              nullable: true
+            pricebook_ids:
+              type: array
+              items:
+                type: string
+              description: List of pricebook IDs.
+              nullable: true
+            schedules:
+              type: array
+              items:
+                type: object
+                properties:
+                  valid_from:
+                    type: string
+                    format: date-time
+                  valid_to:
+                    type: string
+                    format: date-time
+              nullable: true
+            name:
+              type: string
+              description: The name of the catalog rule.
+              nullable: true
+            catalog_id:
+              type: string
+              description: The id of the catalog to match against.
+              nullable: true
+            search_profile_slug:
+              type: string
+              description: |
+                Optional. When `match_type` is `filter`, ANDs an exact match on the rule's
+                `search_profile_slug`. Not used as a shopper-context matching dimension for
+                `resolve_for_shopper`.
+              example: vip-search
+              nullable: true
+            match_date:
+              type: string
+              format: date-time
+              description: The date to match against the schedules.
+              nullable: true
     sale:
       type: object
       description: A set of sale prices and a validity period.

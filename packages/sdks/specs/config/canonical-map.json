@@ -1,0 +1,195 @@
+{
+  "$comment": "Maps a published OpenAPI spec (downloaded to specs/upstream/ by scripts/spec-sync/fetch-upstream.mjs) to the working spec it refreshes, the package it regenerates, and how it diverges. `divergence` values: none = plain copy; needs-triage = drift found but not yet classified, blocked from automatic sync; keep-list / do-not-refresh / operation-allow-list = documented in specs/patches/README.md, blocked until the rule engine exists.",
+  "specs": {
+    "pricebooks": {
+      "upstream": "pricebooks/pricebooks.yaml",
+      "spec": "pricebooks.yaml",
+      "package": "pricebooks",
+      "packageName": "@epcc-sdk/sdks-pricebooks",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "currencies": {
+      "upstream": "currencies/OpenAPISpec.yaml",
+      "spec": "currencies.yaml",
+      "package": "currencies",
+      "packageName": "@epcc-sdk/sdks-currencies",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "files": {
+      "upstream": "files/files.yaml",
+      "spec": "files.yaml",
+      "package": "files",
+      "packageName": "@epcc-sdk/sdks-files",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "flows": {
+      "upstream": "flows/flows.yaml",
+      "spec": "flows.yaml",
+      "package": "flows",
+      "packageName": "@epcc-sdk/flows",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "integrations": {
+      "upstream": "integrations/openapi.yaml",
+      "spec": "integrations.yaml",
+      "package": "integrations",
+      "packageName": "@epcc-sdk/integrations",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "inventories": {
+      "upstream": "inventory/public_openapi.yaml",
+      "spec": "inventories.yaml",
+      "package": "inventories",
+      "packageName": "@epcc-sdk/sdks-inventories",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "personal-data": {
+      "upstream": "personal-data/OpenAPISpec.yaml",
+      "spec": "personal-data.yaml",
+      "package": "personal-data",
+      "packageName": "@epcc-sdk/personal-data",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "pim": {
+      "upstream": "pim/pim.yaml",
+      "spec": "pim.yaml",
+      "package": "pim",
+      "packageName": "@epcc-sdk/sdks-pxm",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "promotions-standard": {
+      "upstream": "promotions/OpenAPISpec.yaml",
+      "spec": "promotions-standard.yaml",
+      "package": "promotions-standard",
+      "packageName": "@epcc-sdk/promotions-standard",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "subscriptions": {
+      "upstream": "subscriptions/public_openapi.yaml",
+      "spec": "subscriptions.yaml",
+      "package": "subscriptions",
+      "packageName": "@epcc-sdk/sdks-subscriptions",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "account-addresses": {
+      "upstream": "addresses/AccountAddresses.OpenAPISpec.yaml",
+      "spec": "account-addresses.yaml",
+      "package": "accounts-addresses",
+      "packageName": "@epcc-sdk/sdks-accounts-addresses",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "authentication": {
+      "upstream": "authentication/OpenAPISpec.yaml",
+      "spec": "authentication.yaml",
+      "package": "authentication",
+      "packageName": "@epcc-sdk/authentication",
+      "shopperJoin": true,
+      "divergence": "keep-list",
+      "note": "Not a copy of canonical. Canonical inlines its request and response bodies and defines only Errors; this spec names AccessTokenRequest, AccessTokenResponse, ErrorResponse and Error, which consumers import. The shapes are identical, so this is a naming divergence, not an API one. Kept deliberately in #545; see specs/patches/README.md."
+    },
+    "authentication-realms": {
+      "upstream": "single-sign-on/OpenAPISpec.yaml",
+      "spec": "authentication-realms.yaml",
+      "package": "authentication-realms",
+      "packageName": "@epcc-sdk/sdks-authentication-realms",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "application-keys": {
+      "upstream": "application-keys/OpenAPISpec.yaml",
+      "spec": "application-keys.yaml",
+      "package": "application-keys",
+      "packageName": "@epcc-sdk/sdks-application-keys",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "catalog_search": {
+      "upstream": "catalog-search/openapi.yaml",
+      "spec": "catalog_search.yaml",
+      "package": "catalog-search",
+      "packageName": "@epcc-sdk/sdks-catalog-search",
+      "shopperJoin": true,
+      "divergence": "none",
+      "note": "the published surface is one operation, postMultiSearch; canonical has 40. catalog_search@v1 in config/redocly.yaml selects it by id. Canonical also moves that operation to /pcm/catalog/multi-search; see specs/patches/README.md before merging the first refresh."
+    },
+    "catalog_view": {
+      "upstream": "catalog/catalog_view.yaml",
+      "spec": "catalog_view.yaml",
+      "package": "catalogs",
+      "packageName": "@epcc-sdk/sdks-catalogs",
+      "shopperJoin": true,
+      "divergence": "none",
+      "note": "one spec, two surfaces: the 16 /catalog/* shopper-view operations go to the shopper join, the 30 admin /catalogs* ones to the catalogs package. catalogs@v1 in config/redocly.yaml selects the admin half and prefixes it with /pcm, which canonical does not record."
+    },
+    "payments": {
+      "upstream": "payments/OpenAPISpec.yaml",
+      "spec": "payments.yaml",
+      "package": "payments",
+      "packageName": "@epcc-sdk/payments",
+      "shopperJoin": false,
+      "divergence": "none",
+      "note": "Canonical has retired the stripe_connect gateway; elastic_path_payments_stripe takes the same body. The refresh that removed its eight exports from @epcc-sdk/payments shipped in 0.1.0."
+    },
+    "permissions": {
+      "upstream": "permissions/OpenAPISpec.yaml",
+      "spec": "permissions.yaml",
+      "package": "permissions",
+      "packageName": "@epcc-sdk/permissions",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "rule-promotions": {
+      "upstream": "promotions-builder/OpenAPISpec.yaml",
+      "spec": "rule-promotions.yaml",
+      "package": "rule-promotions",
+      "packageName": "@epcc-sdk/rule-promotions",
+      "shopperJoin": false,
+      "divergence": "none"
+    },
+    "settings": {
+      "upstream": "settings/OpenAPISpec.yaml",
+      "spec": "settings.yaml",
+      "package": "settings",
+      "packageName": "@epcc-sdk/settings",
+      "shopperJoin": false,
+      "divergence": "none",
+      "note": "canonical moved /v2/settings/cart to the carts spec, where cart_checkout.yaml already carries it. The refresh that dropped get-v2-settings-cart and put-v2-settings-cart from @epcc-sdk/settings shipped in 0.1.0; both live on in @epcc-sdk/sdks-cart-checkout-order and @epcc-sdk/sdks-shopper."
+    },
+    "account_management": {
+      "upstream": "accounts/OpenAPISpec.yaml",
+      "spec": "account_management.yaml",
+      "package": "accounts",
+      "packageName": "@epcc-sdk/sdks-accounts",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "cart_checkout": {
+      "upstream": "carts/OpenAPISpec.yaml",
+      "spec": "cart_checkout.yaml",
+      "package": "cart-checkout-order",
+      "packageName": "@epcc-sdk/sdks-cart-checkout-order",
+      "shopperJoin": true,
+      "divergence": "none"
+    },
+    "commerce-extensions": {
+      "upstream": "commerce-extensions/OpenAPISpec.yaml",
+      "spec": "commerce-extensions.yaml",
+      "package": "commerce-extensions",
+      "packageName": "@epcc-sdk/commerce-extensions",
+      "shopperJoin": false,
+      "divergence": "none",
+      "note": "The package generates from commerce-extensions-standalone@v1 in config/redocly.yaml, which adds the five /v2/extensions/{custom-api-slug} operations canonical leaves out and corrects If-Match and the create bodies' required description. See specs/patches/README.md."
+    }
+  }
+}

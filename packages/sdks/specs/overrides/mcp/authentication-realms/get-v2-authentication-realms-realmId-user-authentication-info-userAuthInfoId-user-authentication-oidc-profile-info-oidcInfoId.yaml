@@ -1,0 +1,4 @@
+x-mcp-name: authentication_realms_get_oidc_profile_info
+x-mcp-description: >-
+  Gets one OIDC profile info for a user by ID: the OIDC profile it links to, and
+  the user's subject and issuer at the identity provider.

@@ -7,6 +7,7 @@ import { LocaleLink } from "src/components/LocaleLink";
 import { Label } from "src/components/label/Label";
 import { Input } from "src/components/input/Input";
 import { FormStatusButton } from "src/components/button/FormStatusButton";
+import { requirePasswordProfileIdInStore } from "src/lib/password-profile";
 
 export default async function Register({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -14,6 +15,8 @@ export default async function Register({ params }: { params: Promise<{ lang: str
   if (isAccountMemberAuthenticated(cookieStore)) {
     redirect(lang ? `/${lang}/account/summary` : "/account/summary");
   }
+
+  await requirePasswordProfileIdInStore(lang, "/register");
 
   return (
     <>
@@ -61,17 +64,7 @@ export default async function Register({ params }: { params: Promise<{ lang: str
             </div>
 
             <div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-light text-brand-primary hover:text-brand-highlight"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <div className="mt-2">
                 <Input
                   id="password"

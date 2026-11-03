@@ -1,0 +1,8 @@
+x-mcp-name: authentication_realms_get_oidc_discovery_document
+x-mcp-title: Get an OIDC Discovery Document
+x-mcp-description: >-
+  Gets the OpenID Connect discovery document for a store's authentication realm:
+  issuer, authorization endpoint, token endpoint, JWKS URI and the supported
+  scopes, response types and signing algorithms. Use it to set up an OIDC
+  library that needs a discovery document. Optionally pass an OIDC profile ID.
+  The token endpoint it lists is not public, so clients do not call it.

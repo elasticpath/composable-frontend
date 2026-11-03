@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a new, empty cart. A shopper can have several carts and check each out
+  without affecting the others. It can set a name, custom attributes for
+  promotions, a contact email for a guest cart, and whether custom discounts or
+  deferred inventory checks apply. A cart with a snapshot_date is a promotion
+  preview cart and cannot be checked out.

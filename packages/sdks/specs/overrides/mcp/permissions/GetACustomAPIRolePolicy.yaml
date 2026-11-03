@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one custom API role policy by its ID, showing whether its role can
+  create, list, read, update and delete entries of the custom API, and which
+  custom API and role it applies to.

@@ -1,0 +1,9 @@
+x-mcp-max-file-bytes: 8388608
+x-mcp-title: Import Subscription Data
+x-mcp-description: >-
+  Starts an import from an uploaded JSONL file, one JSON object per line,
+  holding features, subscribers, offerings and subscriptions in any order. It
+  only creates records and never overwrites existing ones; a record that clashes
+  on external_ref is not created and no line error is recorded for it. A line
+  that is not valid JSON rejects the whole upload, and the default limit is
+  50,000 lines. Get the import and its errors to see the result.

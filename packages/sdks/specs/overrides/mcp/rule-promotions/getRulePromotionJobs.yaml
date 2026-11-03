@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the jobs of one rule promotion, each a code generation or code export,
+  with its status and results. Filter by job type or status. Use it to check
+  that a job has finished before getting an export's file.

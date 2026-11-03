@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the live products in a published catalog release, across all
+  hierarchies; pass a release ID, or latestPublished for the newest release.
+  Filter by name, sku, slug, product type or tags, and include main images,
+  files or bundle component products. For one hierarchy's or node's products,
+  use those reads instead.

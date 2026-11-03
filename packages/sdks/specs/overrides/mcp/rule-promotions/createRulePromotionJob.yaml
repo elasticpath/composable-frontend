@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Starts a background job on a rule promotion. A code_generate job makes a batch
+  of unique codes; a code_export job exports all existing codes as a CSV file.
+  The job runs asynchronously: list the promotion's jobs to check its status,
+  then get the job's file for an export.

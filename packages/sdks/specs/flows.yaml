@@ -1,35 +1,36 @@
-# GENERATED FILE - DO NOT EDIT
+# GENERATED FILE - DO NOT EDIT 
 openapi: 3.1.0
 info:
   title: Flows Service Introduction
-  version: '1.0'
+  version: 26.0630.7838720
+  x-version-timestamp: 2026-06-30T08:57:57Z
   description: |
 
     With flows you can extend the capabilities of Commerce and Product Experience Manager at both organization and store level, and apply Composable Commerce to almost any use case.
-    
+     
     ### Flows in Commerce
-    
+     
     You can define custom data fields for the resources that you use in your store or organization, such as adding more fields to the `customer` resource. 
-    
+     
      You can also create new resources, such as a `wishlist` resource to support wishlists in your store. 
-    
+     
     :::note
-    
+     
      [Custom APIs](/docs/api/commerce-extensions/custom-ap-is#custom-apis-vs-non-core-flows) are the next generation of Non-Core Flows. Flows are not going anywhere, but Custom APIs offer enhanced capabilities. We recommend using Custom APIs for any of your new use cases.
-    
+     
     :::
 
     :::caution
-    
+     
     - In an organization, not all resources are available. See [**Extend a resource**](https://elasticpath.dev/guides/Custom%20Data/extend-any-resource) for a list of organization resources that can be extended.
-    - If you store any sensitive Personal Identifiable Information (PII) or non-public data on your site, ensure that you do not use this data in flows to avoid potential unauthorized access to the data. For more information, see [**Permissions**](/docs/authentication/Tokens/permissions).
-    
+    - If you store any sensitive Personal Identifiable Information (PII) or non-public data on your site, ensure that you do not use this data in flows to avoid potential unauthorized access to the data. For more information, see [**Permissions**](/docs/authentication/tokens/permissions).
+     
     :::
-    
+     
     ### Templates in Product Experience Manager
-    
+     
      Templates allow you to attach a specific set of attributes to your products.
-    
+     
      - You can use templates to define characteristics of your product, for example, a product specification. For example, a *Book* template might contain attributes, such as *ISBN*, *Author*, *Number of pages*, *Year Published*, or *Condition (New/Used)*.
      - You can use templates for Search Engine Optimization (SEO). When you assign template attributes such as, *care instructions* or *fabric*, to a shirt and a shopper searches for a specific item, attributes help stores to return the products that match the search criteria. For example, when a shopper searches for a large blue shirt, all shirts that are large and blue are returned in the search result.
 servers:
@@ -64,21 +65,22 @@ tags:
       | `account-members`                           | Extend the [`account-members`](/docs/api/accounts/account-members) object. | Store |
       | `account-memberships`                       | Extend the [`account-membership`](/docs/api/accounts/account-membership) object. | Store |
       | `addresses`                                 | Extend the [`address`](/docs/api/addresses/account-addresses) object. | Store |
-      | `authentication-realms`                     | Extend the [`authentication-realms`](/docs/authentication/single-sign-on/authentication-realm-api/authentication-realm-api-overview) object. | Store |
+      | `authentication-realms`                     | Extend the [`authentication-realms`](/docs/api/single-sign-on/authentication-realms) object. | Store |
       | `carts`                                     | Extend the [`carts`](/docs/api/carts/carts-checkout-orders-introduction) object. | Organization/Store |
       | `cart_items`                                | Extend the [`cart_item`](/docs/api/carts/cart-items) object. | Organization/Store |
       | `customers`                                 | Extend the [`customer`](/docs/customer-management/customer-management-api/customer-management-api-overview) object. **Note**: Please use Account Management for all new frontend experiences.  | n/a |
-      | `oidc-profiles`                             | Extend the [`oidc-profiles`](/docs/authentication/single-sign-on/openid-connect-profiles-api/openid-connect-profiles-api-overview) object. | Store |
+      | `oidc-profiles`                             | Extend the [`oidc-profiles`](/docs/api/single-sign-on/oidc-profiles) object. | Store |
       | `order_items`                               | Extend the [`order_item`](/docs/api/carts/get-order-items) object. | Organization/Store |
       | `orders`                                    | Extend the [`order`](/docs/api/carts/orders) object. | Organization/Store |
-      | `password-profiles`                         | Extend the [`password-profiles`](/docs/authentication/single-sign-on/password-profiles-api/overview) object. | Store |
+      | `password-profiles`                         | Extend the [`password-profiles`](/docs/api/single-sign-on/password-profiles) object. | Store |
       | `products`                                  | Extend the [`product`](/docs/api/pxm/products/products) object. | Store |
       | `promotions`                                | Extend the [`promotion`](/docs/api/promotions/promotions-standard-introduction) object. | Store |
-      | `rule-promotions`                           | Extend the [`rule-promotion`](docs/promotions-builder/promotions-builder-api/promotions-builder-api-overview) object. | Store |
-      | `user-authentication-info`                  | Extend the [`user-authentication-info`](/docs/authentication/single-sign-on/user-authentication-info-api/overview) object. | Store |
-      | `user-authentication-oidc-profile-info`     | Extend the [`user-authentication-oidc-profile-info`](/docs/authentication/single-sign-on/user-authentication-openid-connect-profile-api/openid-connect-profile-overview) object. | Store |
-      | `user-authentication-password-profile-info` | Extend the [`user-authentication-password-profile-info`](/docs/authentication/single-sign-on/user-authentication-password-profiles-api/password-profile-overview) object. | Store |
+      | `rule-promotions`                           | Extend the [`rule-promotion`](/docs/api/promotions-builder/create-rule-promotion) object. | Store |
+      | `user-authentication-info`                  | Extend the [`user-authentication-info`](/docs/api/single-sign-on/user-authentication-infos) object. | Store |
+      | `user-authentication-oidc-profile-info`     | Extend the [`user-authentication-oidc-profile-info`](/docs/api/single-sign-on/user-authentication-oidc-profile-infos) object. | Store |
+      | `user-authentication-password-profile-info` | Extend the [`user-authentication-password-profile-info`](/docs/api/single-sign-on/user-authentication-password-profile-infos) object. | Store |
       | `catalogs`                                  | Extend the [`catalog`](/docs/api/pxm/catalog/catalogs) object. It will not extend the [`catalog-release`](/docs/api/pxm/catalog/releases) object. | Store |
+      | `shipping-groups`                           | Extend the [`shipping-group`](/docs/api/carts/create-shipping-group) object. | Store |
 
       #### Create a new resource
 
@@ -279,6 +281,8 @@ paths:
         - For Commerce, this endpoint retrieves a list of flows.
         - For Product Experience Manager, this endpoint retrieves a list of templates.
       operationId: getAllFlows
+      parameters:
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -451,6 +455,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -519,6 +525,8 @@ paths:
                         timestamps:
                           created_at: '2018-05-10T18:04:26.623Z'
                           updated_at: '2018-05-10T18:11:47.469Z'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -532,6 +540,8 @@ paths:
         - For Commerce, this endpoint retrieves all fields in a flow. 
         - For Product Experience Manager, this endpoint retrieves all attributes in a template.
       operationId: getAllFields
+      parameters:
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -649,6 +659,8 @@ paths:
                           data:
                             type: flow
                             id: e4145c27-aba1-46af-81a3-58f5e1cf7f15
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/ValidationError'
         '500':
@@ -797,6 +809,8 @@ paths:
                         timestamps:
                           created_at: '2018-05-10T18:19:11.559Z'
                           updated_at: '2018-05-10T18:36:01.208Z'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -822,6 +836,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -845,6 +861,7 @@ paths:
             type: string
         - $ref: '#/components/parameters/page-limit'
         - $ref: '#/components/parameters/page-offset'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -857,6 +874,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Entry'
+                  links:
+                    $ref: '#/components/schemas/ListLinks'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
               examples:
                 default:
                   value:
@@ -881,6 +902,20 @@ paths:
                             updated_at: '2018-06-06T14:48:59.006Z'
                         links:
                           self: https://useast.api.elasticpath.com/v2/flows/brands/entries/a5fcf6bc-233f-44d7-a3b0-0961eed3df9d
+                    links:
+                      current: https://useast.api.elasticpath.com/v2/flows/brands/entries?page[limit]=20&page[offset]=0
+                      first: https://useast.api.elasticpath.com/v2/flows/brands/entries?page[limit]=20&page[offset]=0
+                      last: null
+                      next: null
+                      previous: null
+                    meta:
+                      page:
+                        limit: 20
+                        offset: 0
+                        current: 1
+                        total: 1
+                      results:
+                        total: 2
         '400':
           $ref: '#/components/responses/ValidationError'
         '404':
@@ -946,6 +981,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
         '500':
@@ -1027,6 +1064,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1096,6 +1135,8 @@ paths:
                           updated_at: '2018-06-06T14:42:39.312Z'
                       links:
                         self: https://useast.api.elasticpath.com/v2/flows/brands/entries/03224af8-da41-4761-99fb-a125fa81ed99
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1392,13 +1433,29 @@ components:
         type: string
         examples:
           - '10'
+    filter:
+      name: filter
+      in: query
+      required: false
+      description: Filter resources using the filter query parameter. See [**Filtering**](/guides/Getting-Started/filtering).
+      schema:
+        type: string
+        example: eq(owner,organization)
   schemas:
     FlowsRequest:
       title: FlowsRequest
       type: object
+      required:
+        - data
       properties:
         data:
           type: object
+          required:
+            - type
+            - name
+            - slug
+            - enabled
+            - description
           properties:
             description:
               type: string
@@ -1451,7 +1508,7 @@ components:
           type: boolean
           example: true
         links:
-          $ref: '#/components/schemas/FlowsLinks'
+          $ref: '#/components/schemas/SelfLink'
         relationships:
           $ref: '#/components/schemas/FlowsRelationships'
         meta:
@@ -1467,11 +1524,14 @@ components:
           description: Represents the type of object being returned.
           example: entry
         links:
-          $ref: '#/components/schemas/FlowsLinks'
+          $ref: '#/components/schemas/SelfLink'
         meta:
           $ref: '#/components/schemas/Meta'
+        relationships:
+          type: object
+          additionalProperties: true
+          description: Dynamic relationship fields keyed by field slug.
       additionalProperties:
-        type: string
         description: There can be a `:fieldSlug` attribute for each field/attribute attached to a flow/template. The type depends on the field type.
     Relationships:
       title: Relationships
@@ -1486,9 +1546,18 @@ components:
     FieldRequest:
       title: FieldRequest
       type: object
+      required:
+        - data
       properties:
         data:
           type: object
+          required:
+            - required
+            - type
+            - field_type
+            - slug
+            - name
+            - description
           properties:
             default:
               type: number
@@ -1656,6 +1725,7 @@ components:
             - true
         default:
           type:
+            - boolean
             - number
             - string
             - 'null'
@@ -1710,16 +1780,16 @@ components:
               items:
                 type: string
             - type: object
-              description: An object containing `from` and `to` integers.
+              description: An object containing `from` and `to` numbers.
               properties:
                 from:
                   type:
-                    - integer
+                    - number
                     - string
                   example: 1
                 to:
                   type:
-                    - integer
+                    - number
                     - string
                   example: 5
         to:
@@ -1749,12 +1819,19 @@ components:
     FieldRelationships:
       type: object
       description: Relationships are established between different flow/template entities. For example, a field/attribute is related to a flow/template, as the field/attribute is attached to the flow/template.
+      required:
+        - flow
       properties:
         flow:
           type: object
+          required:
+            - data
           properties:
             data:
               type: object
+              required:
+                - type
+                - id
               properties:
                 id:
                   $ref: '#/components/schemas/UUID'
@@ -1770,7 +1847,9 @@ components:
           type: object
           properties:
             data:
-              $ref: '#/components/schemas/Relationships'
+              type: array
+              items:
+                $ref: '#/components/schemas/Relationships'
     FieldLinks:
       type: object
       description: |
@@ -1781,28 +1860,83 @@ components:
         | `current` | Always the current page |
         | `first` | Always the first page |
         | `last` | `null` if there is only one page. |
-        | `prev` | `null` if you are on the first page. |
+        | `previous` | `null` if you are on the first page. |
         | `next` | `null` if there is only one page. |
       properties:
         self:
           type: string
           example: https://euwest.api.elasticpath.com/v2/flows/3cf3ad3f-b12c-4a08-a6ab-05e6aab0122c/fields/c1c788d1-f1c7-4b90-938f-f158f3353c66
-    FlowsLinks:
+    SelfLink:
       type: object
-      description: |
-        Links allow you to move between requests. Single entities use a `self` parameter with a link to that specific resource. Listing pages use the following:
-        
-         | Property | Description |
-         | --- | --- |
-         | `current` | Always the current page |
-         | `first` | Always the first page |
-         | `last` | `null` if there is only one page. |
-         | `prev` | `null` if you are on the first page. |
-         | `next` | `null` if there is only one page. |
+      description: Link to the current resource.
       properties:
         self:
           type: string
           example: https://euwest.api.elasticpath.com/v2/flows/d2a9b22a-b4b0-456b-bbc7-d8723aaffa84
+    ListLinks:
+      type: object
+      description: |
+        Pagination links returned on list responses.
+
+        | Property | Description |
+        | --- | --- |
+        | `current` | Always the current page |
+        | `first` | Always the first page |
+        | `last` | `null` if there is only one page. |
+        | `previous` | `null` if you are on the first page. |
+        | `next` | `null` if there is only one page. |
+      properties:
+        current:
+          type: string
+          example: https://euwest.api.elasticpath.com/v2/flows?page[offset]=0&page[limit]=100
+        first:
+          type: string
+          example: https://euwest.api.elasticpath.com/v2/flows?page[offset]=0&page[limit]=100
+        last:
+          type:
+            - string
+            - 'null'
+          example: https://euwest.api.elasticpath.com/v2/flows?page[offset]=0&page[limit]=100
+        next:
+          type:
+            - string
+            - 'null'
+          example: null
+        previous:
+          type:
+            - string
+            - 'null'
+          example: null
+    PageMeta:
+      type: object
+      description: Pagination metadata returned on list responses.
+      properties:
+        page:
+          type: object
+          properties:
+            limit:
+              type: integer
+              description: The number of items per page.
+              example: 100
+            offset:
+              type: integer
+              description: The current pagination offset.
+              example: 0
+            current:
+              type: integer
+              description: The current page number.
+              example: 1
+            total:
+              type: integer
+              description: The total number of pages.
+              example: 1
+        results:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: The total number of results across all pages.
+              example: 5
     FlowsUpdateRequest:
       title: FlowsUpdateRequest
       type: object
@@ -1909,10 +2043,9 @@ components:
         - title
       properties:
         status:
-          type: integer
-          format: int
+          type: string
           description: The HTTP response code of the error.
-          example: 500
+          example: '500'
         title:
           type: string
           description: A brief summary of the error.
@@ -1947,7 +2080,7 @@ components:
             internal-server-error:
               value:
                 errors:
-                  - status: 500
+                  - status: '500'
                     title: Internal Server Error
                     detail: There was an internal server error, you can report with your request id.
                     request_id: 635da56d-75a1-43cd-b696-7ab119756b3a
@@ -1962,7 +2095,7 @@ components:
               value:
                 errors:
                   - title: Validation Error
-                    status: 400
+                    status: '400'
                     detail: 'data.attributes.name: "name" is required'
     NotFound:
       description: Bad request. Not Found.
@@ -1975,4 +2108,28 @@ components:
               value:
                 errors:
                   - title: Not Found
-                    status: 404
+                    status: '404'
+    Forbidden:
+      description: Forbidden. The request was valid but the token does not have permission to perform this operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            forbidden:
+              value:
+                errors:
+                  - title: Forbidden
+                    status: '403'
+    Conflict:
+      description: Conflict. The request could not be completed due to a conflict with the current state of the resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            conflict:
+              value:
+                errors:
+                  - title: Conflict
+                    status: '409'

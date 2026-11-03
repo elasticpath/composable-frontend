@@ -67,6 +67,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
       client_id: clientId,
     }),
     {
+      httpOnly: true,
       sameSite: "strict",
       expires: new Date(token.expires! * 1000),
     },

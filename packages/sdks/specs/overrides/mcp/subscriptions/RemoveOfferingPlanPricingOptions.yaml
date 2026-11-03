@@ -1,0 +1,6 @@
+x-mcp-title: Remove Pricing Options from a Plan
+x-mcp-description: >-
+  Removes pricing options from one plan in an offering, given a list of pricing
+  option IDs. The pricing options stay in the offering and remain available to
+  its other plans. The change applies to new subscriptions only; existing
+  subscriptions are not affected.

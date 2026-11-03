@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Adds a field to a Custom API, identified by its ID. A field is one column of
+  the Custom API, and its slug becomes the key in every entry. Provide a name,
+  description, slug and field_type (string, integer, boolean, float, any or
+  list); field_type cannot be changed later. Validation rules apply to new
+  entries only.

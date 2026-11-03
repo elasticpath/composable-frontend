@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the delivery logs of one job of an integration, given the integration ID
+  and job ID. Each shows whether the attempt succeeded, the attempt number,
+  status code, response body and error detail.

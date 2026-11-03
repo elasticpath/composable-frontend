@@ -32,7 +32,7 @@ export async function applyDiscount(formData: FormData) {
       };
     }
 
-    await manageCarts({
+    const { error } = await manageCarts({
       client,
       path: {
         cartID: cartCookie,
@@ -44,6 +44,13 @@ export async function applyDiscount(formData: FormData) {
         },
       },
     });
+
+    if (error) {
+      console.error(error);
+      return {
+        error: getErrorMessage(error),
+      };
+    }
 
     await revalidateTag("cart");
   } catch (error) {

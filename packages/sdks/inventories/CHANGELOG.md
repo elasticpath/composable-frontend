@@ -1,5 +1,146 @@
 # @epcc-sdk/sdks-inventories
 
+## 0.6.1
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+- Updated dependencies [abade3e3]
+  - @epcc-sdk/sdks-runtime@0.1.1
+
+## 0.6.0
+
+### Minor Changes
+
+- e003cd0a: The `/mcp` export now targets MCP SDK v2. Register its tools on an `McpServer` from `@modelcontextprotocol/server` with no adapter. The optional peer dependency is now `@modelcontextprotocol/server` `^2`, in place of `@modelcontextprotocol/sdk`.
+
+  This is a breaking change for `/mcp` consumers:
+
+  - `Tool`, `ToolConfig` and each handler use v2's types. `outputSchema` is a Standard Schema.
+  - A handler takes v2's request context as its second argument and passes `ctx.mcpReq.signal` to the API call, so a cancelled MCP request aborts it. A wrapped handler passes `ctx` through as before.
+
+  Tool names, descriptions, risk tiers and zod schemas do not change. MCP SDK v2 lists input schemas as JSON Schema 2020-12, so a schema shared within a tool's input is now listed under `$defs` in place of `definitions`. The main entry does not change.
+
+## 0.5.0
+
+### Minor Changes
+
+- 018eda8b: `@epcc-sdk/sdks-inventories` has a new `/mcp` export. It has one Model Context Protocol (MCP) tool factory for each of its 18 operations, such as `listStockTool`, and `tools()`, which returns all 18. `createImportTool` uploads a JSONL file sent as a `data:` URI of at most 8 MiB. Location operations need the `EP-Inventories-Multi-Location: true` header on the client. A factory returns the `name`, `config` and `handler` that `McpServer.registerTool` takes. Without a `client`, a tool uses the package's module level `client`, which has no credentials until you configure it. `@modelcontextprotocol/sdk` is an optional peer dependency. The main entry does not change.
+
+## 0.4.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
+## 0.3.0
+
+### Minor Changes
+
+- b1c89251: The `/zod` schemas parse `int64` values as `number`, the type the TypeScript types already use, instead of `bigint`. A value validated with the schema can now be passed straight to the operation or field that takes it.
+
+  - `z.coerce.bigint()` becomes `z.number().int()` behind a step that turns a string into a number, so a query string value such as `"20"` still parses, to `20`.
+  - The bounds the specification declares stay, as plain numbers. The 64-bit range of the format itself is no longer emitted, because a `number` cannot hold it.
+  - No `BigInt(…)` is left in the generated schemas.
+
+  The TypeScript types, the SDK functions and the exported names do not change.
+
+  Breaking in practice, although the version is a minor:
+
+  - `.parse()` returns a `number` where it returned a `bigint` for `zNullableLocation`, `zStockCreateAttributes`, `zStockLocations`, `zStockResponseAttributes`, `zTransactionResponseAttributes` and `zTransactionCreateAttributes`, and for the schemas built from them. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+  - Responses are affected too: `.parse()` of a response now returns `number` for the stock `available`, `allocated` and `total` quantities and a transaction's `quantity`.
+  - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+  - `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.
+
+## 0.2.0
+
+### Minor Changes
+
+- f590bd23: Regenerate the inventories SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61.2), add
+  `createInventoriesClient`, and publish the Zod schemas.
+
+  What is new:
+
+  - `createInventoriesClient` binds the generated `createClient` and `createConfig` to
+    `@epcc-sdk/sdks-runtime`, so one install and one call give you a client with a caching
+    token source, the `auth` hook and a `fetch` that refreshes and replays once on a 401 and
+    backs off on a 429 or a 408, and on a 500, 502, 503, 504 or a transport failure where a
+    replay cannot duplicate work.
+
+    ```ts
+    const client = createInventoriesClient({
+      baseUrl: "https://euwest.api.elasticpath.com",
+      clientId: process.env.EPCC_CLIENT_ID!,
+      clientSecret: process.env.EPCC_CLIENT_SECRET!,
+    })
+    ```
+
+    Credentials are resolved from `source`, `provider`, `token`, `clientId` plus
+    `clientSecret`, or `clientId` alone for the implicit grant. `retry`, `storage`,
+    `leewaySeconds`, `fetch` and `config` tune the rest; `config` is merged last, so
+    anything the factory chose can be overridden. The runtime helpers are re-exported from
+    the package root, so a consumer who assembles the stack by hand still installs only this
+    package.
+
+  - Zod schemas for every request body, path and response are generated and exposed on the
+    `@epcc-sdk/sdks-inventories/zod` subpath. `zod` is an optional peer dependency (3.x) and
+    the root entry never imports it. The schemas coerce the eleven `int64` fields to
+    `bigint`, as the zod plugin does for every `int64`, so a parsed value carries `bigint`
+    where the TypeScript types say `number`.
+
+  Breaking in practice, although the version is a minor:
+
+  - The `@hey-api/client-fetch` dependency is gone. The fetch client is vendored into
+    `src/client/{client,core}`, and the root entry exports `createClient`, `createConfig`,
+    the shared `client` instance and the `Client`, `Config`, `CreateClientConfig`,
+    `RequestOptions` and `RequestResult` types. Import those from this package instead of
+    from `@hey-api/client-fetch`, which is deprecated.
+  - The shared `client` instance now carries a default base URL of
+    `https://euwest.api.elasticpath.com/v2`; before, it had none. This specification puts
+    `/v2` in its server URLs and starts its paths at `/inventories`, so the default carries
+    the `/v2`. `createInventoriesClient` takes the host, as every other factory does: it
+    fetches tokens from `baseUrl` and sends operations to `baseUrl` plus `/v2`, and it
+    accepts a `baseUrl` that already ends in `/v2`. A client built with `createClient` needs
+    the `/v2` in its `baseUrl`.
+  - `_Error` is renamed to `Error`. Rename the import; the shape is unchanged.
+  - The inline enum types `Type`, `Action`, `Status` and `Sort` are no longer exported,
+    because the `exportInlineEnums` option does not exist in 0.99. Their unions are
+    unchanged and are now written inline at each use site. Replace a reference with the
+    literal union, or derive it, for example `TransactionResponseAttributes["action"]`.
+
+  What is fixed:
+
+  - The eleven `int64` fields (`available`, `allocated`, `total` and `quantity` across the
+    stock and transaction types) are typed `number`, not `BigInt`. The old
+    `transformers.gen.ts` converted them to `BigInt`, but no operation called it, so the
+    values at runtime were always numbers and the declared types were wrong. A request body
+    that followed the old type threw when sent, because the old client passed it straight to
+    `JSON.stringify`, which cannot serialise a `bigint`. `transformers.gen.ts` is removed,
+    and big-integer output stays off.
+
+  All 18 operations keep their names — `createStock`, `listStock`, `getStockForProducts`,
+  `getStock`, `updateStock`, `deleteStock`, `listTransactions`, `createTransaction`,
+  `getTransaction`, `listLocations`, `createLocation`, `getLocation`, `updateLocation`,
+  `deleteLocation`, `createImport`, `listImportJobs`, `getImport` and `getImportErrors` —
+  and their `Data` / `Response` / `Error` types. `ClientOptions`, the known base URL union,
+  and `ImportWritable` are new; apart from the changes listed above, nothing in the exported
+  type surface is renamed or removed. This specification declares no `date-time` fields, so
+  dropping the `@hey-api/transformers` plugin changes no timestamp type here.
+
+## 0.1.0
+
+### Minor Changes
+
+- 48fa2a2e: Regenerate from the upstream `inventories` spec (spec version 26.0701.7843571, published 2026-07-01T09:25:34Z).
+
+  Adds 47 exported symbols.
+
 ## 0.0.4
 
 ### Patch Changes

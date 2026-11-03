@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one node from a hierarchy, by node ID. Check the node ID first. This
+  works on draft data in Product Experience Manager, not a published catalog
+  release.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one integration by ID, with its name, type, enabled state, concurrency,
+  observed events and delivery configuration. The configuration can contain a
+  webhook secret key or queue credentials. For delivery attempts, list the
+  integration's logs or jobs.

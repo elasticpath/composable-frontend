@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one lifecycle state change of a subscription by its ID. Returns the
+  action taken, which is cancel, pause, resume or pending, whether it was an
+  immediate cancellation, and when it was created.

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates the indexable fields that extend the search index: custom fields from
+  product extension templates or shopper and admin attributes, overrides that
+  make core fields sortable or facetable, and index-wide stem, token separator
+  and symbol settings. Reindex the catalog releases afterwards for the change to
+  apply. It returns 409 while a reindex is queued or running.

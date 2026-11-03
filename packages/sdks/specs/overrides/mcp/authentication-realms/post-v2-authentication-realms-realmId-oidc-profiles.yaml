@@ -1,0 +1,8 @@
+x-mcp-name: authentication_realms_create_oidc_profile
+x-mcp-description: >-
+  Creates an OpenID Connect profile in an authentication realm, so users can
+  sign in through one identity provider. It needs a name, the provider's
+  discovery URL, a client ID and a client secret. The client secret is write-only
+  and is never returned. Register the callback endpoint from the response
+  links with the provider; the authorization endpoint is for front-end
+  applications.

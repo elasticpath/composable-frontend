@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Cancels or voids a pending or authorized transaction on an order. Works only
+  with the Stripe and PayPal gateways, not the manual gateway. To return funds
+  already taken, refund the transaction instead.

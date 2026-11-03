@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Cancels a Product Experience Manager job that is still pending. Jobs run one
+  at a time and later jobs queue, so cancel a less important pending job to
+  let another start sooner. Only pending jobs can be cancelled. It returns the
+  job with its new status.

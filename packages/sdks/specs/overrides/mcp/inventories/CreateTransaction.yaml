@@ -1,0 +1,7 @@
+x-mcp-risk: update
+x-mcp-description: >-
+  Records a stock transaction on one product and changes its stock. The action
+  is increment, decrement, allocate, deallocate or set, with a quantity and an
+  optional location slug. Set overwrites the total stock with the quantity given,
+  so use increment or decrement for a relative change. It returns 422 when
+  stock levels are insufficient.

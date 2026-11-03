@@ -162,6 +162,38 @@ const adapter = new CatalogSearchInstantSearchAdapter({
 });
 ```
 
+### Including Related Resources (`include`)
+
+EP's catalog-search response only contains hits and `relationships.<resource>.data.id` references by default — full resource data (image URLs, file metadata, component products) is not inlined. Set `include` to forward the EP `?include=` URL query parameter; the adapter resolves the returned `included` block against each hit and inlines the full records onto the hit.
+
+```ts
+const adapter = new CatalogSearchInstantSearchAdapter({
+  client,
+  additionalSearchParameters: { query_by: "name,description" },
+  include: ["main_image"], // also accepts "files", "component_products"
+});
+
+// In a Hits widget:
+const Hit = ({ hit }) => (
+  <article>
+    {hit.main_image && <img src={hit.main_image.link.href} alt={hit.name} />}
+    <h3>{hit.name}</h3>
+  </article>
+);
+```
+
+Cardinality follows the EP relationship shape:
+
+| `include` value      | Resolved field on hit | Type                          |
+| -------------------- | --------------------- | ----------------------------- |
+| `"main_image"`       | `hit.main_image`      | single record or `undefined`  |
+| `"files"`            | `hit.files`           | array (in relationships order) |
+| `"component_products"` | `hit.component_products` | array (in relationships order) |
+
+Missing references (a relationship pointing at an id not present in `included`) are skipped silently — the field is left absent rather than set to a partial record. If the server omits the `included` block entirely while `include` was requested, the adapter logs a single `console.warn` per instance to surface the server-side mismatch.
+
+Behaviour is fully back-compat: omit `include` (or pass `[]`) and the adapter neither sends a `query` field nor merges anything onto hits — they retain their original `relationships.<resource>.data` shape.
+
 ## Widget Compatibility
 
 The adapter supports most InstantSearch widgets out of the box:
@@ -253,6 +285,24 @@ const adapter = new CatalogSearchInstantSearchAdapter({
 |---------------------------|------------------|-----------------|
 | v1.x | v4.x | 0.0.x |
 | v1.x | v3.x | 0.0.x |
+
+### `@epcc-sdk/sdks-shopper` peer range
+
+This package declares `@epcc-sdk/sdks-shopper` as a peer dependency with an open lower bound,
+currently `>=0.4.0`. It uses only the catalog search operations, which have been stable across
+every shopper release so far, so it does not need to track shopper's version.
+
+**Maintainers: when `@epcc-sdk/sdks-shopper` reaches 1.0.0, bump this package's major by hand.**
+
+Nothing will prompt you to. An open-ended range means changesets sees every new shopper version
+as satisfying it, so it will not propose a bump here at all — which is the point for a 0.x
+minor, and wrong for a 1.0.0. An upper bound would catch it, but changesets cannot carry one:
+`@changesets/get-version-range-type` reads only a range's prefix, so `>=0.4.0 <1.0.0` is
+rewritten to `>=0.4.0` on the next release that touches this package.
+
+Before this was set up, the opposite happened: a changed peer requirement on a minor dependency
+release majors the dependent, so shopper's 0.x minors published this package as 1.0.0, 2.0.0
+and 3.0.0 with no change of its own. See #607.
 
 ## Migration from Algolia
 

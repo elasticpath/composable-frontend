@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { paymentSetup, type OrderResponse } from "@epcc-sdk/sdks-shopper"
 
 type Props = {

@@ -721,11 +721,20 @@ export class SearchRequestAdapter {
       commonParams.page = searches[0].page
     }
 
-    // Use the shopper SDK's postMultiSearch function
+    // Use the shopper SDK's postMultiSearch function. When `include` is
+    // configured, forward it as the `?include=` URL query so EP returns a
+    // top-level `included` block alongside hits — letting the consumer join
+    // image / file / component-product resources to each hit's
+    // relationships without an extra round-trip. Conditional spread so the
+    // call site is byte-for-byte identical when `include` is unset, keeping
+    // existing call-arg assertions in tests stable.
     const response = await postMultiSearch({
       client: this.shopperClient,
       body: searchRequest,
       headers: this.configuration.headers || {},
+      ...(this.configuration.include && this.configuration.include.length > 0
+        ? { query: { include: this.configuration.include } }
+        : {}),
       ...commonParams,
     })
 

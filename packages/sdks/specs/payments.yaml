@@ -17,9 +17,15 @@ info:
     - Mark as Refunded: You can use your payment gateway’s console to process a refund. Process the refund first in the payment gateway and then use the **Mark as Refunded** capability in Composable Commerce to complete the process.
     - Refund through Composable Commerce: Start a full or partial refund to a supported payment provider directly from Commerce Manager or the API. You still have the ability to mark as refunded for a pre-integrated gateway, such as Stripe.
     
+    :::info
+    
+    For nonce-based Authorize.net transactions, if a refund is requested before the transaction has settled (typically within 24 hours), the transaction will be voided instead of refunded. This behavior is specific to nonce-based payments.
+    
+    :::
+    
     :::caution
     
-    Configure your store to use [Manual Gateway](/docs/api/carts/authorize-setup) to process payments if the order total is zero or the payment is through non-supported payment providers.
+    Configure your store to use [Manual Gateway](/docs/api/payments/update-manual-gateway) to process payments if the order total is zero or the payment is through non-supported payment providers.
     
     :::
     
@@ -78,7 +84,7 @@ info:
   contact:
     name: Elastic Path
     url: https://elasticpath.com
-  version: 1.0.0
+  version: 26.1013.8319374
 servers:
   - url: https://useast.api.elasticpath.com
     description: US East Production Server
@@ -137,7 +143,6 @@ paths:
               - braintree
               - stripe
               - stripe_payment_intents
-              - stripe_connect
               - elastic_path_payments_stripe
               - paypal_express_checkout
               - adyen
@@ -440,84 +445,6 @@ paths:
                   status: 401
                   title: Unauthorized
       deprecated: false
-  /v2/gateways/stripe_connect:
-    put:
-      tags:
-        - Gateways
-      summary: Update Stripe Connect Gateway
-      description: |
-        Use this endpoint to configure Stripe Connect in Commerce.
-        
-        :::note
-        
-        You can contact Elastic Path sales or [customer success team](mailto:customersuccess@elasticpath.com) to get more information about Stripe Connect and to check whether it will work for you.
-        
-        :::
-      operationId: updateStripeConnectGateway
-      parameters: [ ]
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/Request.UpdateStripeConnectGateway'
-              contentMediaType: application/json
-            examples:
-              default:
-                value:
-                  data:
-                    enabled: true
-                    stripe_account: '{{stripeConnectAccountId}}'
-                    test: true
-        required: false
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Response.Data'
-                  - properties:
-                      data:
-                        type: object
-                        properties:
-                          enabled:
-                            description: Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.
-                            example: true
-                            type: boolean
-                          stripe_account:
-                            description: Specifies the Stripe Connect account ID.
-                            example: '{{stripeConnectAccountId}}'
-                            type: string
-                          name:
-                            description: Specifies the name of the gateway.
-                            example: Stripe Connect
-                            type: string
-                          test:
-                            description: Specifies whether the test mode is enabled. Set `true` to enable test mode and `false` to disable the test mode. Default is `false`.
-                            example: true
-                            type: boolean
-                          slug:
-                            description: Represents the slug of the gateway.
-                            example: stripe_connect
-                            type: string
-                          type:
-                            description: Specifies the type of object being returned.
-                            example: gateway
-                            type: string
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response.Error'
-              example:
-                errors:
-                  status: 401
-                  title: Unauthorized
-      deprecated: false
   /v2/gateways/elastic_path_payments_stripe:
     put:
       tags:
@@ -546,7 +473,7 @@ paths:
                 value:
                   data:
                     enabled: true
-                    stripe_account: '{{stripeConnectAccountId}}'
+                    stripe_account: '{{stripeAccountId}}'
                     test: true
         required: false
       responses:
@@ -567,7 +494,7 @@ paths:
                             type: boolean
                           stripe_account:
                             description: Specifies the Stripe account ID.
-                            example: '{{stripeConnectAccountId}}'
+                            example: '{{stripeAccountId}}'
                             type: string
                           name:
                             description: Specifies the name of the gateway.
@@ -910,7 +837,8 @@ components:
         enabled:
           description: Specifies whether the gateway is enabled or disabled. Set `true` to enable the gateway and `false` to disable the gateway. Default is `false`.
           type: boolean
-          examples: true
+          examples:
+            - true
     Request.UpdateBraintreeGateway:
       title: Update Braintree Gateway Request
       type: object
@@ -972,20 +900,14 @@ components:
           type: string
           examples:
             - '{{stripeToken}}'
-    Request.UpdateStripeConnectGateway:
-      title: Update Stripe Connect Gateway Request
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Data.UpdateStripeConnectGateway'
     Request.UpdateElasticPathPaymentsStripeGateway:
       title: Update Elastic Path Payments by Stripe Gateway Request
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/Data.UpdateStripeConnectGateway'
-    Data.UpdateStripeConnectGateway:
-      title: Update Stripe Connect Gateway Data
+          $ref: '#/components/schemas/Data.ElasticPathPaymentsStripeGateway'
+    Data.ElasticPathPaymentsStripeGateway:
+      title: Update Elastic Path Payments by Stripe Gateway Data
       type: object
       required:
         - stripe_account
@@ -996,10 +918,10 @@ components:
           examples:
             - true
         stripe_account:
-          description: Specifies the Stripe Connect account ID.
+          description: Specifies the Stripe account ID.
           type: string
           examples:
-            - '{{stripeConnectAccountId}}'
+            - '{{stripeAccountId}}'
         test:
           description: Specifies whether the test mode is enabled. Set `true` to enable test mode and `false` to disable the test mode. Default is `false`.
           type: boolean

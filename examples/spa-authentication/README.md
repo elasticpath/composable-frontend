@@ -131,7 +131,6 @@ This interceptor:
   - `src/main.tsx`: Entry point of the React application, wraps `App` with `StorefrontProvider`.
 - `index.html`: The main HTML file for the Vite application.
 - `vite.config.ts`: Vite configuration file.
-- `.env.example`: Example environment variables file.
 - `package.json`: Project dependencies and scripts.
 
 ## Local Storage Strategy
@@ -144,29 +143,36 @@ The authentication token is stored in the browser's local storage:
 
 This approach is simpler than server-side cookies for client-heavy applications but has different security considerations as highlighted in the warning section.
 
+## Store Setup Requirements
+
+### Required
+
+- **An application key (client ID) for implicit authentication.** `src/auth/StorefrontProvider.tsx` requests a token with `grant_type: "implicit"` and throws "Missing storefront client id" if `VITE_APP_EPCC_CLIENT_ID` is unset. Create the key in Commerce Manager (Application Keys) and copy its client ID.
+- **A published catalog with at least one product visible to that key.** `src/App.tsx` calls `getByContextAllProducts` and renders each product's `name` and `sku`. The example reports "Storefront successfully authenticated" only when that call returns at least one product. No prices, currency, hierarchy or payment gateway are needed. Publish a catalog in Commerce Manager, or with the Catalogs API.
+
+### Optional
+
+None. The example uses no other store feature. An empty or unpublished catalog shows "No products found." together with "Storefront not authenticated", even when the token request succeeded, because `App.tsx` does not read the SDK `error` from the product call and cannot tell the two cases apart.
+
 ## Getting Started
 
 ### Prerequisites
 
-- An Elastic Path Commerce Cloud account.
-- A client ID for your storefront application.
 - Node.js and a package manager (npm, yarn, or pnpm).
 
 ### Environment Variables
 
-1.  Copy the `.env.example` file to a new file named `.env` in the root of the `examples/spa-authentication` directory (assuming you rename the parent folder):
-    ```bash
-    # Assuming you are in the 'examples/spa-authentication' directory
-    cp .env.example .env
-    ```
-2.  Update the `.env` file with your specific Elastic Path Commerce Cloud credentials:
+Create a file named `.env` in the root of the `examples/spa-authentication` directory with these variables:
 
-    ```bash
-    VITE_APP_EPCC_ENDPOINT_URL=your_endpoint_url # e.g. https://useast.api.elasticpath.com
-    VITE_APP_EPCC_CLIENT_ID=your_client_id
-    ```
+```bash
+VITE_APP_EPCC_ENDPOINT_URL=https://useast.api.elasticpath.com
+VITE_APP_EPCC_CLIENT_ID=your_client_id
+```
 
-    Ensure `VITE_APP_EPCC_ENDPOINT_URL` points to the correct API host for your EPCC instance.
+- `VITE_APP_EPCC_ENDPOINT_URL` (required): the API host for your store's region, including `https://`. The SDK uses it as the base URL for every request, so a bare host without the scheme is fetched as a relative URL and fails.
+- `VITE_APP_EPCC_CLIENT_ID` (required): the client ID of the application key described above.
+
+Vite inlines `VITE_` variables at build time. Restart the dev server or rebuild after you change them.
 
 ### Installation
 

@@ -1,0 +1,6 @@
+x-mcp-title: Update a Flow Field
+x-mcp-description: >-
+  Updates a flow field by its field ID. Send only the attributes to change, such
+  as name, slug, description, default, required or enabled; the others stay the
+  same. field_type cannot be changed. In Product Experience Manager it updates
+  an attribute.

@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Updates an authentication realm's name, duplicate email policy (allowed or
+  api_only), redirect URIs or origin relationship. Only type is required, and an
+  ID in the body must match the realm ID. The api_only policy points a new
+  identity provider user ID at the existing user with the same email, so use it
+  only when every configured provider treats email as unique.

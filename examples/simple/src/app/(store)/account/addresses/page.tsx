@@ -13,7 +13,6 @@ import React from "react";
 import { DeleteAddressBtn } from "./DeleteAddressBtn";
 import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import { getV2AccountAddresses } from "@epcc-sdk/sdks-shopper";
-import { TAGS } from "../../../../lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -37,9 +36,6 @@ export default async function Addresses() {
     client,
     path: {
       accountID: selectedAccount.account_id,
-    },
-    next: {
-      tags: [TAGS.accountAddresses],
     },
   });
 

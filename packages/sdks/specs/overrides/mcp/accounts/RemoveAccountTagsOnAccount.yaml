@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Detaches account tags from an account; the body lists the tag IDs, and the
+  response is the account's tag relationships. Afterwards the account member
+  token should be regenerated to reflect the change.

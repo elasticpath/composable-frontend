@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the memberships of one account, each pointing to its account member.
+  Filter by account member ID, sort, and page through the results. Include the
+  account member to get each member's name and email in the same response.

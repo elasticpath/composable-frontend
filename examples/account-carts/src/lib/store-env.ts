@@ -1,0 +1,8 @@
+export function storeEnv() {
+  return {
+    NEXT_PUBLIC_EPCC_ENDPOINT_URL: process.env.NEXT_PUBLIC_EPCC_ENDPOINT_URL,
+    NEXT_PUBLIC_EPCC_CLIENT_ID: process.env.NEXT_PUBLIC_EPCC_CLIENT_ID,
+    NEXT_PUBLIC_PASSWORD_PROFILE_ID:
+      process.env.NEXT_PUBLIC_PASSWORD_PROFILE_ID,
+  }
+}

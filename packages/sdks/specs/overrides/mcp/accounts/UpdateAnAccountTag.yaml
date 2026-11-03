@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates an account tag by ID: its name and description. Only data is required
+  in the body, and a conflicting change returns 409. Use it to rename a tag or
+  reword its description.

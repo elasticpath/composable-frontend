@@ -1,0 +1,85 @@
+# Where the published spec and promotions.svc disagree, the service wins. Remove an entry once
+# the published spec agrees.
+components:
+  parameters:
+    # Every other spec authenticates through its security scheme alone. This one also declares a
+    # required Authorization header parameter, so the types made every call pass headers, and any
+    # value passed there turns off the client's token and its replay after a 401.
+    Authorization:
+      required: false
+  schemas:
+    # The service decodes the create and update bodies as { data: ... }, and every create and
+    # update example in the spec sends data. The spec's body schema is the bare item.
+    RulePromotionRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/RulePromotionItem'
+    # The spec discriminates Condition on strategy without a mapping, so by OpenAPI's rules the
+    # values are the schema names ("AndCondition", ...), not the strategies the service reads
+    # ("and", ...). The generator then types Condition as never, and zod's discriminatedUnion
+    # throws when the /zod entry loads, because no member requires strategy. The service rejects
+    # a condition without one ("strategy is required").
+    Condition:
+      discriminator:
+        mapping:
+          and: '#/components/schemas/AndCondition'
+          or: '#/components/schemas/OrCondition'
+          cart_total: '#/components/schemas/CartTotalCondition'
+          item_identifier: '#/components/schemas/ItemIdentifierCondition'
+          item_price: '#/components/schemas/ItemPriceCondition'
+          item_quantity: '#/components/schemas/ItemQuantityCondition'
+          item_category: '#/components/schemas/ItemCategoryCondition'
+          item_attribute: '#/components/schemas/ItemAttributeCondition'
+          item_custom_attribute: '#/components/schemas/CartItemCustomAttributeCondition'
+          shipping_type: '#/components/schemas/ShippingTypeCondition'
+          items_bundle: '#/components/schemas/ItemsBundleCondition'
+    # CartTotalCondition already requires strategy. None of the others has a required list, so
+    # nothing is lost to the positional list merge.
+    AndCondition:
+      required:
+        - strategy
+    OrCondition:
+      required:
+        - strategy
+    ItemIdentifierCondition:
+      required:
+        - strategy
+    ItemPriceCondition:
+      required:
+        - strategy
+    ItemQuantityCondition:
+      required:
+        - strategy
+    ItemCategoryCondition:
+      required:
+        - strategy
+    ItemAttributeCondition:
+      required:
+        - strategy
+    CartItemCustomAttributeCondition:
+      required:
+        - strategy
+    ShippingTypeCondition:
+      required:
+        - strategy
+    ItemsBundleCondition:
+      required:
+        - strategy
+paths:
+  /v2/rule-promotions:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RulePromotionRequest'
+  /v2/rule-promotions/{promotionID}:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RulePromotionRequest'

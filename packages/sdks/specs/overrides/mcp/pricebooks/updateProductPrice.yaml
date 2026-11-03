@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a product price in a price book by price ID. The body requires data.id
+  and data.attributes.sku; beyond those, specify whichever attributes you want
+  to change and the rest keep their values. If the attributes section is empty,
+  the price is not updated.

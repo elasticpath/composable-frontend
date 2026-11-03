@@ -7,6 +7,7 @@ Composable Frontend is a modern starter kit built on Next.js from Elastic Path. 
 Learn more:
 * [Build a Next.js Storefront with Composable Frontend](https://www.elasticpath.com/blog/build-a-nextjs-storefront-with-composable-frontend)
 * [Composable Frontend Documentation](https://elasticpath.dev/docs/developer-tools/composable-starter/storefront-starter)
+* [Examples](examples/README.md): every example in this repository, and the Elastic Path capability each one teaches
 
 In addition to the Next.js React framework for static and server-side rendered applications, Composable Frontend includes:
 

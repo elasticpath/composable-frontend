@@ -1,0 +1,6 @@
+x-mcp-title: Attach Features to an Offering
+x-mcp-description: >-
+  Attaches one or more existing features to an offering, given a list of feature
+  IDs. Use it to reuse a feature that already exists; to create a new feature
+  inside the offering, create it in the offering instead. The change applies to
+  new subscriptions only.

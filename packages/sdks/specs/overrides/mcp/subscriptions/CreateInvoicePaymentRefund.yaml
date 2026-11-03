@@ -1,0 +1,7 @@
+x-mcp-description: >-
+  Creates a refund for a payment on an invoice, given the amount in the
+  currency's smallest subdivision and a reason. The payment must have succeeded
+  and must not be a manual payment, and the amount cannot exceed what is still
+  unrefunded; a breach, or a refund outside the invoice's billing period,
+  returns 422. The response records the refund's gateway and external refund ID.
+  Get the payment first to check its amount and gateway.

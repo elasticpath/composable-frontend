@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import {
-  getCart,
+  getACart,
   deleteACartItem,
   updateACartItem,
   manageCarts,
   deleteAPromotionViaPromotionCode,
   deleteAllCartItems,
-  type CartItemsObjectResponse,
-  type CartItemResponseObject,
+  type CartIncluded,
+  type CartItemObject,
   getCartId,
 } from "@epcc-sdk/sdks-shopper"
 
@@ -36,7 +36,7 @@ function formatPrice(cents: number) {
 
 export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
   const [cart, setCart] = useState<
-    Awaited<ReturnType<typeof getCart>>["data"] | null
+    Awaited<ReturnType<typeof getACart>>["data"] | null
   >(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,7 +68,7 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
         return
       }
 
-      const response = await getCart({
+      const response = await getACart({
         path: {
           cartID: cartId,
         },
@@ -798,7 +798,7 @@ export function CartView({ onCheckout }: { onCheckout?: () => void } = {}) {
 }
 
 function isCartItem(
-  item: CartItemsObjectResponse,
-): item is CartItemResponseObject {
+  item: NonNullable<CartIncluded["items"]>[number],
+): item is CartItemObject {
   return item.type === "cart_item"
 }

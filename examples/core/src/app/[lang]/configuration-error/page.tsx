@@ -1,5 +1,11 @@
 import { LocaleLink } from "src/components/LocaleLink";
 import { Metadata } from "next";
+import {
+  STORE_SHAPE_PARAM,
+  parseStoreShapeProblems,
+  storeShapeRequirement,
+} from "src/lib/search-store-shape";
+import { TAXONOMY_FACET_FIELD } from "src/lib/search-taxonomy-facet";
 
 export const metadata: Metadata = {
   title: "Configuration Error",
@@ -23,6 +29,9 @@ export default async function ConfigurationErrorPage(props: Props) {
     ...(authentication && { authentication }),
   };
   const fromProcessed = Array.isArray(from) ? from[0] : from;
+  const storeShapeRequirements = parseStoreShapeProblems(
+    searchParams[STORE_SHAPE_PARAM],
+  ).map((problem) => storeShapeRequirement(problem, TAXONOMY_FACET_FIELD));
 
   return (
     <div className="m-auto flex h-[36rem] w-full max-w-base-max-width flex-col items-center justify-center gap-4 p-8">
@@ -63,6 +72,12 @@ export default async function ConfigurationErrorPage(props: Props) {
                 </tr>
               );
             })}
+          {storeShapeRequirements.map(({ name, remedy }) => (
+            <tr key={name}>
+              <td className="break-words pr-4 align-top">{name}</td>
+              <td className="break-words">{remedy}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

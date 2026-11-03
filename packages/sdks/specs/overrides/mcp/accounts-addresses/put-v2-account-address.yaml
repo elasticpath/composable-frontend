@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates an address of an account by account ID and address ID. The body uses
+  the same fields as a new address: saved name, recipient, company, phone,
+  instructions, address lines, city, county, region, postcode and country.

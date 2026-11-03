@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the nodes of every hierarchy in a published catalog release; pass a
+  release ID, or latestPublished for the newest release. Filter by name, slug or
+  id, for example in(id,...) with the nodes attached to a product to build its
+  breadcrumbs. For one hierarchy's nodes or one node's children, use those reads
+  instead.

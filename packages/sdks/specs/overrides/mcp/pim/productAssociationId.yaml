@@ -1,0 +1,7 @@
+x-mcp-title: Relate Products Through a Custom Relationship
+x-mcp-description: >-
+  Relates a product to up to 2000 other products under a custom relationship, by
+  slug, with an optional sort order for each. The relationship is attached to
+  the product automatically. It adds to the existing related products and does
+  not overwrite them. The response lists the products associated and those that
+  could not be.

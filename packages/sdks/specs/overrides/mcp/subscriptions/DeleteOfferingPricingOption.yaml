@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Removes a pricing option from an offering. The last pricing option of an
+  offering cannot be removed and returns 400. Existing subscriptions are not
+  affected; the change applies to new subscriptions only.

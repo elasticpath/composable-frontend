@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one payment made against an invoice of a subscription. Returns whether
+  the payment succeeded or is pending, its gateway, amount, and failure reason
+  if it failed.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the pricing options associated with a subscription. Use it to see which
+  pricing option is currently active: the one with active_pricing_option set to
+  true is active. If active_pricing_option is null, the pricing option is not
+  active on the subscription.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Changes the slug or description of a search rule group. This is a label-only
+  change and does not alter how rules run. It returns 400 when no supported
+  attribute is sent and 403 when the group is not yours to modify.

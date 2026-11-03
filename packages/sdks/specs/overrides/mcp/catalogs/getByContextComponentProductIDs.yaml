@@ -1,0 +1,6 @@
+x-mcp-title: Get a Shopper Bundle's Component Product IDs
+x-mcp-description: >-
+  Lists the IDs of the component products in one bundle, from the catalog that
+  the shopper's context selects. It returns IDs only; to get a bundle's
+  components with their data, get the product with the component products
+  included. To read a specific catalog and release by ID, use the catalog reads.

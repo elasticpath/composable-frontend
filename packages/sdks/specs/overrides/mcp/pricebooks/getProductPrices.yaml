@@ -1,0 +1,5 @@
+x-mcp-title: Get a Price Book's Prices
+x-mcp-description: >-
+  Lists the product prices in one price book, with their currencies, tiers and
+  sales. Filter by SKU, in-list of SKUs or external reference. To search prices
+  across every price book, get all prices instead.

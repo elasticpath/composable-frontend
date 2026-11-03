@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates an inventory location's name, slug, external reference, description,
+  address or geolocation. The location ID must appear in both the path and the
+  body. The external reference, description, address and geolocation can be set
+  to null.

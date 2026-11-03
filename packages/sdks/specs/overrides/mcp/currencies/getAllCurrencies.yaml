@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the currencies configured for the store, including each currency's code,
+  exchange rate, display format, and whether it is the default and enabled.
+  Supports offset and limit pagination. A store can have at most 10 currencies.

@@ -1,0 +1,8 @@
+x-mcp-risk: update
+x-mcp-title: Import Price Books and Prices
+x-mcp-description: >-
+  Starts a bulk import that creates and updates price books and their prices
+  from a JSONL file, optionally GZIP compressed, so it can overwrite existing
+  prices. If an error occurs the import stops and the job fails, but objects
+  already created or updated stay. Imports are processed one at a time, in the
+  order sent.

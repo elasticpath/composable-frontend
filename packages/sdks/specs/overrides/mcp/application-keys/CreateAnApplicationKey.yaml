@@ -1,0 +1,7 @@
+x-mcp-description: >-
+  Creates an application key, identified by name and not tied to a user, that
+  can be used to generate client_credentials and implicit tokens. The response
+  includes the key's client ID and its client secret, which is a credential, so
+  keep it out of logs and code. The optional reserved rate limit is rejected if
+  the total reserved across all keys would exceed the store or organization
+  limit.

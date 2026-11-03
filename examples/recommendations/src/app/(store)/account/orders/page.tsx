@@ -3,7 +3,7 @@ import { ACCOUNT_MEMBER_TOKEN_COOKIE_NAME } from "../../../../lib/cookie-constan
 import { notFound, redirect } from "next/navigation";
 import { retrieveAccountMemberCredentials } from "../../../../lib/retrieve-account-member-credentials";
 import { ResourcePagination } from "../../../../components/pagination/ResourcePagination";
-import { DEFAULT_PAGINATION_LIMIT, TAGS } from "../../../../lib/constants";
+import { DEFAULT_PAGINATION_LIMIT } from "../../../../lib/constants";
 import { OrderItemWithDetails } from "./OrderItemWithDetails";
 import { createElasticPathClient } from "../../../../lib/create-elastic-path-client";
 import {
@@ -47,9 +47,6 @@ export default async function Orders(props: {
       "page[limit]": limit,
       "page[offset]": offset,
     },
-    next: {
-      tags: [TAGS.orders],
-    },
   });
 
   if (!result.data?.data) {
@@ -67,9 +64,6 @@ export default async function Orders(props: {
     query: {
       filter: `in(id,${productIds})`,
       include: ["main_image"],
-    },
-    next: {
-      tags: [TAGS.orders],
     },
   });
 

@@ -5,16 +5,17 @@ import { useElasticPathClient } from "src/app/[lang]/(store)/ClientProvider"
 import {
   Breadcrumb,
   Configure,
-  HierarchicalMenu,
   Hits,
   InstantSearch,
   Pagination,
-  RefinementList,
 } from "react-instantsearch"
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
-import { Panel } from "./Panel"
+import {
+  HierarchicalMenuPanel,
+  RangeSliderPanel,
+  RefinementListPanel,
+} from "./Panel"
 import { Autocomplete } from "./Autocomplete"
-import { RangeSlider } from "./RangeSlider"
 import {
   INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES,
   resolveInstantSearchRouting,
@@ -27,8 +28,15 @@ import { useParams } from "next/navigation"
 
 import "instantsearch.css/themes/satellite.css"
 import { useCurrencies } from "src/hooks/use-currencies"
-import { getPreferredCurrency } from "src/lib/i18n"
+import { getCurrencyCodeForLocale, getPreferredCurrency } from "src/lib/i18n"
 import { HitsWithImages } from "./HitsWithImages"
+import { SortBy } from "./SortBy"
+import { EXCLUDE_CHILD_PRODUCTS_FILTER } from "src/lib/product-family"
+import {
+  TAXONOMY_FACET_FIELD,
+  taxonomyFacetLabel,
+} from "src/lib/search-taxonomy-facet"
+import { emptyResultsOnServerFailure } from "src/lib/empty-results-on-server-failure"
 
 const categoryPageInstance = createInstantSearchNextInstance()
 
@@ -40,17 +48,27 @@ export default function InstantSearchResults(): JSX.Element {
     lang as string,
     currencies || [],
   )
-  const currencyCode = preferredCurrency?.code || "USD"
+  const currencyCode =
+    preferredCurrency?.code || getCurrencyCodeForLocale(lang as string)
 
   const searchClient = useMemo(() => {
     const catalogSearchInstantSearchAdapter =
       new CatalogSearchInstantSearchAdapter({
         client: client,
       })
-    return catalogSearchInstantSearchAdapter.searchClient
+    return emptyResultsOnServerFailure(
+      catalogSearchInstantSearchAdapter.searchClient,
+      typeof window === "undefined",
+    )
   }, [client])
 
-  const routing = resolveInstantSearchRouting(lang as string, currencyCode)
+  const priceAttribute = `price.${currencyCode}.float_price`
+
+  const routing = resolveInstantSearchRouting(
+    lang as string,
+    currencyCode,
+    TAXONOMY_FACET_FIELD,
+  )
 
   return (
     <InstantSearchNext
@@ -62,34 +80,32 @@ export default function InstantSearchResults(): JSX.Element {
       }}
       instance={categoryPageInstance}
     >
+      {/* Filtered here so paging and facet counts come from the server. */}
       <Configure
+        filters={EXCLUDE_CHILD_PRODUCTS_FILTER}
         attributesToSnippet={["attributes.name:7", "attributes.description:15"]}
         snippetEllipsisText="…"
       />
-      <div className="p-6 grid gap-4 grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-6">
+      <div className="p-6 grid gap-4 grid-cols-1 md:grid-cols-[1fr_3fr] mx-auto max-w-[1200px] w-full px-4 md:px-6">
         {" "}
         {/* mt-4 */}
         <div>
-          <Panel header="Categories">
-            <HierarchicalMenu
-              attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+          <HierarchicalMenuPanel
+            header="Categories"
+            attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+            showMore={true}
+          />
+          {TAXONOMY_FACET_FIELD && (
+            <RefinementListPanel
+              header={taxonomyFacetLabel(TAXONOMY_FACET_FIELD)}
+              attribute={TAXONOMY_FACET_FIELD}
+              limit={10}
               showMore={true}
+              showMoreLimit={50}
+              sortBy={["count:desc", "name:asc"]}
             />
-          </Panel>
-          {/* <div className="my-4" /> */}
-          {/* <Panel header="Brands">
-           <RefinementList
-             attribute="extensions.Details.BRAND-NAME"
-             limit={25}
-             showMore={true}
-             showMoreLimit={50}
-             sortBy={["count:desc"]}
-           />
-          </Panel> */}
-          <div className="my-4" />
-          <Panel header="Price">
-            <RangeSlider attribute={`price.${currencyCode}.float_price`} />
-          </Panel>
+          )}
+          <RangeSliderPanel header="Price" attribute={priceAttribute} />
         </div>
         <div>
           <div className="mb-4">
@@ -100,12 +116,15 @@ export default function InstantSearchResults(): JSX.Element {
               openOnFocus
             />
           </div>
-          <Breadcrumb
-            attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
-            classNames={{
-              root: "flex my-2",
-            }}
-          />
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Breadcrumb
+              attributes={INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES}
+              classNames={{
+                root: "flex my-2",
+              }}
+            />
+            <SortBy currencyCode={currencyCode} />
+          </div>
           <HitsWithImages preferredCurrency={preferredCurrency} />
           <Pagination
             classNames={{

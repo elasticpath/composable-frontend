@@ -139,7 +139,7 @@ export function CheckoutView({ onBack, isUserAuthenticated }: Props) {
       return
     }
 
-    if (!form.billing_address.city.trim()) {
+    if (!form.billing_address.city?.trim()) {
       setError("Billing city is required")
       return
     }
@@ -165,7 +165,7 @@ export function CheckoutView({ onBack, isUserAuthenticated }: Props) {
         return
       }
 
-      if (!form.shipping_address.city.trim()) {
+      if (!form.shipping_address.city?.trim()) {
         setError("Shipping city is required")
         return
       }

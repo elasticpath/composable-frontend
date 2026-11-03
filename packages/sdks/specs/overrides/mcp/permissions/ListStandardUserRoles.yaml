@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the standard user roles that can be assigned to Commerce Manager users,
+  each with its access level (none, view or manage) for areas such as products,
+  orders, promotions and settings. Use it to find a role ID for a custom API
+  role policy.

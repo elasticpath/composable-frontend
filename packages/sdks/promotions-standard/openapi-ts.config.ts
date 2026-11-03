@@ -1,24 +1,23 @@
-import { defaultPlugins, defineConfig } from "@hey-api/openapi-ts"
-import { defineConfig as defineReadmeConfig } from "../specs/heyapi/plugins"
+import { $, defineConfig } from "@hey-api/openapi-ts"
+import { int64AsNumber } from "../specs/heyapi/int64-as-number"
+import { mcpTools } from "../specs/heyapi/mcp-tools"
 
 export default defineConfig({
-  client: "@hey-api/client-fetch",
-  experimentalParser: true,
-  input: "../specs/promotions-standard.yaml",
-  output: { path: "src/client", format: "prettier" },
+  // The bundle, not the spec: it carries the corrections in ../specs/overrides/.
+  input: "../specs/bundled/promotions-standard_standalone.yaml",
+  output: { path: "src/client", postProcess: ["prettier"] },
   plugins: [
-    ...defaultPlugins,
     {
-      exportInlineEnums: true,
-      name: "@hey-api/typescript",
+      baseUrl: "https://euwest.api.elasticpath.com",
+      name: "@hey-api/client-fetch",
     },
+    { name: "@hey-api/typescript" },
+    { name: "@hey-api/sdk" },
     {
-      dates: true,
-      name: "@hey-api/transformers",
+      $resolvers: { number: int64AsNumber },
+      metadata: true,
+      name: "zod",
     },
-    defineReadmeConfig({
-      name: "generate-readme",
-      targetOperation: "getAPromotion",
-    }),
+    mcpTools($, { api: "promotions_standard" }),
   ],
 })

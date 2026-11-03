@@ -7,7 +7,11 @@ const PrefixPaths = (props) => {
         // create the new keys
         const newPaths = {}
         for (const [pathKey, pathItem] of Object.entries(paths || {})) {
-          const newKey = prefix + pathKey
+          // Idempotent: canonical has re-baselined some specs onto prefixed paths.
+          const newKey =
+            pathKey === prefix || pathKey.startsWith(prefix + "/")
+              ? pathKey
+              : prefix + pathKey
           newPaths[newKey] = pathItem
         }
 

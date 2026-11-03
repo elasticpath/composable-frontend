@@ -12,6 +12,9 @@ interface ProductRecommendationsProps {
 }
 
 export function ProductRecommendations({ similarProducts, included }: ProductRecommendationsProps) {
+  if (similarProducts.length === 0) {
+    return null;
+  }
 
   return (
     <div className="mt-20 flex flex-col">

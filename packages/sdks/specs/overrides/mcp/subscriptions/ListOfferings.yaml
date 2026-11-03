@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the subscription offerings. Use it to find an offering ID, or filter by
+  external reference, plan external reference or proration policy ID. Add plans,
+  pricing options or features to the include parameter to return them with each
+  offering.

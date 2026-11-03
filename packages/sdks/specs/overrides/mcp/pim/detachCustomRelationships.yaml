@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Removes one or more custom relationships from a product, by slug in the
+  request body. It returns no content. To delete a custom relationship itself,
+  delete it by slug instead.

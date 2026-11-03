@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the fields of one flow, identified by its slug rather than its ID, or in
+  Product Experience Manager the attributes of a template. Use it to see which
+  field slugs an entry of the flow accepts before creating or updating entries.

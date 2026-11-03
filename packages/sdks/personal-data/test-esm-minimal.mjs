@@ -1,5 +1,7 @@
 // This file is used to test that ESM imports work correctly
-import * as upersonaldata from './dist/index.mjs';
+import * as PersonalData from "./dist/index.mjs"
+import * as mcp from "./dist/mcp.mjs"
 
-console.log('upersonaldata:', Object.keys(upersonaldata));
-console.log('Test successful!');
+console.log("PersonalData:", Object.keys(PersonalData))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

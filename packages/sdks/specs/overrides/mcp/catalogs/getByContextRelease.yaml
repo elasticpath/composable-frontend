@@ -1,0 +1,7 @@
+x-mcp-title: Get the Shopper's Catalog Release
+x-mcp-description: >-
+  Gets the published catalog release that applies to the shopper's context,
+  such as the channel and context tag you pass. It returns one release with its
+  ID, catalog ID, release status and relationships to its hierarchies and
+  products. To read a release of a specific catalog by ID, use the catalog
+  release reads instead.

@@ -18,11 +18,7 @@ export default function DisplayInventory({
       : inventoryData.attributes)
 
   if (!inventoryData) {
-    return (
-      <div className="text-sm text-gray-500">
-        No stock available
-      </div>
-    )
+    return null
   }
 
   if (!selectedLocation && inventoryData?.attributes?.locations) {
@@ -47,7 +43,7 @@ export default function DisplayInventory({
     total: Number(locationInventory.total),
   }
 
-  if (locationInventory.available === BigInt(0)) {
+  if (locationInventory.available === 0) {
     return (
       <div className="text-sm text-gray-500">
         No stock information available

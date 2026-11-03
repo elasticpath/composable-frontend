@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates a Promotions Standard promotion. The types are cart fixed or percent
+  discount, X for Y, X for amount, fixed bundle, item fixed or percent discount,
+  and free gift. Set automatic to false to require codes, which you add
+  afterwards. Item-level discounts need the line calculation method.

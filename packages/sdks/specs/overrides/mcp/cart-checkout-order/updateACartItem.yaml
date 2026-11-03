@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates one item in a cart, such as its quantity or custom inputs, by cart ID
+  and cart item ID, and returns the cart's items. To update several items in one
+  request, update them in bulk instead.

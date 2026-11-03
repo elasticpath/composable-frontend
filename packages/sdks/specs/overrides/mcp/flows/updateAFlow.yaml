@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Updates a flow by its flow ID. Send only the attributes to change (name, slug,
+  description, enabled); the others stay the same, and an empty attributes
+  section changes nothing. In Product Experience Manager it updates a template.

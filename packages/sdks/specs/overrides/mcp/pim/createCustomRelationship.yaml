@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Creates a custom relationship that products can later use to link to other
+  products, such as upsell or related items. Set bi_directional to true so a
+  link from product A to B also links B back to A; the default is one-way. The
+  slug is required and must be unique; Product Experience Manager adds the
+  CRP_ prefix if you omit it.

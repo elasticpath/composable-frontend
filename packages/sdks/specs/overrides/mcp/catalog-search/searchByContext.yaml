@@ -1,0 +1,7 @@
+x-mcp-title: Search the Shopper Catalog
+x-mcp-description: >-
+  Searches the products of the published catalog that applies to the shopper
+  context (channel, context tag, currency). It supports full-text queries,
+  filters, facets, sorting, highlighting and autocomplete, and returns matching
+  products with facet counts. A catalog rule search profile wins over the
+  search_profile parameter. Use it for storefront search.

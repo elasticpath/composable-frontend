@@ -1,10 +1,23 @@
+import type { FormattedPrice, Product } from "@epcc-sdk/sdks-shopper"
+
 interface VariationPriceProps {
-  basePrice?: {
-    amount: number;
-    currency: string;
-  };
-  variations?: any[];
-  selectedVariation?: any;
+  basePrice?: FormattedPrice
+  variations?: Product[]
+  selectedVariation?: Product
+}
+
+type ComparablePrice = FormattedPrice & { amount: number; formatted: string }
+
+function displayPrice(product: Product): FormattedPrice | undefined {
+  return product.meta?.display_price?.without_tax
+}
+
+function isComparable(price: FormattedPrice | undefined): price is ComparablePrice {
+  return price?.amount !== undefined && price.formatted !== undefined
+}
+
+function PriceText({ children }: { children: string }) {
+  return <div className="text-2xl font-bold">{children}</div>
 }
 
 export default function VariationPrice({
@@ -12,51 +25,32 @@ export default function VariationPrice({
   variations,
   selectedVariation,
 }: VariationPriceProps) {
-  // If a variation is selected, show its price
-  if (selectedVariation && selectedVariation.attributes?.price) {
-    const price = selectedVariation.attributes.price.USD || selectedVariation.attributes.price;
+  const selectedPrice = selectedVariation && displayPrice(selectedVariation)
+  if (selectedPrice?.formatted) {
+    return <PriceText>{selectedPrice.formatted}</PriceText>
+  }
+
+  const variationPrices = (variations ?? [])
+    .map(displayPrice)
+    .filter(isComparable)
+    .sort((a, b) => a.amount - b.amount)
+
+  if (variationPrices.length > 0) {
+    const lowest = variationPrices[0]
+    const highest = variationPrices[variationPrices.length - 1]
+
     return (
-      <div className="text-2xl font-bold">
-        ${(price.amount / 100).toFixed(2)}
-      </div>
-    );
+      <PriceText>
+        {lowest.amount === highest.amount
+          ? lowest.formatted
+          : `${lowest.formatted} - ${highest.formatted}`}
+      </PriceText>
+    )
   }
 
-  // If no variation selected but we have variations, show price range
-  if (variations && variations.length > 0) {
-    const prices = variations
-      .map(v => v.attributes?.price?.USD?.amount || v.attributes?.price?.amount)
-      .filter(Boolean)
-      .map(p => p / 100);
-
-    if (prices.length > 0) {
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-
-      if (minPrice === maxPrice) {
-        return (
-          <div className="text-2xl font-bold">
-            ${minPrice.toFixed(2)}
-          </div>
-        );
-      }
-
-      return (
-        <div className="text-2xl font-bold">
-          ${minPrice.toFixed(2)} - ${maxPrice.toFixed(2)}
-        </div>
-      );
-    }
+  if (basePrice?.formatted) {
+    return <PriceText>{basePrice.formatted}</PriceText>
   }
 
-  // Fallback to base price
-  if (basePrice) {
-    return (
-      <div className="text-2xl font-bold">
-        ${(basePrice.amount / 100).toFixed(2)}
-      </div>
-    );
-  }
-
-  return <div className="text-2xl font-bold">Price unavailable</div>;
+  return <PriceText>Price unavailable</PriceText>
 }

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one entry from the Custom API with this slug, through the extensions
+  endpoint. The identifier is the entry ID, or, if one of the Custom API's
+  fields is used as the URL slug, that field's value, in which case the ID is
+  not accepted.

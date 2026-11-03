@@ -54,7 +54,7 @@ export async function fetchProductStock(
 export function getStockForLocation(
   stock: StockResponse,
   locationSlug: string,
-): { available: BigInt; allocated: BigInt; total: BigInt } | null {
+): { available: number; allocated: number; total: number } | null {
   if (
     !stock.attributes.locations ||
     !stock.attributes.locations[locationSlug]
@@ -70,9 +70,9 @@ export function getStockForLocation(
  * Following B2B best practices for stock display
  */
 export function getAvailabilityStatus(stockLevel: {
-  available: BigInt
-  allocated: BigInt
-  total: BigInt
+  available: number
+  allocated: number
+  total: number
 }): {
   status: "in-stock" | "limited" | "out-of-stock"
   label: string
@@ -134,9 +134,9 @@ export function getDefaultLocation(
  * Maps to schema.org availability values
  */
 export function getStructuredDataAvailability(stockLevel: {
-  available: BigInt
-  allocated: BigInt
-  total: BigInt
+  available: number
+  allocated: number
+  total: number
 }): string {
   const available = Number(stockLevel.available)
 

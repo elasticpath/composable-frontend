@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Moves a node under a new parent node in the same hierarchy, by the new
+  parent's ID. A node cannot move to another hierarchy; create it there and
+  delete the old one instead. It returns no content. This works on draft data in
+  Product Experience Manager, not a published catalog release.

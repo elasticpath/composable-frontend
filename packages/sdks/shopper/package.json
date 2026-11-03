@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/sdks-shopper",
-  "version": "0.0.42",
+  "version": "0.13.0",
   "description": "",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -17,6 +17,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./zod": {
+      "import": {
+        "types": "./dist/zod.d.ts",
+        "default": "./dist/zod.mjs"
+      },
+      "require": {
+        "types": "./dist/zod.d.cts",
+        "default": "./dist/zod.cjs"
+      }
+    },
     "./react-query": {
       "import": {
         "types": "./dist/react-query.d.ts",
@@ -29,15 +39,25 @@
     },
     "./package.json": "./package.json"
   },
+  "typesVersions": {
+    "*": {
+      "zod": [
+        "./dist/zod.d.ts"
+      ],
+      "react-query": [
+        "./dist/react-query.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "pnpm oas:build && pnpm oas:openapi-ts && pnpm build:tsup",
-    "build:tsup": "tsup",
+    "build:tsup": "tsup && node scripts/import-data-tag-symbols.mjs",
     "oas:build": "pnpm oas:redocly:bundle && pnpm oas:openapi-format:convert && pnpm oas:redocly:join:shopper",
     "oas:openapi-ts": "openapi-ts",
     "oas:redocly": "redocly --config ./redocly.json",
     "oas:redocly:lint": "redocly lint --config ../specs/config/redocly.yaml",
     "oas:redocly:join:shopper": "redocly join --config ../specs/config/redocly.yaml --output ../specs/shopper.yaml ../specs/bundled/catalog_view_3.1.yaml ../specs/bundled/cart_checkout.yaml ../specs/bundled/subscriptions_3.1.yaml ../specs/bundled/inventories_3.1.yaml ../specs/bundled/authentication.yaml ../specs/bundled/account-addresses.yaml ../specs/bundled/account_management.yaml ../specs/bundled/authentication-realms.yaml ../specs/bundled/currencies.yaml  ../specs/bundled/files.yaml ../specs/bundled/catalog_search_3.1.yaml",
-    "oas:redocly:bundle": "redocly bundle --config ../specs/config/redocly.yaml",
+    "oas:redocly:bundle": "redocly bundle cart-checkout@v1 catalog_view@v1 subscriptions@v1 inventories@v1 authentication@v1 account_addresses@v1 account_management@v1 authentication_realms@v1 currencies@v1 files@v1 catalog_search@v1 --config ../specs/config/redocly.yaml",
     "oas:openapi-format:convert": "pnpm dlx openapi-format ../specs/bundled/catalog_view.yaml -o ../specs/bundled/catalog_view_3.1.yaml --convertTo \"3.1\" && pnpm dlx openapi-format ../specs/bundled/subscriptions.yaml -o ../specs/bundled/subscriptions_3.1.yaml --convertTo  \"3.1\" && pnpm dlx openapi-format ../specs/bundled/inventories.yaml -o ../specs/bundled/inventories_3.1.yaml --convertTo  \"3.1\" && pnpm dlx openapi-format ../specs/bundled/catalog_search.yaml -o ../specs/bundled/catalog_search_3.1.yaml --convertTo \"3.1\"",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -48,11 +68,10 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.61.1",
+    "@hey-api/openapi-ts": "0.99.0",
     "@redocly/cli": "^1.21.0",
     "@redocly/openapi-core": "^1.21.0",
     "@tanstack/react-query": "^5.69.0",
-    "@testing-library/jest-dom": "6.6.3",
     "@types/ejs": "^3.1.5",
     "ejs": "^3.1.10",
     "esbuild-fix-imports-plugin": "^1.0.19",
@@ -61,19 +80,25 @@
     "lodash": "^4.17.21",
     "tsup": "^8.4.0",
     "typescript": "^5.5.3",
-    "vitest": "3.1.4"
+    "vitest": "3.1.4",
+    "zod": "4.6.5"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "0.6.0"
+    "@epcc-sdk/sdks-runtime": "workspace:*",
+    "@epcc-sdk/visitor": "workspace:*"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.69.0"
+    "@tanstack/react-query": "^5.69.0",
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "@tanstack/react-query": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   }

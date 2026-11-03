@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the IDs of the component products in one bundle, from a published
+  catalog release; pass a release ID, or latestPublished for the newest release.
+  Include component_products to get the products' data too. For a parent
+  product's child products, use that read instead.

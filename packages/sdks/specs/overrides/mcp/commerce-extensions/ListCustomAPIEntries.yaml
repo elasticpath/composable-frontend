@@ -1,0 +1,6 @@
+x-mcp-description: >-
+  Lists the entries of a Custom API addressed by its ID, the generic admin
+  route. Filter on id, created_at, updated_at and the Custom API's fields, sort,
+  and page; the default is newest first. On large data sets, set the total
+  method to observed or sort to null to cut latency. A timeout in milliseconds
+  can be set; exceeding it returns 422.

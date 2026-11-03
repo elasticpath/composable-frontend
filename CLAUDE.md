@@ -41,13 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `composable-common` - Shared utilities and types
 - `sdks/` - TypeScript SDKs for various Elastic Path Commerce APIs
 
-**Examples Structure**:
-- `simple/` - Basic storefront implementation
-- `commerce-essentials/` - Full-featured storefront
-- `list-products/` - Product listing with multi-location inventory
-- `algolia/` - Algolia search integration
-- `payments/` - Payment gateway examples
-- `memberships/` - Account membership features
+**Examples**: `examples/README.md` lists every example and what it teaches. A pull request that adds, removes, renames or retitles an example updates that list in the same pull request.
 
 **Technology Stack**:
 - Next.js for storefronts
@@ -98,3 +92,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - SDK interceptors configured to include MLI header on all requests
 
 **Why This Feature**: Enables B2B customers to see accurate, location-specific inventory levels for informed purchasing decisions across multiple warehouses or distribution centers.
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues on `elasticpath/composable-frontend`, through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

@@ -1,5 +1,7 @@
 // This file is used to test that CommonJS requires work correctly
-const urulepromotions = require('./dist/index.cjs');
+const RulePromotions = require("./dist/index.cjs")
+const mcp = require("./dist/mcp.cjs")
 
-console.log('urulepromotions:', Object.keys(urulepromotions));
-console.log('Test successful!');
+console.log("RulePromotions:", Object.keys(RulePromotions))
+console.log("mcp:", Object.keys(mcp))
+console.log("Test successful!")

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Copies an existing price book into a new one with the same pricing structure.
+  The body can set a new name, description and external reference for the copy;
+  the other attributes stay the same. Use it to build several price books from
+  one template.

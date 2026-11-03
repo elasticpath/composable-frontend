@@ -1,4 +1,4 @@
-# GENERATED FILE - DO NOT EDIT
+# GENERATED FILE - DO NOT EDIT 
 openapi: 3.0.3
 info:
   title: Product Experience Manager Introduction
@@ -18,7 +18,8 @@ info:
     - **Product sales**. Offer sale items for a limited time.
 
     Scenarios are created by defining the context within which a catalog is displays. Contexts can be a customer ID, a channel, or any other user-defined tag that can be passed to the APIs from the front-end shopper experiences.
-  version: 1.0.0
+  version: 26.0924.8211771
+  x-version-timestamp: 2026-09-24T10:27:11Z
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -383,7 +384,6 @@ paths:
                 $ref: '#/components/schemas/multi'
               examples:
                 completed:
-                  summary: Get all jobs
                   $ref: '#/components/examples/multi'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -410,19 +410,14 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 started:
-                  summary: Started Job
                   $ref: '#/components/examples/started'
                 successful:
-                  summary: Product Import Job
                   $ref: '#/components/examples/successful'
                 product-export:
-                  summary: Product Export Job
                   $ref: '#/components/examples/product-export'
                 hierarchy-duplicate:
-                  summary: Hierarchy Duplicate Job
                   $ref: '#/components/examples/hierarchy-duplicate'
                 build-child-products:
-                  summary: Build Child Products Job
                   $ref: '#/components/examples/build-child-products'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -458,7 +453,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 cancelled:
-                  summary: Cancelled Job
                   $ref: '#/components/examples/cancelled'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -485,7 +479,6 @@ paths:
                 $ref: '#/components/schemas/errors'
               examples:
                 errors:
-                  summary: Errors Returned
                   $ref: '#/components/examples/errors'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -544,17 +537,15 @@ paths:
               $ref: '#/components/schemas/create_product_request'
             examples:
               create-product:
-                summary: Create a base product
                 $ref: '#/components/examples/product_request'
               build-rules:
-                summary: Create a base product, associate variations, configure build rules
                 $ref: '#/components/examples/build_rules_request'
               sku-bundles:
-                summary: SKU-based bundles
                 $ref: '#/components/examples/bundle_sku_based_request'
               sku-less-bundles:
-                summary: SKU-less bundles
                 $ref: '#/components/examples/bundle_sku_less_request'
+              bundle-quantity-config:
+                $ref: '#/components/examples/create_bundle_with_quantity_config'
       responses:
         '201':
           description: Creates a product with the following attributes.
@@ -564,11 +555,11 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 created-product:
-                  summary: Create a base product
                   $ref: '#/components/examples/create_single_product_response'
                 build-rules:
-                  summary: Create a base product, associate variations, configure build rules
                   $ref: '#/components/examples/create_build_rules_response'
+                bundle-quantity-config:
+                  $ref: '#/components/examples/create_bundle_with_quantity_config_response'
         '422':
           $ref: '#/components/responses/unprocessable_entity'
         '500':
@@ -580,22 +571,38 @@ paths:
 
         You can also use `include` to retrieve top-level resources, such as files or images, and key attribute data, such as SKU or slug for component products in a product bundle. With this option, you can get more information about the products in a product bundle in your store front, improving the buying experience for your shoppers.
 
+        #### Pagination
+
+        This endpoint supports offset-based pagination using `page[offset]` and `page[limit]` query parameters.
+
+        :::caution Planned pagination changes — on or after 1 September 2026
+
+        The pagination links returned by this endpoint currently differ from the Elastic Path Commerce Cloud platform standard. Specifically, the `current` link is not returned, `first`/`last` are not always present, `prev` is incorrectly omitted on the second page, and `next` is incorrectly omitted on the second-to-last page.
+
+        On or after **1 September 2026**, this endpoint will be updated so that `current` and `first` are always present, `last` is present on every page except the final page, `next` is present on every page except the last, and `prev` is present on every page except the first. See the [links](/docs/api/pxm/products/get-all-products#links) schema for full details.
+
+        If your integration iterates through pages using these links, please verify that it will handle the updated behaviour correctly before this date.
+
+        :::
+
         #### Filtering
 
          Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
 
          The following attributes and operators are supported.
 
-        | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
-        | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
-        | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
-        | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
-        | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
-        | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
-        | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
-        | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
-        | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
-        | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
+        | Operator                  | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                          |
+        | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
+        | `eq`                      | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `component_option_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`. **Note:** `component_option_id` matches when a bundle includes that product id as a component option. | `?filter=eq(name,some-name)` |
+        | `like`                    | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                        | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                     | `?filter=like(name,*some-name*)`                 |
+        | `in`                      | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `component_option_id`, `tags`, `external_ref`                                   | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                           | `?filter=in(id,some-id)`                         |
+        | `gt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`    |
+        | `ge`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`    |
+        | `lt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`    |
+        | `le`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`    |
+        | `eq` (extensions)         | `extensions.book.isbn`                                                                                                                                  | Filters using a nested extension field.                                                                                                                                                                                                                 | `?filter=eq(extensions.book.isbn,1765426)`       |
+        | `eq` (shopper_attributes) | `shopper_attributes.color`                                                                                                                              | Filters using a shopper custom attribute field.                                                                                                                                                                                                         | `?filter=eq(shopper_attributes.color,red)`       |
+        | `eq` (admin_attributes)   | `admin_attributes.warehouse`                                                                                                                            | Filters using an admin custom attribute field.                                                                                                                                                                                                          | `?filter=eq(admin_attributes.warehouse,US-EAST)` |
       operationId: getAllProducts
       tags:
         - Products
@@ -636,13 +643,26 @@ paths:
         - Delete existing products.
         - Import product bundles.
 
-        The Product Import API uses a Comma Separated Values (CSV) file to import products, main image files and custom extension data. Each row in a .csv file represents a product you want to create/update. See an [example file](/assets/pim_product_import_example.csv).
+        The Product Import API uses a Comma Separated Values (CSV) file to import products, main image files, custom extension data, and admin and shopper attributes. Each row in a .csv file represents a product you want to create/update. See an [example file](/assets/pim_product_import_example.csv).
 
         Each file can have 50,000 rows, including the header. If a CSV file exceeds 50,000 rows, an error is displayed, and the products are not imported. A CSV file must not be larger than 50 megabytes. If a CSV file is larger than 50 megabytes, a `503 client read` error is displayed.
 
         If you want to create/update more than 50,000 products or your CSV file is larger than 50 megabytes, you must have a separate CSV file and import each CSV file one at a time.
 
         See [**Characteristics of CSV Files**](/docs/api/pxm/products/product-import-bulk-update#characteristics-of-csv-import-files).
+
+        ## Custom Attributes in CSV
+
+        You can set custom attributes on products using CSV columns with the prefixes `shopper_attributes.` or `admin_attributes.` followed by the attribute key name. For example:
+
+        - `shopper_attributes.color` sets the `color` key on `shopper_attributes`.
+        - `admin_attributes.cost_of_goods` sets the `cost_of_goods` key on `admin_attributes`.
+
+        **Partial updates:** When updating an existing product, only the attribute keys present as columns in the CSV are affected. Attribute keys not included as columns are left unchanged.
+
+        **Removing an attribute key:** To explicitly delete an attribute key from an existing product, set the cell value to `__REMOVE_ATTRIBUTE__`. This special sentinel value instructs the importer to remove that key from the product's custom attributes. An empty cell value is treated as a literal empty string, not a deletion.
+
+        **New products:** For new products being created via import, any column whose value is `__REMOVE_ATTRIBUTE__` is ignored (the key is not created).
       operationId: importProducts
       tags:
         - Product Import/Bulk Update
@@ -671,7 +691,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 pending:
-                  summary: Successful Job
                   $ref: '#/components/examples/import'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -679,31 +698,98 @@ paths:
           $ref: '#/components/responses/unprocessable_entity'
         '500':
           $ref: '#/components/responses/internal'
+      parameters:
+        - name: locale
+          in: query
+          description: |
+            Specifies the locale to assist in parsing flow entry date values.
+
+            - If a supported locale is provided, the system attempts to interpret dates using that locale's conventions. The import job fails if a date does not match one of the supported locale's formats.
+            - If this parameter is omitted, or if the value provided is not on the supported list, the system proceeds using its default parsing logic. An unsupported locale is ignored and does not cause a failure.
+
+            **Supported Locales and Date Formats:**
+
+            **`en-US`**
+            - `1/2/2006 15:04:05`
+            - `01/02/2006 15:04:05`
+            - `1/2/06 15:04`
+
+            **`en-GB`**
+            - `2/1/2006 15:04:05`
+            - `02/01/2006 15:04:05`
+            - `2/1/06 15:04`
+
+            **`en-CA`**
+            - `2/1/2006 15:04:05`
+            - `02/01/2006 15:04:05`
+            - `2/1/06 15:04`     
+
+            Additional locales and date formats can be added upon request.
+          required: false
+          schema:
+            type: string
+            enum:
+              - en-US
+              - en-GB
+              - en-CA
+          example: en-US
   /pcm/products/export:
     post:
       summary: Export Products
       description: |
 
         The Export API is available to make bulk updates to products in Product Experience Manager. You might also export products for your personal requirements. 
-        
+         
         The Export API builds a CSV file containing the product entries. A CSV file can contain up to 50,000 product entries. If you have more than 50,000 product entries, then another CSV file is created and so on, until all your products are exported.
 
         The Job endpoint response specifies the location where the CSV file is stored. See [Characteristics of CSV Files](/docs/api/pxm/products/product-export#characteristics-of-exporting-products).
-        
-        ### Filtering
-        
+
+        ### Custom Attributes in Exported CSV
+
+        Exported CSV files include custom attribute columns using the prefixes `shopper_attributes.` and `admin_attributes.` followed by the attribute key name. For example, a product with `admin_attributes: {cost_of_goods: "42.0"}` produces a column `admin_attributes.cost_of_goods` in the exported file.
+
+        You can select specific attribute columns to include in the export using the `columns.include` parameter. You may specify individual keys (for example, `admin_attributes.cost_of_goods`) or use a wildcard to include all keys of a given type (for example, `admin_attributes.*`). You cannot combine a wildcard and individual keys for the same attribute type in a single export request.
+
+        ### Exporting Selected Columns
+        Product exports support the ability to select a subset of columns to be included in the generated .csv file. This allows you to export only the data you need, making it easier to work with smaller, more focused datasets.
+
+         To specify the columns you want to include in the export, use the columns.include parameter in the request body of this endpoint. This parameter accepts an array of strings, where each string represents the name of a product attribute or a flow field.
+
+         #### Specifying Flow Field Columns:
+         
+         The format for specifying flow field columns depends on the useTemplateSlugs setting:
+         
+         * useTemplateSlugs: `true`: Specify flow field columns using the format: `products(<flow_slug>):<field_name>`. For example: `products(my_flow):my_field`.
+         * useTemplateSlugs: `false` (default): Specify flow field columns using the format: `template:<flow_id>:<field_name>`. For example: `template:82c10a02-1851-4992-8ecb-d44f2782d09b:my_field`.
+         
+         #### Mandatory Fields:
+
+         To ensure successful re-importing of product data, the following fields are always included in the export, regardless of the columns.include parameter:
+           
+           * id
+           * name
+           * sku
+           * external_ref
+           * commodity_type
+         
+         If the `columns.include` parameter is not provided in the request, the system will export all available product fields.
+         
+         ### Filtering
+         
         The following attributes and operators are supported.
 
-        | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
-        | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
-        | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
-        | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
-        | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
-        | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
-        | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
-        | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
-        | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
-        | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
+        | Operator                  | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                          |
+         | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
+         | `eq`                      | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `component_option_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`. **Note:** `component_option_id` matches when a bundle includes that product id as a component option. | `?filter=eq(name,some-name)` |
+         | `like`                    | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                        | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                     | `?filter=like(name,*some-name*)`                 |
+         | `in`                      | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `component_option_id`, `tags`, `external_ref`                                   | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                           | `?filter=in(id,some-id)`                         |
+         | `gt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`    |
+         | `ge`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`    |
+         | `lt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`    |
+         | `le`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`    |
+         | `eq` (extensions)         | `extensions.book.isbn`                                                                                                                                  | Filters using a nested extension field.                                                                                                                                                                                                                 | `?filter=eq(extensions.book.isbn,1765426)`       |
+         | `eq` (shopper_attributes) | `shopper_attributes.color`                                                                                                                              | Filters using a shopper custom attribute field.                                                                                                                                                                                                         | `?filter=eq(shopper_attributes.color,red)`       |
+         | `eq` (admin_attributes)   | `admin_attributes.warehouse`                                                                                                                            | Filters using an admin custom attribute field.                                                                                                                                                                                                          | `?filter=eq(admin_attributes.warehouse,US-EAST)` |
       operationId: exportProducts
       tags:
         - Product Export
@@ -712,6 +798,46 @@ paths:
           application/json:
             schema:
               type: object
+              properties:
+                data:
+                  type: object
+                  required:
+                    - type
+                  properties:
+                    attributes:
+                      type: object
+                      properties:
+                        columns:
+                          type: object
+                          properties:
+                            include:
+                              type: array
+                              items:
+                                type: string
+                    type:
+                      type: string
+                      example: product-export
+            examples:
+              product-export-columns:
+                summary: Export only a subset of columns when useTemplateSlugs is `false`
+                value:
+                  data:
+                    type: product-export
+                    attributes:
+                      columns:
+                        include:
+                          - description
+                          - template:a1b2c3d4-e5f6-7890-1234-567890abcdef:isbn
+              product-export-columns-template-slugs:
+                summary: Export only a subset of columns when useTemplateSlugs is `true`
+                value:
+                  data:
+                    type: product-export
+                    attributes:
+                      columns:
+                        include:
+                          - description
+                          - products(book):isbn
       responses:
         '201':
           description: Export started
@@ -721,7 +847,6 @@ paths:
                 $ref: '#/components/schemas/single'
               examples:
                 pending:
-                  summary: Successful Job
                   $ref: '#/components/examples/export'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -754,19 +879,16 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 get-product:
-                  summary: Product
                   $ref: '#/components/examples/get_single_product_response'
                 get-product-bundle:
-                  summary: Bundle
                   $ref: '#/components/examples/get_bundle_response'
+                get-product-bundle-quantity-config:
+                  $ref: '#/components/examples/get_bundle_with_quantity_config_response'
                 get-product-component-parent:
-                  summary: Parent Product
                   $ref: '#/components/examples/get_parent_product_response'
                 get-product-component-child:
-                  summary: Child Product
                   $ref: '#/components/examples/get_child_product_response'
                 get-product-component-products:
-                  summary: Component Product
                   $ref: '#/components/examples/get_component_product_response'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -789,18 +911,15 @@ paths:
               $ref: '#/components/schemas/update_product_request'
             examples:
               update-product:
-                summary: Update a base product
                 $ref: '#/components/examples/update_product_request'
               update-product-build-rules:
-                summary: Update a base product and build rules
                 $ref: '#/components/examples/update_build_rules_request'
               update-product-custom-inputs:
-                summary: Update using custom_inputs
-                description: You can allow your shoppers to add custom text to a product when checking out their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized. You can do this using the custom_inputs attribute when creating your products.
                 $ref: '#/components/examples/update_custom_inputs_request'
               update-product-bundle:
-                summary: Update a bundle
                 $ref: '#/components/examples/update_bundle_request'
+              update-product-bundle-quantity-config:
+                $ref: '#/components/examples/update_bundle_with_quantity_config'
       responses:
         '200':
           description: Updates a product with the following attributes.
@@ -810,17 +929,15 @@ paths:
                 $ref: '#/components/schemas/single_product_response'
               examples:
                 updated-product:
-                  summary: Update a base product
                   $ref: '#/components/examples/update_single_product_response'
                 build-rules:
-                  summary: Update a base product, configure build rules
                   $ref: '#/components/examples/update_build_rules_response'
                 update-product-custom-inputs:
-                  summary: Update using custom_inputs
                   $ref: '#/components/examples/update_custom_inputs_response'
                 update-product-bundle:
-                  summary: Update a bundle
                   $ref: '#/components/examples/update_bundle_response'
+                update-product-bundle-quantity-config:
+                  $ref: '#/components/examples/update_bundle_with_quantity_config_response'
         '403':
           $ref: '#/components/responses/forbidden'
         '404':
@@ -856,19 +973,21 @@ paths:
       summary: Attach multiple nodes
       description: |
         Assigns products to multiple hierarchies and their children nodes. You can apply a filter to search for the appropriate products to attach to a node. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
-        
+         
          The following attributes and operators are supported.
-        
-         | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
-         | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
-         | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
-         | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
-         | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
-         | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
-         | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
-         | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
-         | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
-         | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
+         
+         | Operator                  | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                          |
+         | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
+         | `eq`                      | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `component_option_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`. **Note:** `component_option_id` matches when a bundle includes that product id as a component option. | `?filter=eq(name,some-name)` |
+         | `like`                    | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                        | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                     | `?filter=like(name,*some-name*)`                 |
+         | `in`                      | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `component_option_id`, `tags`, `external_ref`                                   | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                           | `?filter=in(id,some-id)`                         |
+         | `gt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`    |
+         | `ge`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`    |
+         | `lt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`    |
+         | `le`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`    |
+         | `eq` (extensions)         | `extensions.book.isbn`                                                                                                                                  | Filters using a nested extension field.                                                                                                                                                                                                                 | `?filter=eq(extensions.book.isbn,1765426)`       |
+         | `eq` (shopper_attributes) | `shopper_attributes.color`                                                                                                                              | Filters using a shopper custom attribute field.                                                                                                                                                                                                         | `?filter=eq(shopper_attributes.color,red)`       |
+         | `eq` (admin_attributes)   | `admin_attributes.warehouse`                                                                                                                            | Filters using an admin custom attribute field.                                                                                                                                                                                                          | `?filter=eq(admin_attributes.warehouse,US-EAST)` |
       operationId: attachNodes
       tags:
         - Products
@@ -941,24 +1060,76 @@ paths:
           $ref: '#/components/responses/unprocessable_entity'
         '500':
           $ref: '#/components/responses/internal'
+  /pcm/products/attach_nodes_job:
+    post:
+      summary: Create attach multiple nodes job
+      description: |
+        Asynchronously assigns products matching the supplied `filter` query parameter to the specified hierarchy nodes. The request body contains the target node IDs. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
+
+        The response is a `pim-job` entity in `pending` status. Poll `GET /pcm/jobs/{jobID}` to track progress.
+      operationId: attachNodesJob
+      tags:
+        - Products
+      parameters:
+        - name: filter
+          in: query
+          required: true
+          description: |
+            Filters applied to search for the appropriate products to attach to the specified nodes. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering). For the attributes and operators supported, see [Attach multiple nodes](/docs/api/pxm/products/attach-nodes).
+          style: form
+          explode: true
+          schema:
+            type: string
+          example: eq(sku,book)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/attach_nodes_job'
+            examples:
+              attach-nodes-job:
+                summary: Create attach nodes job
+                value:
+                  data:
+                    node_ids:
+                      - f0d3a3b3-1a2b-4c5d-6e7f-8a9b0c1d2e3f
+      responses:
+        '201':
+          description: Successfully created the attach-nodes job.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/single'
+              examples:
+                attach-nodes-job-created:
+                  $ref: '#/components/examples/attach_nodes_job_created'
+        '400':
+          $ref: '#/components/responses/bad_request'
+        '422':
+          $ref: '#/components/responses/unprocessable_entity'
+        '500':
+          $ref: '#/components/responses/internal'
   /pcm/products/detach_nodes:
     post:
       summary: Detach multiple nodes
       description: |
         Dissociates products from multiple hierarchies and their children nodes. You can apply filters to search for the appropriate products to detach. For general filtering syntax, see [**Filtering**](/guides/Getting-Started/filtering).
-        
+         
         The following attributes and operators are supported.
-        
-         | Operator          | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                      |
-         | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------- |
-         | `eq`              | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`.                           | `?filter=eq(name,some-name)`                 |
-         | `like`            | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                           | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                   | `?filter=like(name,*some-name*)`              |
-         | `in`              | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `tags`, `external_ref`                                        | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                        | `?filter=in(id,some-id)`                     |
-         | `gt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`  |
-         | `ge`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`  |
-         | `lt`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`  |
-         | `le`              | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                          | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`  |
-         | `eq` (extensions) | `extensions.book.isbn`                                                                                                                                    | Filters using a nested extension field.                                                                                                                                                                                                               | `?filter=eq(extensions.book.isbn,1765426)`     |
+         
+         | Operator                  | Attribute                                                                                                                                               | Description                                                                                                                                                                                                                                             | Example                                          |
+         | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------- |
+         | `eq`                      | `id`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `templates`, `commodity_type`, `owner`, `product_types`, `parent_id`, `component_option_id`, `tags`, `status`, `has_nodes (false only)`, `created_at`, `updated_at`, `external_ref`, `description` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. For `product_types`, you can only specify one product type. **Note:** `has_nodes` can only be filtered as `false`. **Note:** `component_option_id` matches when a bundle includes that product id as a component option. | `?filter=eq(name,some-name)` |
+         | `like`                    | `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `name`, `tags`, `description`, `external_ref`                                                        | Like. Checks if the operand contains the specified string. Wildcards are supported.                                                                                                                                                                     | `?filter=like(name,*some-name*)`                 |
+         | `in`                      | `id`, `name`, `sku`, `slug`, `upc_ean`, `manufacturer_part_num`, `product_types`, `parent_id`, `component_option_id`, `tags`, `external_ref`                                   | Checks if the values are included in the specified list. If they are, the condition is true. For `product_types`, you can specify more than one product type.                                                                                           | `?filter=in(id,some-id)`                         |
+         | `gt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than. Checks if the value of the field is greater than the given value.                                                                                                                                                                         | `?filter=gt(updated_at,2024-01-01T00:00:00Z)`    |
+         | `ge`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Greater than or equal to. Checks if the value of the field is greater than or equal to the given value.                                                                                                                                                 | `?filter=ge(created_at,2023-01-01T00:00:00Z)`    |
+         | `lt`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than. Checks if the value of the field is less than the given value.                                                                                                                                                                               | `?filter=lt(updated_at,2025-01-01T00:00:00Z)`    |
+         | `le`                      | `id`, `created_at`, `updated_at`, `external_ref`                                                                                                        | Less than or equal to. Checks if the value of the field is less than or equal to the given value.                                                                                                                                                       | `?filter=le(created_at,2022-01-01T00:00:00Z)`    |
+         | `eq` (extensions)         | `extensions.book.isbn`                                                                                                                                  | Filters using a nested extension field.                                                                                                                                                                                                                 | `?filter=eq(extensions.book.isbn,1765426)`       |
+         | `eq` (shopper_attributes) | `shopper_attributes.color`                                                                                                                              | Filters using a shopper custom attribute field.                                                                                                                                                                                                         | `?filter=eq(shopper_attributes.color,red)`       |
+         | `eq` (admin_attributes)   | `admin_attributes.warehouse`                                                                                                                            | Filters using an admin custom attribute field.                                                                                                                                                                                                          | `?filter=eq(admin_attributes.warehouse,US-EAST)` |
       operationId: detachNodes
       tags:
         - Products
@@ -1583,8 +1754,8 @@ paths:
                 product-main-image-relationships:
                   value:
                     data:
-                      - type: file
-                        id: file-1
+                      type: file
+                      id: file-1
         '400':
           $ref: '#/components/responses/bad_request'
         '403':
@@ -1669,7 +1840,7 @@ paths:
           - A Product has been created.
       operationId: attachCustomRelationships
       tags:
-        - Product Association
+        - Product Relationships
       requestBody:
         content:
           application/json:
@@ -1677,7 +1848,6 @@ paths:
               $ref: '#/components/schemas/attach_custom_relationship_request'
             examples:
               assign-custom-relationships-to-product:
-                summary: attach custom relationships to product
                 $ref: '#/components/examples/attach_custom_relationship_request'
       responses:
         '201':
@@ -1688,8 +1858,7 @@ paths:
                 $ref: '#/components/schemas/multi_custom_relationships'
               examples:
                 custom-relationship:
-                  summary: Attached custom relationships
-                  $ref: '#/components/examples/resp_multi_custom_relationships'
+                  $ref: '#/components/examples/resp_attached_custom_relationships'
         '400':
           $ref: '#/components/responses/bad_request'
         '403':
@@ -1710,7 +1879,7 @@ paths:
         Delete Custom Relationships from a Product. Multiple Custom Relationships can be deleted from a product in one request.
       operationId: detachCustomRelationships
       tags:
-        - Product Association
+        - Product Relationships
       requestBody:
         content:
           application/json:
@@ -1746,7 +1915,7 @@ paths:
           - **OR** Products have been related to one another, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id)
       operationId: listAttachedCustomRelationship
       tags:
-        - Product Association
+        - Product Relationships
       requestBody:
         content:
           application/json:
@@ -1796,7 +1965,7 @@ paths:
            - One or many Product have been created for the product to relate to.
       operationId: productAssociationId
       tags:
-        - Product Association
+        - Product Relationships
       requestBody:
         content:
           application/json:
@@ -1834,7 +2003,7 @@ paths:
       summary: Delete a Relationship between a product with one or more products
       operationId: dissociateProducts
       tags:
-        - Product Association
+        - Product Relationships
       requestBody:
         content:
           application/json:
@@ -1865,7 +2034,7 @@ paths:
           - Relationships have been created between Products, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id).
       operationId: getRelatedProductIDsOfAProductId
       tags:
-        - Product Association
+        - Product Relationships
       parameters:
         - $ref: '#/components/parameters/page_offset'
         - $ref: '#/components/parameters/page_limit'
@@ -1901,7 +2070,7 @@ paths:
         ### Prerequisites
           - Relationships have been created between Products, see [Create a Relationship between a product with one or more products](/docs/api/pxm/products/product-association-id).
       tags:
-        - Product Association
+        - Product Relationships
       parameters:
         - $ref: '#/components/parameters/page_offset'
         - $ref: '#/components/parameters/page_limit'
@@ -1941,7 +2110,6 @@ paths:
               $ref: '#/components/schemas/create_variation'
             examples:
               create-variation:
-                summary: Create a variation
                 $ref: '#/components/examples/create_variation'
       responses:
         '201':
@@ -2191,7 +2359,7 @@ paths:
       summary: Create a modifier
       description: |
         You can specify different modifiers for different options in a variation. When you build child products using options in variations, the properties of a child products depends on the modifier set for the options that are applied to the child product.
-        
+         
         The table below describes the different types of modifiers.
 
         | Modifier | Data Type | Effect |
@@ -2397,8 +2565,22 @@ paths:
       description: |
         Get all hierarchies
 
+        #### Pagination
+
+        This endpoint supports offset-based pagination using `page[offset]` and `page[limit]` query parameters.
+
+        :::caution Planned pagination changes — on or after 1 September 2026
+
+        The pagination links returned by this endpoint currently differ from the Elastic Path Commerce Cloud platform standard. Specifically, the `current` link is not returned, `first`/`last` are not always present, `prev` is incorrectly omitted on the second page, and `next` is incorrectly omitted on the second-to-last page.
+
+        On or after **1 September 2026**, this endpoint will be updated so that `current` and `first` are always present, `last` is present on every page except the final page, `next` is present on every page except the last, and `prev` is present on every page except the first. See the [links](#links) schema for full details.
+
+        If your integration iterates through pages using these links, please verify that it will handle the updated behaviour correctly before this date.
+
+        :::
+
         #### Filtering
-        
+                     
         Many Commerce API endpoints support filtering. The general syntax is described in [**Filtering**](/guides/Getting-Started/filtering).
 
         The following attributes and operators are supported.
@@ -2431,6 +2613,7 @@ paths:
         - $ref: '#/components/parameters/page_offset'
         - $ref: '#/components/parameters/filter_nodes'
         - $ref: '#/components/parameters/page_limit'
+        - $ref: '#/components/parameters/include_hierarchies'
       summary: List all nodes
       operationId: getAllNodes
       description: |
@@ -2448,6 +2631,7 @@ paths:
         | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
         | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
         | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+        | `ilike`        | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Case-insensitive like. Same as `like` but ignores case when matching. | `filter=ilike(name,*some-name*)` |
       tags:
         - Hierarchies
       responses:
@@ -2456,10 +2640,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/multi_nodes'
+                $ref: '#/components/schemas/nodes_or_hierarchies'
               examples:
                 get-all-nodes:
-                  $ref: '#/components/examples/resp_multi_nodes'
+                  $ref: '#/components/examples/resp_multi_nodes_or_hierarchies'
         '400':
           $ref: '#/components/responses/bad_request'
         '404':
@@ -2563,11 +2747,11 @@ paths:
         ```
 
          ### Sorting Nodes in a Hierarchy
-        
+          
          You can sort the order of your nodes, regardless of where the nodes are in the hierarchy.
 
          You can do this by adding a `meta` object to the body of your request and specifying a `sort_order` value.
-        
+          
          The node with the highest value of `sort_order` is displayed first. For example, a node with a `sort_order` value of `3` appears before a node with a `sort_order` value of `2`.
 
          - If you don’t provide `sort_order` when creating nodes, all child nodes in the response for Get a Node’s Children request are ordered by the `updated_at` time in descending order, with the most recently updated child node first.
@@ -2577,21 +2761,21 @@ paths:
 
          - If you create a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**), the `sort_order` you specified when creating **Node A** is overwritten.
          - If you create **Node A** and then you create a relationship with **Node B** but do not configure a `sort_order`, the `sort_order` you specified when you created **Node A** is not overwritten.
-        
+          
          ### Curating Products in a Node
-        
+          
           You can curate the products in a node. Product curation allows you to promote specific products within each node of your hierarchies, enabling you to create unique product collections in your storefront. For example, you may find you have an abundance of cotton T-Shirts and you want to promote these products to the top of the product list. When a shopper navigates to T-shirts, the cotton T-Shirts are displayed first.
-        
+          
           You can do this by adding a `curated_products` attribute to the body of your request and adding an array of product IDs to the attribute. You should add the products IDs in the order you want them to be displayed in your node. The first product ID is displayed first in the product list.
-        
+          
           You can only curate 20 products or less. You cannot have more than 20 curated products.
-        
+          
           - The product IDs you provide must exist in the specified node.
           - If a curated product is removed from a node, the product is also removed from the curated_products list.
           - Once you have curated the products in a node, you can use the get node products endpoint to retrieve a list of curated products.
-        
+          
           You can then display your curated products in your catalogs using the following catalog endpoints.
-        
+          
           - Get a node in your latest catalog release.
           - Get a node in a catalog.
           - Get all nodes in your latest catalog release.
@@ -2649,6 +2833,7 @@ paths:
         | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
         | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
         | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+        | `ilike`        | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Case-insensitive like. Same as `like` but ignores case when matching. | `filter=ilike(name,*some-name*)` |
       operationId: getAllNodesInHierarchy
       tags:
         - Hierarchies
@@ -2711,17 +2896,17 @@ paths:
         ### Sorting Nodes in a Hierarchy
 
         You can sort the order of your nodes, regardless of where the nodes are in the hierarchy.
-        
+          
          The node with the highest value of sort_order is displayed first. For example, a node with a `sort_order` value of `3` appears before a node with a `sort_order` value of `2`.
-        
+          
          - If you don’t provide `sort_order` when creating nodes, all child nodes in the response for Get a Node’s Children request are ordered by the `updated_at` time in descending order, with the most recently updated child node first.
          - If you set `sort_order` for only a few child nodes or not all, the child nodes with a `sort_order` value appear first and then other child nodes appear in the order of `updated_at` time.
-        
+          
          You can also specify a sort_order when creating a node relationship.
 
          - If you update a node (**Node A**) with a `sort_order` and then you create a relationship for **Node A** with another node (**Node B**), the `sort_order` you specified when updating **Node A** is overwritten.
          - If you have updated **Node A** and then you create a relationship with **Node B** but do not configure a `sort_order`, the `sort_order` you specified when you updated **Node A** is not overwritten.
-        
+          
          ### Curating Products in a Node
 
          You can curate the products in a node. Product curation allows you to promote specific products within each node of your hierarchies, enabling you to create unique product collections in your storefront. For example, you may find you have an abundance of cotton T-Shirts and you want to promote these products to the top of the product list. When a shopper navigates to T-shirts, the cotton T-Shirts are displayed first.
@@ -2729,13 +2914,13 @@ paths:
          You can do this by adding a `curated_products` attribute to the body of your request and adding an array of product IDs to the attribute. You should add the products IDs in the order you want them to be displayed in your node. The first product ID is displayed first in the product list.
 
          You can only curate 20 products or less. You cannot have more than 20 curated products.
-        
+          
          - The product IDs you provide must exist in the specified node.
          - If a curated product is removed from a node, the product is also removed from the curated_products list.
          - Once you have curated the products in a node, you can use the get node products endpoint to retrieve a list of curated products.
-        
+          
          You can then display your curated products in your catalogs using the following catalog endpoints.
-        
+          
          - [Get a node in your latest catalog release](/docs/api/pxm/catalog/get-node)
          - [Get a node in a catalog](/docs/api/pxm/catalog/get-by-context-node)
          - [Get all nodes in your latest catalog release](/docs/api/pxm/catalog/get-all-nodes)
@@ -2812,6 +2997,7 @@ paths:
         | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
         | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
         | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+        | `ilike`        | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Case-insensitive like. Same as `like` but ignores case when matching. | `filter=ilike(name,*some-name*)` |
       operationId: getAllChildren
       tags:
         - Hierarchies
@@ -2966,6 +3152,7 @@ paths:
         | `in`           | `id`, `hierarchy_id`,  `parent_id`, `breadcrumbs.id`                                              | Checks if the value of the attribute is included in the specified list.                        | `filter=in(id,1,2,3,4)`                 |
         | `lt`, `le`, `gt`, `ge` | `id`, `hierarchy_id`,  `parent_id`, `created_at`, `updated_at`         | Comparison operators. `lt`: Less than, `le`: Less than or equal to, `gt`: Greater than, `ge`: Greater than or equal to. | `filter=lt(id,100)`, `filter=ge(created_at,2022-01-01)` |
         | `like`         | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Like. Checks if the attribute contains the specified string (wildcards supported).            | `filter=like(name,*some-name*)`, `filter=like(locales.es-ES.description,*descripción*)` |
+        | `ilike`        | `name`, `slug`, `description`, `locales.[locale].name`, `locales.[locale].description`, `breadcrumbs.name`, `breadcrumbs.slug`, `breadcrumbs.locales.[locale].name` | Case-insensitive like. Same as `like` but ignores case when matching. | `filter=ilike(name,*some-name*)` |
       operationId: getAllNodeChildren
       tags:
         - Hierarchies
@@ -3141,9 +3328,9 @@ paths:
       description: |
         Using this option, you can duplicate an existing hierarchy. This is useful because it enables you to quickly and easily create multiple hierarchies with the same node structure.
 
-        When you duplicate a hierarchy, you can specify a new name and/or a new description for the duplicated hierarchy. All other attributes, such as slug and locales, stay the same.
+        When you duplicate a hierarchy, you can specify a new name and/or a new description and/or a new slug for the duplicated hierarchy. All other attributes will stay the same.
 
-        Any nodes in the existing hierarchy are also replicated in the duplicated hierarchy. In addition, you can optionally use the `include_products` attribute to specify whether you want products associated with the nodes in an existing hierarchy to be associated with the nodes in the duplicated hierarchy. By default, product associations in an existing hierarchy are not duplicated in a duplicate hierarchy.
+        Any nodes in the existing hierarchy are also replicated in the duplicated hierarchy. In addition, you can optionally use the `include_products` attribute to specify whether you want products associated with the nodes in an existing hierarchy to be associated with the nodes in the duplicated hierarchy. By default, product relationships in an existing hierarchy are not duplicated in a duplicate hierarchy.
 
         Duplicating a hierarchy is an asynchronous operation. When you duplicate a hierarchy, a job is created. The jobId of the job is displayed in the response. When the job is complete, the duplicate hierarchy operation is also complete. You can use the jobId to see the status of your job using Get a Job.
 
@@ -3186,7 +3373,7 @@ paths:
       summary: Get All Product Tags
       description: |
         Retrieves all product tags for a store. A store can view the tags associated with the organization to which the store belongs. However, an organization can only view the tags associated with the organization.
-
+         
       operationId: getAllProductTags
       tags:
         - Product Tags
@@ -3199,7 +3386,6 @@ paths:
                 $ref: '#/components/schemas/multi_tag'
               examples:
                 list-tags:
-                  summary: Get all tags
                   $ref: '#/components/examples/resp_multi_tags'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -3227,7 +3413,6 @@ paths:
                 $ref: '#/components/schemas/single_tag'
               examples:
                 get-tag:
-                  summary: Get a tag
                   $ref: '#/components/examples/resp_single_tag'
         '400':
           $ref: '#/components/responses/bad_request'
@@ -3246,19 +3431,19 @@ paths:
           Within a uni-directional relationship, if Product A links to Product B, Product B will not link back to Product A. 
           This is ideal when one product (e.g., a base product) recommends another (e.g., an upsell), but the reverse 
           recommendation is unnecessary.
-        
+         
          - **Bi-Directional**: By setting `bi_directional` to `true` a bi-directional custom relationship will be created. Within a bi-directional 
          relationship, if Product A is linked to Product B, Product B will automatically link back to Product A. 
          This bi-directionality ensures a consistent experience, where products always suggest each other as related items.
-        
+         
           For more information on use cases, see [Custom Relationships](/guides/key-concepts/product-experience-manager/custom-relationships/).
 
         Custom Relationship slugs must meet the following criteria:
           - be unique 
           - be prefixed with `CRP_`. Product Experience Manager automatically adds the `CRP_` prefix if you do not include it.
           - contain A to Z, a to z, 0 to 9, hyphen, underscore, and period. Spaces or other special characters like ^, [], *, and $ are not allowed.
-        
-        Once a custom relationship has been created, you can:
+         
+        Once a custom relationship has been created, you can then create Product Relationships:
            1. Add the custom relationship to a product. See [Attach a custom relationship to a product](/docs/api/pxm/products/attach-custom-relationships).
            2. Associate a product to multiple products. See [Associate a product with other products under a custom relationship](/docs/api/pxm/products/product-association-id).
       operationId: createCustomRelationship
@@ -3367,7 +3552,6 @@ paths:
                 $ref: '#/components/schemas/single_custom_relationship'
               examples:
                 updated-custom-relationship:
-                  summary: Updated
                   $ref: '#/components/examples/custom_relationship_updated'
         '403':
           $ref: '#/components/responses/forbidden'
@@ -3399,8 +3583,7 @@ paths:
                 $ref: '#/components/schemas/single_custom_relationship'
               examples:
                 get-custom-relationship:
-                  summary: Get
-                  $ref: '#/components/examples/custom_relationship_updated'
+                  $ref: '#/components/examples/custom_relationship_get'
         '400':
           $ref: '#/components/responses/bad_request'
         '404':
@@ -3435,6 +3618,61 @@ components:
       type: http
       scheme: bearer
   schemas:
+    multi_links:
+      type: object
+      description: |
+        Links allow you to navigate between pages of results.
+
+        :::caution Planned pagination changes — on or after 1 September 2026
+
+        The pagination behaviour of PIM list endpoints (for example, `GET /pcm/products` and `GET /pcm/hierarchies`) currently differs from the rest of the Elastic Path Commerce Cloud platform. We plan to align PIM pagination with the platform standard on or after **1 September 2026**. Please review the details below and check that your integration code will handle the new behaviour correctly.
+
+        :::
+
+        #### Current behaviour
+
+        The current pagination link behaviour in PIM has the following known issues:
+
+        - The `current` link is **not returned**.
+        - The `first` and `last` links are **not always returned**.
+        - The `prev` link is omitted on both the first **and** second pages. It should only be omitted on the first page.
+        - The `next` link is omitted on both the last **and** second-to-last pages. It should only be omitted on the last page.
+
+        #### Planned behaviour (on or after 1 September 2026)
+
+        On or after 1 September 2026, PIM list endpoints will adopt the following pagination link behaviour, aligning with the rest of the platform:
+
+        - `current` — always present, pointing to the current page.
+        - `first` — always present.
+        - `last` — present on all pages **except the final page**. Omitting `last` on the final page is intentional, to avoid triggering infinite‑loop bugs in integration code that uses the presence of `last` to detect whether more pages remain.
+        - `next` — present on all pages except the last page.
+        - `prev` — present on all pages except the first page.
+      properties:
+        current:
+          description: |
+            A link to the current page of results. **Note:** this link is not currently returned by PIM endpoints. It will be introduced on or after 1 September 2026.
+          type: string
+          example: /pcm/hierarchies?page[offset]=10&page[limit]=10
+        first:
+          description: |
+            A link to the first page of results. Currently this may not always be present. After the planned changes it will always be present.
+          type: string
+          example: /pcm/hierarchies?page[offset]=0&page[limit]=10
+        last:
+          description: |
+            A link to the last page of results. Currently this may not always be present. After the planned changes it will be present on all pages except the final page (where it is intentionally omitted).
+          type: string
+          example: /pcm/hierarchies?page[offset]=20&page[limit]=10
+        next:
+          description: |
+            A link to the next page of results. Should be absent on the last page. Currently this is incorrectly absent on the second-to-last page as well; this will be fixed on or after 1 September 2026.
+          type: string
+          example: /pcm/hierarchies?page[offset]=10&page[limit]=10
+        prev:
+          description: |
+            A link to the previous page of results. Should be absent on the first page. Currently this is incorrectly absent on the second page as well; this will be fixed on or after 1 September 2026.
+          type: string
+          example: /pcm/hierarchies?page[offset]=8&page[limit]=10
     job:
       type: object
       required:
@@ -3464,24 +3702,24 @@ components:
             started_at:
               description: The date and time a job is started.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
               nullable: true
             completed_at:
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
               nullable: true
               description: The date and time a job is completed.
             created_at:
               type: string
               description: The date and time a job is created.
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             updated_at:
               type: string
               description: The date and time a job is updated.
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             type:
               type: string
@@ -3497,12 +3735,17 @@ components:
                 - product-import
                 - product-export
                 - hierarchy-duplicate
-                - price-import
+                - pricebook-import
+                - pricebook-delete
+                - hierarchy-delete
+                - indexing-job
+                - attach-nodes
             status:
               type: string
               enum:
                 - pending
                 - cancelled
+                - cancelling
                 - started
                 - success
                 - failed
@@ -3528,6 +3771,7 @@ components:
                 type: string
             filter:
               type: string
+              nullable: true
               description: The entities included in the job. For example, if the job type is `product-export`, the PXM products included in the export.
     multi:
       type: object
@@ -3535,6 +3779,8 @@ components:
         - data
         - meta
       properties:
+        links:
+          $ref: '#/components/schemas/multi_links'
         data:
           description: An array of jobs.
           type: array
@@ -3597,7 +3843,25 @@ components:
           $ref: '#/components/schemas/job'
     errors:
       type: object
+      required:
+        - data
+        - meta
       properties:
+        links:
+          $ref: '#/components/schemas/multi_links'
+        meta:
+          type: object
+          required:
+            - results
+          properties:
+            results:
+              type: object
+              required:
+                - total
+              properties:
+                total:
+                  type: integer
+                  description: Total number of job errors for this job.
         data:
           type: array
           description: An array of job errors.
@@ -3635,6 +3899,30 @@ components:
           description:
             type: string
             description: A localized description for the product.
+    shopper_attributes:
+      type: object
+      description: |
+        `shopper_attributes` are displayed in catalogs. This means `shopper_attributes` can be viewed by both shoppers and administrators. If you do not want a custom attribute to be displayed in a catalog, you must add it to `admin_attributes`. 
+
+        `shopper_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+      example:
+        cost_of_goods: '42.0'
+        charge_type: credit card
+      additionalProperties:
+        nullable: true
+        type: string
+    admin_attributes:
+      type: object
+      description: |
+        `admin_attributes` are not displayed in catalogs. This means `admin_attributes` can only be viewed by administrators. If you want a custom attribute to be displayed in a catalog, you must add it to `shopper_attributes`. 
+
+        `admin_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
+      example:
+        cost_of_goods: '42.0'
+        charge_type: credit card
+      additionalProperties:
+        nullable: true
+        type: string
     product_custom_inputs:
       type: object
       description: You use the `custom_inputs` attribute to allow your shoppers to add custom text to a product when adding product items to their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized or you sell greetings cards that can be printed with your shoppers personalized messages. See [Personalizing Products](/docs/api/pxm/products/create-product#personalizing-products).
@@ -3648,15 +3936,19 @@ components:
           validation_rules:
             type: array
             description: The validation rules for the custom text.
-          type:
-            description: This represents the type of the resource being returned.
-            type: string
-          options:
-            type: object
-            description: The length of the custom input text field.
-          max_length:
-            type: integer
-            description: The number of characters the custom text field can be. You can specify a maximum length up to 255 characters, as the limit is 255 characters.
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: The type of validation rule. For example, `string`.
+                options:
+                  type: object
+                  description: The options for the validation rule.
+                  properties:
+                    max_length:
+                      type: integer
+                      description: The number of characters the custom text field can be. You can specify a maximum length up to 255 characters, as the limit is 255 characters.
           required:
             type: boolean
             description: '`true` or `false` depending on whether the custom text is required.'
@@ -3708,13 +4000,30 @@ components:
                   description: This represents the type of object being returned. Always `product`.
                 quantity:
                   type: integer
+                  minimum: 1
                   description: The number of this product option that a shopper must purchase.
+                min:
+                  type: integer
+                  minimum: 1
+                  description: The minimum quantity of this product option that a shopper can select. Must be 1 or greater. If specified, max must also be specified.
+                max:
+                  type: integer
+                  minimum: 1
+                  description: The maximum quantity of this product option that a shopper can select. Must be 1 or greater and greater than or equal to min. If specified, min must also be specified.
                 sort_order:
                   type: integer
                   description: The sort order of the options. The `create a bundle` and `update a bundle` endpoints do not sort the options. You can use the `sort_order` attribute when programming your storefront to display the options in the order that you want.
                 default:
                   description: Whether the product option is a default option in a bundle. Shoppers can select a bundle that specifies a default list of product options. See [Dynamic Bundles](/docs/api/pxm/products/products#dynamic-bundles).
                   type: boolean
+                product_should_be_substituted_with_child:
+                  description: Whether the product option should be substituted with a child product.
+                  type: boolean
+                excluded_children:
+                  description: The IDs of child products that are excluded from the bundle option.
+                  type: array
+                  items:
+                    type: string
           min:
             type: integer
             description: The minimum number of product options a shopper can select from this component.
@@ -3779,6 +4088,10 @@ components:
               type: array
               items:
                 type: string
+            shopper_attributes:
+              $ref: '#/components/schemas/shopper_attributes'
+            admin_attributes:
+              $ref: '#/components/schemas/admin_attributes'
             extensions:
               type: object
               additionalProperties:
@@ -3787,7 +4100,7 @@ components:
                   oneOf:
                     - type: string
                       nullable: true
-                    - type: integer
+                    - type: number
                     - type: boolean
             custom_inputs:
               $ref: '#/components/schemas/product_custom_inputs'
@@ -3801,12 +4114,12 @@ components:
             created_at:
               description: The date and time a product is created.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             updated_at:
               description: The date and time a product is updated.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             owner:
               description: The resource owner, either `organization` or `store`.
@@ -3826,6 +4139,9 @@ components:
                   name:
                     type: string
                     description: The name of a variation.
+                  sort_order:
+                    type: integer
+                    description: The sort order of the variation.
                   options:
                     type: array
                     items:
@@ -3841,6 +4157,9 @@ components:
                         description:
                           type: string
                           description: A description of an option.
+                        sort_order:
+                          type: integer
+                          description: The sort order of the option.
             custom_relationships:
               description: Custom relationship slugs that are attached to the product.
               type: array
@@ -3877,6 +4196,9 @@ components:
                         description:
                           type: string
                           description: A description of an option.
+                        sort_order:
+                          type: integer
+                          description: The sort order of the option.
                   option:
                     type: object
                     description: The options available for this variation.
@@ -3890,6 +4212,9 @@ components:
                       description:
                         type: string
                         description: A description of an option.
+                      sort_order:
+                        type: integer
+                        description: The sort order of the option.
             product_types:
               description: |
                 One of the following product types: 
@@ -3909,6 +4234,7 @@ components:
             variation_matrix:
               description: The child products defined for a product. The order of the variations in the `variation_matrix` is the order of the variations in the array when the variations were linked to the product. For example, the first variation in the `variation_matrix` corresponds to the first variation in the array, and so on. You can use the `sort_order`attribute to sort the order of your variation and variation options in the `variation_matrix` object. See [Sorting the Order of Variations and Options](/docs/api/pxm/products/variations#sorting-the-order-of-variations-and-options) If no variations are defined for a product, the `variation_matrix` is empty.
               type: object
+              additionalProperties: true
         relationships:
           description: Relationships are established between different product entities. For example, a `bundle` product and a `child` product are related to a `parent` product, as both are associated with it.
           type: object
@@ -4055,6 +4381,8 @@ components:
             $ref: '#/components/schemas/product_response'
         included:
           $ref: '#/components/schemas/included_response'
+        links:
+          $ref: '#/components/schemas/multi_links'
         meta:
           type: object
           properties:
@@ -4108,6 +4436,10 @@ components:
           description: You can use product tags to store or assign a key word against a product. The product tag can then be used to describe or label that product. Using product tags means that you can group your products together, for example, by brand, category, subcategory, colors, types, industries, and so on. A product can have up to 20 tags. A product tag can be up to 255 characters. Product tags must not contain any spaces or commas. See [Product Tags](/docs/api/pxm/products/product-tags).
           items:
             type: string
+        shopper_attributes:
+          $ref: '#/components/schemas/shopper_attributes'
+        admin_attributes:
+          $ref: '#/components/schemas/admin_attributes'
         build_rules:
           $ref: '#/components/schemas/product_build_rules'
         locales:
@@ -4184,30 +4516,26 @@ components:
               example: 00000000-0000-0000-0000-000000000000
             attributes:
               $ref: '#/components/schemas/product_attributes'
-    admin_attributes:
+    attach_nodes_job:
       type: object
-      description: |
-        `admin_attributes` are not displayed in catalogs. This means `admin_attributes` can only be viewed by administrators. If you want a custom attribute to be displayed in a catalog, you must add it to `shopper_attributes`. 
-
-        `admin_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
-      example:
-        cost_of_goods: '42.0'
-        charge_type: credit card
-      additionalProperties:
-        nullable: true
-        type: string
-    shopper_attributes:
-      type: object
-      description: |
-        `shopper_attributes` are displayed in catalogs. This means `shopper_attributes` can be viewed by both shoppers and administrators. If you do not want a custom attribute to be displayed in a catalog, you must add it to `admin_attributes`. 
-
-        `shopper_attributes` are structured as key-value pairs. Both the keys and values are `strings`. You can have up to 100 keys.
-      example:
-        cost_of_goods: '42.0'
-        charge_type: credit card
-      additionalProperties:
-        nullable: true
-        type: string
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          additionalProperties: false
+          required:
+            - node_ids
+          properties:
+            node_ids:
+              type: array
+              description: A list of node unique identifiers that the matched products should be attached to.
+              minItems: 1
+              maxItems: 10
+              items:
+                type: string
+              example:
+                - f0d3a3b3-1a2b-4c5d-6e7f-8a9b0c1d2e3f
     attributes:
       type: object
       properties:
@@ -4255,7 +4583,7 @@ components:
             data:
               description: An array of child nodes.
               type: array
-              required: []
+              items: {}
             links:
               description: Links allow you to move between requests.
               type: object
@@ -4289,7 +4617,7 @@ components:
             data:
               description: An array of products.
               type: array
-              required: []
+              items: {}
             links:
               type: object
               description: Links allow you to move between requests.
@@ -4327,12 +4655,12 @@ components:
             created_at:
               description: The date and time a node is created.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             updated_at:
               description: The date and time a node was updated.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             parent_name:
               description: The name of the parent of the node if one exists.
@@ -4343,6 +4671,9 @@ components:
               enum:
                 - store
                 - organization
+            has_children:
+              description: Whether the node has child nodes.
+              type: boolean
             hierarchy_id:
               description: The unique identifier of hierarchy
               type: string
@@ -4384,26 +4715,6 @@ components:
               type: integer
               example: 30
               minimum: 0
-    multi_links:
-      type: object
-      description: Links are used to allow you to move between requests.
-      properties:
-        first:
-          description: Always the first page.
-          type: string
-          example: /pcm/hierarchies?page[offset]=0&page[limit]=10
-        last:
-          description: This is `null` if there is only one page.
-          type: string
-          example: /pcm/hierarchies?page[offset]=20&page[limit]=10
-        next:
-          description: This is `null` if there is only one page.
-          type: string
-          example: /pcm/hierarchies?page[offset]=10&page[limit]=10
-        prev:
-          description: This is `null` if you on the first page.
-          type: string
-          example: /pcm/hierarchies?page[offset]=8&page[limit]=10
     multi_nodes:
       type: object
       required:
@@ -4476,12 +4787,25 @@ components:
             properties:
               id:
                 type: string
-                description: The unique identifier of the new file.
+                description: The unique identifier of the file.
               type:
                 type: string
                 description: This represents the type of resource object being returned. Always `file`.
                 enum:
                   - file
+              meta:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    description: The date and time the file relationship was created.
+                    format: date-time
+                    nullable: true
+                  tags:
+                    type: array
+                    description: The file tags.
+                    items:
+                      type: string
     product_files_request:
       type: object
       properties:
@@ -4529,7 +4853,7 @@ components:
                   created_at:
                     description: The date and time a resource is created.
                     type: string
-                    example: '2020-09-22T09:00:00'
+                    example: '2020-09-22T09:00:00.000Z'
                     format: date-time
     product_variations_request:
       type: object
@@ -4551,16 +4875,18 @@ components:
       type: object
       properties:
         data:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                description: A unique identifier for the image file generated automatically when a file is created.
-                type: string
-              type:
-                description: This represents the type of resource object being returned. Always `file`.
-                type: string
+          description: A file object representing the main image, or null if no main image is set.
+          type: object
+          nullable: true
+          properties:
+            id:
+              description: A unique identifier for the image file generated automatically when a file is created.
+              type: string
+            type:
+              description: This represents the type of resource object being returned. Always `file`.
+              type: string
+              enum:
+                - file
     replace_main_image_request:
       type: object
       properties:
@@ -4742,7 +5068,7 @@ components:
               - type
             properties:
               id:
-                description: A unique identifier generated when a product association is created.
+                description: A unique identifier generated when a product relationship is created.
                 type: string
               type:
                 description: This represents the type of resource object being returned. Always `product`.
@@ -4757,6 +5083,19 @@ components:
                     nullable: true
                     type: integer
                     example: 5
+        links:
+          $ref: '#/components/schemas/multi_links'
+        meta:
+          type: object
+          properties:
+            results:
+              description: Contains the results for the entire collection.
+              type: object
+              properties:
+                total:
+                  description: Total number of results for the entire collection.
+                  type: integer
+                  example: 2
     product_association_request:
       type: object
       required:
@@ -4908,16 +5247,71 @@ components:
                         created_at:
                           type: string
                           description: The date and time an option is created.
-                          example: '2020-09-22T09:00:00'
+                          example: '2020-09-22T09:00:00.000Z'
                           format: date-time
                         updated_at:
                           type: string
                           description: The date and time an option is updated.
-                          example: '2020-09-22T09:00:00'
+                          example: '2020-09-22T09:00:00.000Z'
                           format: date-time
                         sort_order:
                           description: The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
                           type: integer
+                        modifiers:
+                          type: array
+                          description: The modifiers associated with this option.
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: A unique identifier generated when a modifier is created.
+                              type:
+                                type: string
+                                description: The type of modifier.
+                                enum:
+                                  - commodity_type
+                                  - status
+                                  - price
+                                  - name_append
+                                  - name_prepend
+                                  - name_equals
+                                  - sku_append
+                                  - sku_prepend
+                                  - sku_equals
+                                  - sku_builder
+                                  - slug_append
+                                  - slug_prepend
+                                  - slug_equals
+                                  - slug_builder
+                                  - description_append
+                                  - description_prepend
+                                  - description_equals
+                                  - custom_inputs_equals
+                                  - build_rules_equals
+                                  - locales_equals
+                                  - upc_ean_equals
+                                  - mpn_equals
+                                  - external_ref_equals
+                              value:
+                                type: string
+                                nullable: true
+                                description: Required for non-builder modifiers. The value of the modifier type.
+                              seek:
+                                type: string
+                                nullable: true
+                                description: Required for builder modifiers. The sub-string to find and replace.
+                              set:
+                                type: string
+                                nullable: true
+                                description: Required for builder modifiers. The value to replace matches of the seek string.
+                              owner:
+                                type: string
+                                nullable: true
+                                description: The owner of the modifier, either `organization` or `store`.
+                                enum:
+                                  - organization
+                                  - store
                   owner:
                     type: string
                     description: The owner of the resource, either `organization` or `store`.
@@ -4927,13 +5321,15 @@ components:
                   created_at:
                     type: string
                     description: The date and time a variation is created.
-                    example: '2020-09-22T09:00:00'
+                    example: '2020-09-22T09:00:00.000Z'
                     format: date-time
                   updated_at:
                     type: string
                     description: The date and time a variation is updated.
-                    example: '2020-09-22T09:00:00'
+                    example: '2020-09-22T09:00:00.000Z'
                     format: date-time
+        links:
+          $ref: '#/components/schemas/multi_links'
         meta:
           type: object
           properties:
@@ -4971,11 +5367,11 @@ components:
                 sort_order:
                   description: |
                     The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. 
-                    
+                     
                      The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. 
-                    
+                     
                      You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
-                    
+                     
                      You must rebuild your products for the sort order changes to take effect.
                   type: integer
     created_variation:
@@ -5021,12 +5417,12 @@ components:
                 created_at:
                   type: string
                   description: The date and time a variation is created.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
                 updated_at:
                   type: string
                   description: The date and time a variation is updated.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
     single_variation:
       type: object
@@ -5081,16 +5477,71 @@ components:
                       created_at:
                         type: string
                         description: The date and time an option is created.
-                        example: '2020-09-22T09:00:00'
+                        example: '2020-09-22T09:00:00.000Z'
                         format: date-time
                       updated_at:
                         type: string
                         description: The date and time an option is updated.
-                        example: '2020-09-22T09:00:00'
+                        example: '2020-09-22T09:00:00.000Z'
                         format: date-time
                       sort_order:
                         description: The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
                         type: integer
+                      modifiers:
+                        type: array
+                        description: The modifiers associated with this option.
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A unique identifier generated when a modifier is created.
+                            type:
+                              type: string
+                              description: The type of modifier.
+                              enum:
+                                - commodity_type
+                                - status
+                                - price
+                                - name_append
+                                - name_prepend
+                                - name_equals
+                                - sku_append
+                                - sku_prepend
+                                - sku_equals
+                                - sku_builder
+                                - slug_append
+                                - slug_prepend
+                                - slug_equals
+                                - slug_builder
+                                - description_append
+                                - description_prepend
+                                - description_equals
+                                - custom_inputs_equals
+                                - build_rules_equals
+                                - locales_equals
+                                - upc_ean_equals
+                                - mpn_equals
+                                - external_ref_equals
+                            value:
+                              type: string
+                              nullable: true
+                              description: Required for non-builder modifiers. The value of the modifier type.
+                            seek:
+                              type: string
+                              nullable: true
+                              description: Required for builder modifiers. The sub-string to find and replace.
+                            set:
+                              type: string
+                              nullable: true
+                              description: Required for builder modifiers. The value to replace matches of the seek string.
+                            owner:
+                              type: string
+                              nullable: true
+                              description: The owner of the modifier, either `organization` or `store`.
+                              enum:
+                                - organization
+                                - store
                 owner:
                   description: The owner of the resource, either `organization` or `store`.
                   type: string
@@ -5130,11 +5581,11 @@ components:
                 sort_order:
                   description: |
                     The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want. 
-                    
+                     
                      The variation with the highest value of `sort_order` is displayed first. For example, a variation with a `sort_order` value of 3 appears before a variation with a `sort_order` value of 2. 
-                    
+                     
                      You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, including, zero or negative numbers. You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
-                    
+                     
                      You must rebuild your products for the sort order changes to take effect.
                   type: integer
             id:
@@ -5182,13 +5633,15 @@ components:
                   created_at:
                     type: string
                     description: The date and time an option is created.
-                    example: '2020-09-22T09:00:00'
+                    example: '2020-09-22T09:00:00.000Z'
                     format: date-time
                   updated_at:
                     type: string
                     description: The date and time an option is updated.
-                    example: '2020-09-22T09:00:00'
+                    example: '2020-09-22T09:00:00.000Z'
                     format: date-time
+        links:
+          $ref: '#/components/schemas/multi_links'
         meta:
           type: object
           properties:
@@ -5229,13 +5682,13 @@ components:
                 sort_order:
                   description: |
                     By default, variations and variation options are sorted alphabetically. You can use the `sort_order` attribute to sort the order of your variation and variation options in the `variation_matrix`. 
-                    
+                     
                      The sort order value is visible when you add the variations and variation options to your catalogs. You can then use the `sort_order` value to program your storefront to display the variation options in the order that you want.  
-                    
+                     
                      The variation option with the highest value of `sort_order` is displayed first. For example, a variation option with a `sort_order` value of `3` appears before a variation option with a `sort_order` value of `2`. You can specify any numbers that you want. You can use 1, 2, 3, or 100, 90, 80, and so on, zero or negative numbers. 
-                    
+                     
                      You can set `sort_order` to either `null` or omit it entirely from the request if you wish to remove an existing `sort_order` attribute.
-                    
+                     
                      You must rebuild your products for the sort order changes to take effect.
                   type: integer
                 description:
@@ -5285,12 +5738,12 @@ components:
                 created_at:
                   type: string
                   description: The date and time an option is created.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
                 updated_at:
                   type: string
                   description: The date and time an option is updated.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
     single_option:
       type: object
@@ -5339,13 +5792,68 @@ components:
                 created_at:
                   type: string
                   description: The date and time an option is created.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
                 updated_at:
                   type: string
                   description: The date and time an option is updated.
-                  example: '2020-09-22T09:00:00'
+                  example: '2020-09-22T09:00:00.000Z'
                   format: date-time
+                modifiers:
+                  type: array
+                  description: The modifiers associated with this option.
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: A unique identifier generated when a modifier is created.
+                      type:
+                        type: string
+                        description: The type of modifier.
+                        enum:
+                          - commodity_type
+                          - status
+                          - price
+                          - name_append
+                          - name_prepend
+                          - name_equals
+                          - sku_append
+                          - sku_prepend
+                          - sku_equals
+                          - sku_builder
+                          - slug_append
+                          - slug_prepend
+                          - slug_equals
+                          - slug_builder
+                          - description_append
+                          - description_prepend
+                          - description_equals
+                          - custom_inputs_equals
+                          - build_rules_equals
+                          - locales_equals
+                          - upc_ean_equals
+                          - mpn_equals
+                          - external_ref_equals
+                      value:
+                        type: string
+                        nullable: true
+                        description: Required for non-builder modifiers. The value of the modifier type.
+                      seek:
+                        type: string
+                        nullable: true
+                        description: Required for builder modifiers. The sub-string to find and replace.
+                      set:
+                        type: string
+                        nullable: true
+                        description: Required for builder modifiers. The value to replace matches of the seek string.
+                      owner:
+                        type: string
+                        nullable: true
+                        description: The owner of the modifier, either `organization` or `store`.
+                        enum:
+                          - organization
+                          - store
     update_option:
       type: object
       required:
@@ -5483,6 +5991,8 @@ components:
                     enum:
                       - store
                       - organization
+        links:
+          $ref: '#/components/schemas/multi_links'
         meta:
           type: object
           properties:
@@ -5864,7 +6374,7 @@ components:
             data:
               description: An array of child nodes.
               type: array
-              required: []
+              items: {}
             links:
               description: Links allow you to move between requests.
               type: object
@@ -5899,12 +6409,12 @@ components:
             created_at:
               description: The date and time a hierarchy is created.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             updated_at:
               description: The date and time a hierarchy is updated.
               type: string
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             owner:
               description: The owner of a resource, either `organization` or `store`.
@@ -5912,6 +6422,9 @@ components:
               enum:
                 - store
                 - organization
+            has_children:
+              description: Whether the hierarchy has child nodes.
+              type: boolean
             breadcrumbs:
               type: array
               description: Breadcrumbs
@@ -6007,6 +6520,27 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/hierarchy'
+    nodes_or_hierarchies:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          description: An array of nodes or hierarchies.
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/node'
+              - $ref: '#/components/schemas/hierarchy'
+            discriminator:
+              propertyName: type
+              mapping:
+                node: '#/components/schemas/node'
+                hierarchy: '#/components/schemas/hierarchy'
+        meta:
+          $ref: '#/components/schemas/multi_meta'
+        links:
+          $ref: '#/components/schemas/multi_links'
     update_hierarchy:
       type: object
       required:
@@ -6134,7 +6668,7 @@ components:
                 sort_order:
                   description: |
                     You can sort the order of your nodes, regardless of where the nodes are in the hierarchy. The `sort_order` for each node. This value determines the order of nodes in the response for the `Get a Node’s Children` request. The node with the highest value of sort_order is displayed first. For example, a node with a sort_order value of 3 appears before a node with a sort_order value of 2.
-                    
+                     
                     - If you don’t provide `sort_order` when creating nodes, all child nodes in the response for `Get a Node’s Children` request are ordered by the `updated_at` time in descending order, with the most recently updated child node first.
                     - If you set `sort_order` for only a few child nodes or not all, the child nodes with a `sort_order` value appear first and then other child nodes appear in the order of `updated_at` time.
                   type: integer
@@ -6225,8 +6759,11 @@ components:
                 description:
                   description: A description of the duplicate hierarchy.
                   type: string
+                slug:
+                  description: The slug of the duplicate hierarchy. Must be lower case and use dashes instead of spaces.
+                  type: string
                 include_products:
-                  description: Specify `true` if you want the product associations in the existing nodes associated in your duplicated hierarchy. If not, specify `false`.
+                  description: Specify `true` if you want the product relationships in the existing nodes associated in your duplicated hierarchy. If not, specify `false`.
                   type: boolean
     tag:
       type: object
@@ -6254,12 +6791,12 @@ components:
             created_at:
               type: string
               description: The date and time a tag is created.
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             updated_at:
               type: string
               description: The date and time a tag is updated.
-              example: '2020-09-22T09:00:00'
+              example: '2020-09-22T09:00:00.000Z'
               format: date-time
             owner:
               description: The owner of a resource, either `organization` or `store`.
@@ -6275,6 +6812,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/tag'
+        links:
+          $ref: '#/components/schemas/multi_links'
         meta:
           type: object
           properties:
@@ -6342,6 +6881,7 @@ components:
               $ref: '#/components/schemas/req_attributes_custom_relationship'
   examples:
     multi:
+      summary: Get all jobs
       value:
         data:
           - type: pim-job
@@ -6383,6 +6923,7 @@ components:
           results:
             total: 1
     started:
+      summary: Started Job
       value:
         data:
           type: pim-job
@@ -6397,6 +6938,7 @@ components:
           meta:
             x_request_id: 7e832a26-d615-4305-b26a-e33c9c2fc06a
     successful:
+      summary: Product Import Job
       value:
         data:
           type: pim-job
@@ -6411,6 +6953,7 @@ components:
           meta:
             x_request_id: 7e832a26-d615-4305-b26a-e33c9c2fc06a
     product-export:
+      summary: Product Export Job
       value:
         data:
           type: pim-job
@@ -6427,6 +6970,7 @@ components:
             filter: eq(sku,product-1)
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     hierarchy-duplicate:
+      summary: Hierarchy Duplicate Job
       value:
         data:
           type: pim-job
@@ -6443,6 +6987,7 @@ components:
             hierarchy_id: c05bfefc-8de4-43ea-858b-eb8984ad9f8f
             x_request_id: an-x-request-id
     build-child-products:
+      summary: Build Child Products Job
       value:
         data:
           type: pim-job
@@ -6457,6 +7002,7 @@ components:
           meta:
             x_request_id: an-x-request-id
     cancelled:
+      summary: Cancelled Job
       value:
         data:
           type: pim-job
@@ -6471,12 +7017,16 @@ components:
           meta:
             x_request_id: 4fde01c1-95ba-4dd6-948e-b9d5763ff9c2
     errors:
+      summary: Errors Returned
       value:
         data:
           - type: pim-job-error
             id: 2950cae3-1050-4c43-9fbd-2aa60dc5c249
             attributes:
               message: 'data.attributes.sku: Must be unique amongst products.'
+        meta:
+          results:
+            total: 1
     multi_product_response:
       value:
         data:
@@ -6548,6 +7098,7 @@ components:
           results:
             total: 1
     product_request:
+      summary: Create a base product
       value:
         data:
           type: product
@@ -6584,6 +7135,7 @@ components:
                 name: T_Shirt
                 description: T-Shirt.
     build_rules_request:
+      summary: Create a base product, associate variations, configure build rules
       value:
         data:
           type: product
@@ -6614,6 +7166,7 @@ components:
                 - type: product-variation
                   id: b1ae545e-3375-455f-b5ea-09669b60996f
     bundle_sku_based_request:
+      summary: SKU-based bundles
       value:
         data:
           type: product
@@ -6646,6 +7199,7 @@ components:
                     quantity: 1
                     default: false
     bundle_sku_less_request:
+      summary: SKU-less bundles
       value:
         data:
           type: product
@@ -6674,7 +7228,72 @@ components:
                     type: product
                     quantity: 1
                     default: false
+    create_bundle_with_quantity_config:
+      summary: Create Bundle with Quantity Configuration
+      description: Create a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: draft
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
     create_single_product_response:
+      summary: Create a base product
       value:
         data:
           type: product
@@ -6741,6 +7360,7 @@ components:
               - standard
             updated_at: '2022-08-18T14:25:57.391Z'
     create_build_rules_response:
+      summary: Create a base product, associate variations, configure build rules
       value:
         data:
           type: product
@@ -6829,7 +7449,106 @@ components:
                   - id: a43d8b6f-b411-49aa-adaa-36a1a025051e
                     name: Blue
                     description: Color Blue
+    create_bundle_with_quantity_config_response:
+      summary: Create Bundle with Quantity Configuration
+      description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
+          relationships:
+            children:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/children
+            component_products:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/component_products
+            files:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/files
+            main_image:
+              data: null
+            templates:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/templates
+            variations:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/variations
+          meta:
+            created_at: '2024-04-14T10:34:00.000Z'
+            owner: organization
+            product_types:
+              - bundle
+            updated_at: '2024-04-14T10:34:00.000Z'
+            variation_matrix: {}
+        included:
+          main_images: []
+          files: []
     import:
+      summary: Successful Job
       value:
         data:
           type: pim-job
@@ -6844,6 +7563,7 @@ components:
           meta:
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     export:
+      summary: Successful Job
       value:
         data:
           type: pim-job
@@ -6860,6 +7580,7 @@ components:
             filter: eq(sku,product-1)
             x_request_id: fad8c5c0-9546-4e0c-b68e-8a2d809891e5
     get_single_product_response:
+      summary: Product
       value:
         data:
           type: product
@@ -6908,6 +7629,7 @@ components:
               - CRP_summer_session
               - CRP_winter_session
     get_bundle_response:
+      summary: Bundle
       value:
         data:
           type: product
@@ -6956,7 +7678,106 @@ components:
               - bundle
             updated_at: '2024-01-08T13:36:53.658Z'
             variation_matrix: {}
+    get_bundle_with_quantity_config_response:
+      summary: Bundle with Quantity Configuration
+      description: Retrieve a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
+          relationships:
+            children:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/children
+            component_products:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/component_products
+            files:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/files
+            main_image:
+              data: null
+            templates:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/templates
+            variations:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/variations
+          meta:
+            created_at: '2024-04-14T10:34:00.000Z'
+            owner: organization
+            product_types:
+              - bundle
+            updated_at: '2024-04-14T10:34:00.000Z'
+            variation_matrix: {}
+        included:
+          main_images: []
+          files: []
     get_parent_product_response:
+      summary: Parent Product
       value:
         data:
           type: product
@@ -7010,6 +7831,7 @@ components:
                     name: Red
                     description: This is a colour.
     get_child_product_response:
+      summary: Child Product
       value:
         data:
           type: product
@@ -7068,6 +7890,7 @@ components:
                   name: Red
                   description: '#EE2238'
     get_component_product_response:
+      summary: Component Product
       value:
         data:
           type: product
@@ -7200,6 +8023,7 @@ components:
                 updated_at: '2022-02-01T12:49:19.298Z'
                 variation_matrix: {}
     update_product_request:
+      summary: Update a base product
       value:
         data:
           type: product
@@ -7207,6 +8031,7 @@ components:
           attributes:
             name: UPDATED BestEver Range, Model 1a1a
     update_build_rules_request:
+      summary: Update a base product and build rules
       value:
         data:
           type: product
@@ -7219,6 +8044,8 @@ components:
                   - 0b261f7d-753d-4af6-b9f4-62b436cca37d
                   - 994c2029-519c-43d9-9c54-14f3af4e3efd
     update_custom_inputs_request:
+      summary: Update using custom_inputs
+      description: You can allow your shoppers to add custom text to a product when checking out their carts. This is useful, for example, if you have a product like a T-shirt that can be personalized. You can do this using the custom_inputs attribute when creating your products.
       value:
         data:
           type: product
@@ -7240,6 +8067,7 @@ components:
                       max_length: 50
                 required: false
     update_bundle_request:
+      summary: Update a bundle
       value:
         data:
           id: 8a0072c0-cedf-4e53-bdc4-a14a5d6389d5
@@ -7301,7 +8129,73 @@ components:
                     quantity: 1
                     default: false
                     sort_order: 3
+    update_bundle_with_quantity_config:
+      summary: Update Bundle with Quantity Configuration
+      description: Update a bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          type: product
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
     update_single_product_response:
+      summary: Update a base product
       value:
         data:
           type: product
@@ -7338,6 +8232,7 @@ components:
               - standard
             updated_at: '2023-09-28T10:43:41.72Z'
     update_build_rules_response:
+      summary: Update a base product, configure build rules
       value:
         data:
           type: product
@@ -7429,6 +8324,7 @@ components:
                     name: Blue
                     description: Color Blue
     update_custom_inputs_response:
+      summary: Update using custom_inputs
       value:
         data:
           type: product
@@ -7525,6 +8421,7 @@ components:
                     name: Blue
                     description: Color Blue
     update_bundle_response:
+      summary: Update a bundle
       value:
         data:
           type: product
@@ -7619,6 +8516,118 @@ components:
             owner: store
             updated_at: '2022-02-03T19:43:21.487Z'
             variation_matrix: {}
+    update_bundle_with_quantity_config_response:
+      summary: Update Bundle with Quantity Configuration
+      description: A bundle where each selected option can have a configurable quantity. In this example, syrup is optional (0-2 types) with up to 3 pumps per syrup, and exactly one coffee type must be selected.
+      value:
+        data:
+          type: product
+          id: 143e9ded-b549-4631-831c-d27f5fb2fe2e
+          attributes:
+            name: Coffee Bundle
+            description: A customizable coffee bundle with optional syrups and coffee options
+            sku: COFFEE-BUNDLE-001
+            commodity_type: physical
+            status: live
+            components:
+              syrup:
+                name: Syrup Selection
+                min: 0
+                max: 2
+                options:
+                  - id: vanilla-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                    default: true
+                  - id: salted-caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: hazelnut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: caramel-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: toffee-nut-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+                  - id: pumpkin-spice-id
+                    type: product
+                    quantity: 1
+                    min: 1
+                    max: 3
+              coffee:
+                name: Coffee Selection
+                min: 1
+                max: 1
+                options:
+                  - id: cappuccino-id
+                    type: product
+                    quantity: 1
+                    default: true
+                  - id: espresso-id
+                    type: product
+                    quantity: 1
+                  - id: latte-id
+                    type: product
+                    quantity: 1
+          relationships:
+            children:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/children
+            component_products:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/component_products
+            files:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/files
+            main_image:
+              data: null
+            templates:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/templates
+            variations:
+              data: []
+              links:
+                self: /products/143e9ded-b549-4631-831c-d27f5fb2fe2e/relationships/variations
+          meta:
+            created_at: '2024-04-14T10:34:00.000Z'
+            owner: organization
+            product_types:
+              - bundle
+            updated_at: '2024-04-14T10:34:00.000Z'
+            variation_matrix: {}
+        included:
+          main_images: []
+          files: []
+    attach_nodes_job_created:
+      value:
+        data:
+          type: pim-job
+          id: 1d9b101e-a40a-4e53-9f54-08a9ede65019
+          attributes:
+            completed_at: null
+            created_at: '2024-01-11T22:49:10.338Z'
+            started_at: null
+            status: pending
+            type: attach-nodes
+            updated_at: '2024-01-11T22:49:10.338Z'
+          meta:
+            x_request_id: 40995a1d-c0c1-4d52-a178-bfb5399ab0ec
     resp_multi_nodes:
       value:
         data:
@@ -7821,6 +8830,7 @@ components:
           - id: 43903bfa-5352-4a3d-9496-c9ab1229a175
             type: product-variation
     attach_custom_relationship_request:
+      summary: attach custom relationships to product
       value:
         data:
           - type: custom-relationship
@@ -7828,6 +8838,55 @@ components:
           - type: custom-relationship
             slug: CRP_cart_products
     resp_multi_custom_relationships:
+      value:
+        data:
+          - id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
+            type: custom-relationship
+            attributes:
+              name: Kitchen electrics
+              description: Kitchen electric devices
+              slug: CRP_kitchen_individual_devices
+              bi_directional: false
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+          - id: 21b1315b-c47f-4766-85bf-7bf0f94d73b6
+            type: custom-relationship
+            attributes:
+              name: Related Products
+              description: A list of related products shown on the PDP
+              slug: CRP_related_products
+              bi_directional: true
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+          - id: e390ff7e-efc4-4769-90d2-fceabcc1e2cd
+            type: custom-relationship
+            attributes:
+              name: Related Products
+              description: A list of related products shown on the PDP
+              slug: CRP_related_products
+              sort_order: 5
+              external_name: Similar items to consider
+              external_description: Check out these similar products that may also meet your needs or match your preferences.
+              bi_directional: false
+            meta:
+              owner: store
+              timestamps:
+                created_at: '2024-01-10T20:16:35.343Z'
+                updated_at: '2024-01-10T20:16:35.343Z'
+        links:
+          last: /pcm/custom_relationships?page[offset]=29&page[limit]=1
+          next: /pcm/custom_relationships?page[offset]=1&page[limit]=1
+        meta:
+          results:
+            total: 3
+    resp_attached_custom_relationships:
+      summary: Attached custom relationships
       value:
         data:
           - id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
@@ -7980,6 +9039,7 @@ components:
           results:
             total: 2
     create_variation:
+      summary: Create a variation
       value:
         data:
           type: product-variation
@@ -8252,6 +9312,114 @@ components:
                 locales:
                   fr-FR:
                     name: hierarchy 1 in French
+    resp_multi_nodes_or_hierarchies:
+      value:
+        data:
+          - id: 9ea0de15-3347-43dd-8faa-cd32f44a04c7
+            type: node
+            attributes:
+              description: Latest Ballet Shoes
+              locales:
+                fr-FR:
+                  name: Chaussons de ballet
+                  description: Dernières chaussures de ballet
+              name: Ballet Shoes
+              slug: ballet-shoes
+            relationships:
+              children:
+                data: []
+                links:
+                  related: /hierarchies/6183d10c-94b5-4caa-9f12-2f14cb738d41/nodes/9ea0de15-3347-43dd-8faa-cd32f44a04c7/children
+              products:
+                data: []
+                links:
+                  related: /hierarchies/6183d10c-94b5-4caa-9f12-2f14cb738d41/nodes/9ea0de15-3347-43dd-8faa-cd32f44a04c7/products
+            meta:
+              created_at: '2024-01-11T19:19:50.087Z'
+              owner: store
+              sort_order: 5
+              updated_at: '2024-01-11T19:56:53.695Z'
+              hierarchy_id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+              breadcrumbs:
+                - id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+                  name: Shoes
+                  slug: shoes
+                  locales:
+                    fr-FR:
+                      name: hierarchy 1 in French
+                - id: 9ea0de15-3347-43dd-8faa-cd32f44a04c7
+                  name: Ballet Shoes
+                  slug: ballet-shoes
+                  locales:
+                    fr-FR:
+                      name: Node 1 in French
+          - type: node
+            id: b2f5e53e-de3c-4548-98da-120f8b185d34
+            attributes:
+              description: All Dress Shoes
+              locales:
+                fr-FR:
+                  name: Chaussures habillées
+                  description: Toutes les chaussures habillées
+              name: Dress Shoes
+              slug: dress-shoes
+            relationships:
+              children:
+                data: []
+                links:
+                  related: /hierarchies/6183d10c-94b5-4caa-9f12-2f14cb738d41/nodes/b2f5e53e-de3c-4548-98da-120f8b185d34/children
+              products:
+                data: []
+                links:
+                  related: /hierarchies/6183d10c-94b5-4caa-9f12-2f14cb738d41/nodes/b2f5e53e-de3c-4548-98da-120f8b185d34/products
+            meta:
+              created_at: '2024-01-11T19:50:21.729Z'
+              owner: store
+              sort_order: 3
+              updated_at: '2024-01-11T19:50:21.729Z'
+              hierarchy_id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+              breadcrumbs:
+                - id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+                  name: Shoes
+                  slug: shoes
+                  locales:
+                    fr-FR:
+                      name: hierarchy 1 in French
+                - id: b2f5e53e-de3c-4548-98da-120f8b185d34
+                  name: Dress Shoes
+                  slug: dress-shoes
+                  locales:
+                    fr-FR:
+                      name: Node 2 in French
+          - type: hierarchy
+            id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+            attributes:
+              description: Shoes Category
+              locales:
+                fr-FR:
+                  name: Chaussures
+                  description: Catégorie de chaussures
+              name: Shoes
+              slug: shoes
+            relationships:
+              children:
+                data: []
+                links:
+                  related: /hierarchies/6183d10c-94b5-4caa-9f12-2f14cb738d41/children
+            meta:
+              created_at: '2024-01-10T20:16:35.343Z'
+              owner: store
+              updated_at: '2024-01-10T20:30:50.867Z'
+              breadcrumbs:
+                - id: 6183d10c-94b5-4caa-9f12-2f14cb738d41
+                  name: Shoes
+                  slug: shoes
+                  locales:
+                    fr-FR:
+                      name: hierarchy 1 in French
+        meta:
+          results:
+            total: 3
     update_hierarchy:
       value:
         data:
@@ -8480,6 +9648,7 @@ components:
           meta:
             x_request_id: 40995a1d-c0c1-4d52-a178-bfb5399ab0ec
     resp_multi_tags:
+      summary: Get all tags
       value:
         data:
           - type: tag
@@ -8502,6 +9671,7 @@ components:
           results:
             total: 2
     resp_single_tag:
+      summary: Get a tag
       value:
         data:
           type: tag
@@ -8597,7 +9767,8 @@ components:
             timestamps:
               created_at: '2024-01-10T20:16:35.343Z'
               updated_at: '2024-01-10T20:16:35.343Z'
-    custom_relationship_updated:
+    custom_relationship_get:
+      summary: Get
       value:
         data:
           type: custom-relationship
@@ -8629,6 +9800,25 @@ components:
             external_name: Similar items to consider
             external_description: Check out these similar products that may also meet your needs or match your preferences.
             bi_directional: false
+    custom_relationship_updated:
+      summary: Updated
+      value:
+        data:
+          type: custom-relationship
+          id: f3297ee8-da90-45e9-ae56-a2654aebbdfe
+          attributes:
+            name: Related Products
+            description: A list of related products shown on the PDP
+            slug: CRP_related_products
+            sort_order: 5
+            external_name: Similar items to consider
+            external_description: Check out these similar products that may also meet your needs or match your preferences.
+            bi_directional: false
+          meta:
+            owner: store
+            timestamps:
+              created_at: '2024-01-10T20:16:35.343Z'
+              updated_at: '2024-01-10T20:16:35.343Z'
   responses:
     bad_request:
       description: Bad request. The request failed validation.
@@ -8726,8 +9916,7 @@ components:
         minimum: 0
         maximum: 10000
         format: int64
-        example:
-          - '0'
+        example: 0
     page_limit:
       name: page[limit]
       in: query
@@ -8737,8 +9926,7 @@ components:
         minimum: 0
         maximum: 10000
         format: int64
-        example:
-          - '10'
+        example: 10
     filterproduct:
       name: filter
       in: query
@@ -8750,10 +9938,13 @@ components:
       explode: true
       schema:
         type: string
-        example:
-          - eq(name,some-name)
-          - like(name,*some-name*)
-          - filter=in(id,some-id)
+      examples:
+        eq:
+          value: eq(name,some-name)
+        like:
+          value: like(name,*some-name*)
+        in:
+          value: in(id,some-id)
     include:
       name: include
       in: query
@@ -8794,10 +9985,13 @@ components:
       explode: true
       schema:
         type: string
-        example:
-          - eq(name,some-name)
-          - like(name,*some-name*)
-          - filter=in(id,some-id)
+      examples:
+        eq:
+          value: eq(name,some-name)
+        like:
+          value: like(name,*some-name*)
+        in:
+          value: in(id,some-id)
     product_id:
       name: productID
       in: path
@@ -8849,17 +10043,35 @@ components:
       explode: true
       schema:
         type: string
-        example:
-          - eq(name,some-name)
-          - like(name,*some-name*)
-          - in(id,some-id)
-          - lt(id,100)
-          - le(created_at,2023-01-01)
-          - gt(updated_at,2023-01-01)
-          - ge(parent_id,500)
-          - eq(owner,store)
-          - eq(locales.fr-FR.name,Nom-du-produit)
-          - like(locales.es-ES.description,*descripción*)
+      examples:
+        eq:
+          value: eq(name,some-name)
+        like:
+          value: like(name,*some-name*)
+        in:
+          value: in(id,some-id)
+        lt:
+          value: lt(id,100)
+        le:
+          value: le(created_at,2023-01-01)
+        gt:
+          value: gt(updated_at,2023-01-01)
+        ge:
+          value: ge(parent_id,500)
+        eq-owner:
+          value: eq(owner,store)
+        eq-locale:
+          value: eq(locales.fr-FR.name,Nom-du-produit)
+        like-locale:
+          value: like(locales.es-ES.description,*descripción*)
+    include_hierarchies:
+      name: include_hierarchies
+      in: query
+      description: When true, includes hierarchy objects in the response alongside nodes
+      required: false
+      schema:
+        type: boolean
+        default: false
     hierarchy_id:
       name: hierarchyID
       in: path
@@ -8893,5 +10105,6 @@ components:
       explode: true
       schema:
         type: string
-        example:
-          - eq(owner,store)
+      examples:
+        eq-owner:
+          value: eq(owner,store)

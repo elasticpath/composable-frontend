@@ -19,7 +19,6 @@ export default defineConfig({
     fixFolderImportsPlugin(),
     fixExtensionsPlugin(),
   ],
-  external: ["@hey-api/client-fetch"],
   outDir: "dist",
   outExtension(ctx) {
     return {

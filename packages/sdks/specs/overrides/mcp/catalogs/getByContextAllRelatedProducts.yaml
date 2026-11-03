@@ -1,0 +1,6 @@
+x-mcp-title: Get a Shopper Product's Related Products
+x-mcp-description: >-
+  Lists the products linked to one product through a custom relationship, in the
+  catalog that the shopper's context selects. The relationship slug picks which
+  relationship to follow, and you can filter the results. To read a specific
+  catalog and release by ID instead, use the catalog related-products read.

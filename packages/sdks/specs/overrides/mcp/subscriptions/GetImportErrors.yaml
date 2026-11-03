@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the errors found in an import's JSONL file, ordered by line number
+  ascending and paginated. Each error gives the line number, the field and the
+  error message. Use it when an import fails or imports fewer records than it
+  uploaded.

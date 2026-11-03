@@ -1,0 +1,5 @@
+x-mcp-name: accounts_update_account_membership
+x-mcp-description: >-
+  Updates an account membership by account ID and membership ID. A membership's
+  account_member_id cannot be updated, so this call cannot relink the membership
+  to a different account member.

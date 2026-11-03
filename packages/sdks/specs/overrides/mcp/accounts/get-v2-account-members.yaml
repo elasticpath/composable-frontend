@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the account members in the store: the users who can act for accounts.
+  Filter by email, name, given name, middle name or family name, sort, and page
+  through the results. To see which accounts a member belongs to, list that
+  member's memberships.

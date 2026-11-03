@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Deletes an entry from the Custom API with this slug, through the extensions
+  endpoint. The identifier is the entry ID, or the URL-slug field's value if the
+  Custom API has one. Optionally send If-Match with the entry's ETag; a mismatch
+  returns 412.

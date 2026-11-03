@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists every node in one hierarchy, at all levels, from a published catalog
+  release; pass a release ID, or latestPublished for the newest release. Use it
+  to get a hierarchy's whole tree in one list. For only the nodes directly under
+  the hierarchy, list its children instead.

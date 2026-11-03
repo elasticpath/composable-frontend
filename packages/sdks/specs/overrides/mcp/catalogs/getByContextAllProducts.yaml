@@ -1,0 +1,7 @@
+x-mcp-title: Get Shopper Catalog Products
+x-mcp-description: >-
+  Lists the live products in the catalog that the shopper's context selects,
+  using the catalog rule that best matches it. Filter by name, sku, slug,
+  product type or tags, and include main images, files or bundle component
+  products. To read a specific catalog and release by ID instead, use the
+  catalog product reads.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a field of a Custom API by its field ID. You can change its name,
+  description, slug, presentation and validation, but not its field_type or
+  use_as_url_slug. Validation changes apply to new entries only; existing
+  entries are unaffected until updated.

@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists the features attached to a subscription offering. A feature is of type
+  access, promotion or usage and defines what a subscriber is entitled to.
+  Returns each feature's name, description and configuration.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Creates an account tag, a label with a name and description that you can
+  attach to accounts to organize and filter them, and to target discounts and
+  promotions. Attach the tag to accounts afterwards. A conflicting tag returns
+  409.

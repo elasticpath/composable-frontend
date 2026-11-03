@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
+  version: 26.1001.8242253
+  x-version-timestamp: 2026-10-01T12:24:43Z
   title: Subscriptions Introduction
   description: |
     Elastic Path Subscriptions allows you to offer your customers subscriptions and recurring billing for your plans and services. Elastic Path Subscriptions gives you the flexibility to pause, update, or reactivate your subscription offerings, change subscription cycles and apply discounts.
@@ -31,9 +32,9 @@ info:
 
     Elastic Path Subscriptions enables you to manage the billing and recurring payments associated with your customers subscriptions. Elastic Path Subscriptions provides seamless integration with Elastic Path Payments powered by Stripe. See [**Invoicing and Payments**](/docs/api/subscriptions/invoices).
 servers:
-  - url: https://euwest.api.elasticpath.com/v2
+  - url: https://euwest.api.elasticpath.com
     description: EU west cluster
-  - url: https://useast.api.elasticpath.com/v2
+  - url: https://useast.api.elasticpath.com
     description: US east cluster
 security:
   - BearerToken: []
@@ -142,29 +143,71 @@ tags:
 
       See [create a subscription](/docs/api/subscriptions/create-subscription).
 
-      #### Cancelling or pausing and resuming subscriptions
+      #### Cancelling, pausing, and resuming subscriptions
 
-      A subscriber can decide to cancel or pause and/or resume a subscription. The following example describes pausing or canceling and resuming a subscription.
+      A subscriber can cancel their own subscription, and can pause or resume it when the current pricing option's `can_pause` or `can_resume` allows it. A merchandizer can pause, resume, or cancel a subscription on a subscriber's behalf, regardless of those flags. The following example describes each lifecycle change.
 
-      1. The subscriber pauses or cancels the subscription. 
-         - The subscription status is `active`. 
-         - either `paused` or `cancelled` is set to `true`.
-         - either the `paused_at` or `cancelled_at` timestamp is populated with the date and time the subscription is paused or cancelled.
+      ##### Subscriber-initiated cancellation
+
+      1. The subscriber cancels the subscription.
+         - The subscription status is `active`.
+         - `cancelled` is set to `true`.
+         - the `cancelled_at` timestamp is populated with the date and time the subscription was cancelled.
+         - `end_date` indicates when the subscription will expire and end.
+      2. When the next billing run is due, the billing run checks the subscription state. If the subscription is cancelled then no invoice is created and the subscription status is updated to `inactive`.
+      3. Subsequent billing runs skip that subscription completely as the subscription status is `inactive`.
+
+      ##### Subscriber-initiated pause and resume
+
+      1. The subscriber pauses the subscription. This request is rejected if the current pricing option's `can_pause` is `false`.
+         - The subscription status is `active`.
+         - `paused` is set to `true`.
+         - the `paused_at` timestamp is populated with the date and time the subscription was paused.
+         - `paused_by` is set to `subscriber`. This field is visible only to merchandizer and store or organization-scoped callers.
+      2. When the next billing run is due, the billing run checks the subscription state. If the subscription is paused then no invoice is created and the subscription status is updated to `inactive`.
+      3. Subsequent billing runs skip that subscription completely as the subscription status is `inactive`.
+      4. The subscriber resumes the subscription. This request is rejected if the current pricing option's `can_resume` is `false`, or if `paused_by` is `dunning` or absent, meaning only a merchandizer can resume it instead.
+         - `paused` is set to `false`.
+         - the `resumed_at` timestamp is populated with the date and time the subscription is resumed.
+      5. When the next billing run is due, the billing run checks the subscription state. If `paused` is set to `false` then the billing run creates an invoice.
+      6. The payment run processes the invoice. Once the payment succeeds, the payment run updates the status of the subscription to `active`.
+
+      ##### Merchandizer-initiated pause, resume, or cancellation
+
+      1. The merchandizer pauses, resumes, or cancels the subscription on the subscriber's behalf.
+         - The subscription status is `active`.
+         - `paused` or `cancelled` is set to `true` (for pause or cancel).
+         - the `paused_at` or `cancelled_at` timestamp is populated with the date and time the subscription was paused or cancelled.
+         - for cancelled subscriptions, `end_date` indicates when the subscription will expire and end.
       2. When the next billing run is due, the billing run checks the subscription state. If the subscription state is paused or cancelled then no invoice is created and the subscription status is updated to `inactive`.
       3. Subsequent billing runs skip that subscription completely as the subscription status is `inactive`.
-      4. If the subscriber resumes the subscription:
-         - either `paused` or `cancelled` is set to `false`.
+      4. If the merchandizer resumes the subscription:
+         - `paused` or `cancelled` is set to `false`.
          - the `resumed_at` timestamp is populated with the date and time the subscription is resumed.
-      5. When the next billing run is due, the billing run checks the subscription state. If the `paused` or `cancelled` is set to `false` then the billing run creates an invoice.
-      6. The payment run processes the invoice. Once the payment succeeds then the payment run updates the status of the subscription to `active`.
+      5. When the next billing run is due, the billing run checks the subscription state. If `paused` or `cancelled` is set to `false` then the billing run creates an invoice.
+      6. The payment run processes the invoice. Once the payment succeeds, the payment run updates the status of the subscription to `active`.
 
       ### Orders
 
       When a customer chooses a subscription, they need to add the subscription to a cart, checkout the cart and then pay for the order. 
 
       1. When a customer adds a subscription to cart, this is handled using the `Add subscription to cart` endpoint. 
-      2. Once a subscription has been added to a cart, the [**Checkout API**](/docs/carts-orders/checkout-account-management-authentication-token) converts the cart to an order. 
+      2. Once a subscription has been added to a cart, the [**Checkout API**](/docs/api/carts/checkout-api) converts the cart to an order. 
       3. Once the order is created, payment needs to be taken. This is handled by Elastic Path Payments Powered by Stripe. See [**Payments**](/docs/api/subscriptions/invoices#payments).
+
+      ### Paying for an Order
+
+      Elastic Path Payments Powered by Stripe supports three ways to pay for an order that contains a subscription.
+
+      The first way is a single `purchase` payment for the full order amount. The gateway attempts to take payment immediately and returns the result of the attempt. See [**Payment Requests**](/docs/api/subscriptions/invoices#payment-requests) for the `purchase` payment mechanism.
+
+      The second and third ways use a payment intent. A payment intent tracks a multi-step Stripe payment. You set up the payment intent on the cart before checkout. This supports payment methods that need more than one step, for example a bank transfer or a card that needs additional verification.
+
+      A payment intent uses one of two capture methods. With automatic capture, the gateway takes payment as soon as the payment intent completes. This behaves like a `purchase` payment. With manual capture, the gateway only authorizes the payment. You send a separate capture request to take the payment.
+
+      Elastic Path Subscriptions creates the subscription only when the order reaches the `paid` payment status. For automatic capture, this happens as soon as the payment intent completes. For manual capture, this happens only after the separate capture request completes. An order that is only authorized does not create a subscription.
+
+      When an order pays for a subscription through a payment intent, Subscriptions reads the payment method and customer from that payment intent. Subscriptions uses this payment method for future invoice payments. A subscriber can update the payment method later. See [**Card Declines**](/docs/api/subscriptions/invoices#card-declines).
   - name: Jobs
     description: |
       Jobs are an asynchronous process that can be triggered manually or scheduled. 
@@ -202,6 +245,8 @@ tags:
       - `BillingRunReport` - This report provides invoice summaries such as invoices ready for payment, invoices that require tax, and invoice failures.
       - `TaxRunReport` - This report provides invoice summaries such as invoices to which tax was successfully or unsuccessfully added.
       - `PaymentRunReport` - This report provides invoice summaries such as invoices for which payment was attempted, failed payment attempts and totals collected by a payment run. 
+      - `NotificationRunReport` - This report provides notification summaries such as notifications sent and failed to send.
+      - `SubscriptionUpdateReport` - This report provides subscription update summaries such as subscriptions that were updated successfully and failed updates.
 
       See [Get a job](/docs/api/subscriptions/get-job) and [List jobs](/docs/api/subscriptions/list-jobs).
   - name: Imports
@@ -379,16 +424,16 @@ tags:
 
       #### Payment Requests
 
-      Subscriptions only supports the `purchase` payment mechanism. The gateway attempts to charge the customer immediately, and the result of the attempt is returned. If a payment fails, the invoice is kept as outstanding and the payment information, with the reason for the failure is attached to the invoice. A new payment run is required to attempt another payment. 
+      For recurring invoice payments, Subscriptions only supports the `purchase` payment mechanism. See [**Paying for an Order**](/docs/api/subscriptions/subscriptions#paying-for-an-order) for the payment methods available for the initial order payment. The gateway attempts to charge the customer immediately, and the result of the attempt is returned. If a payment fails, the invoice is kept as outstanding and the payment information, with the reason for the failure is attached to the invoice. A new payment run is required to attempt another payment. 
 
       When sending a payment request to the Payments service, you must specify the following.
 
       | Attribute | Required | Description |
       | --- | --- | --- |
-      | `gateway` | Required| Either `elastic_path_payments_stripe` or `authorize_net`. |
+      | `gateway` | Required| One of `elastic_path_payments_stripe`, `authorize_net` and `stripe_payment_intents`. |
       | `method` | Required | Must be `purchase`.
       | `payment` | Required | The type of payment, for example, `pm_card_visa_debit`.
-      | `options` | Required | These options must be set as they set up the card to be used in future without the customer being present. If these options are not set, future payments may fail. There are two options. <ul><li>`off_session`. Must be set to `true`. </li><li>`confirm`. Must be set to `true`.</li></ul> |
+      | `options` | Required | These options must be set so that the payment method can be reused in future without the customer being present. If these options are not set, future payments may fail. There are two options. <ul><li>`customer`. The ID of the Stripe customer to attach the payment method to.</li><li>`setup_future_usage`. Must be set to `off_session`.</li></ul> |
 
       #### External Payments
 
@@ -416,7 +461,7 @@ tags:
 
       - Do nothing - the subscription remains active and Subscriptions does not attempt to retry the payment. However, the subscription is still available for a subscriber to use.
       - Suspend the subscription. Subscriptions does not attempt to retry the payment. A subscriber can choose to pay the outstanding invoice. However, a subscriber cannot renew their subscription; a merchandizer must renew the subscription on behalf of the subscriber.
-      - close a subscription. The subscription ends and it's status becomes `inactive`. However, a merchandizer can choose to resume the subscription if a subscriber pays the outstanding payment.
+      - close a subscription. The subscription ends and it's status becomes `inactive`. However, a merchandizer can choose to resume the subscription if a subscriber pays the outstanding payment. 
   - name: Proration Policies
     description: |
       Proration is the adjustment of charges or credits on a subscriber's account based on the amount of time a service is used. Proration ensures that subscribers are only charged for the actual time they use the service, whether they upgrade, downgrade, start, or cancel their subscription partway through a billing cycle. This means fair billing for your subscribers and provides you with the flexibility to change your subscribers subscriptions at any time. 
@@ -471,9 +516,7 @@ tags:
       | Schedule | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-schedule.created`</li><li>`subscription-schedule.updated`</li><li>`subscription-schedule.deleted`</li></ul> | Store |
       | Subscriber | <ul><li>Created</li><li>Updated</li><li>Deleted</li></ul> | <ul><li>`subscription-subscriber.created`</li><li>`subscription-subscriber.updated`</li><li>`subscription-subscriber.deleted`</li></ul> | Store |
 paths:
-  /subscriptions/offerings:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/offerings:
     post:
       tags:
         - Offerings
@@ -519,14 +562,13 @@ paths:
         | Operator | Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `external_ref`, `plans.external_ref`, `proration_policy_id` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
-        | `in` | `plans.external_ref` | In. Checks if the values are included in the specified string. If they are, the condition is true. |
+        | `in` | `external_ref`, `plans.external_ref`, `proration_policy_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/OfferingInclude'
       operationId: ListOfferings
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of offerings is returned.
@@ -547,7 +589,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/build:
+  /v2/subscriptions/offerings/build:
     post:
       tags:
         - Offerings
@@ -571,7 +613,7 @@ paths:
              - Product Experience Manager products. Specify the Product Experience Manager product ID in `external_ref` in `PlanAttributes`. For the remaining plan attributes, you can specify their values to match the values of the existing Product Experience Manager product attributes. However, you can also specify different values, depending on your requirements.
 
         2. Specify the pricing options to build with the offering. Pricing options are the rules that govern your subscription, for example, any discount. You can combine and reuse pricing options for as many plans as you want, making it quick and easy to create your subscription offerings.
-          An offering must have at least one pricing option.
+          An offering must have at least one pricing option. 
       operationId: BuildOffering
       requestBody:
         content:
@@ -597,7 +639,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}:
+  /v2/subscriptions/offerings/{offering_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -612,8 +654,6 @@ paths:
         - Offerings
       summary: Get offering
       operationId: GetOffering
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. The details of the subscription offering are returned.
@@ -680,7 +720,7 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/features/{feature_uuid}:
+  /v2/subscriptions/offerings/{offering_uuid}/features/{feature_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -694,6 +734,27 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a feature in an offering
+      operationId: GetOfferingFeature
+      tags:
+        - Offerings
+      responses:
+        '200':
+          description: Success. The details of the feature are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingFeature'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Updates a feature in an offering
       description: Use the unique identifier of the feature in the offering that you want to update. Any modifications that you make to the features in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
@@ -746,7 +807,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
-  /subscriptions/offerings/{offering_uuid}/features/attach:
+  /v2/subscriptions/offerings/{offering_uuid}/features/attach:
     parameters:
       - name: offering_uuid
         in: path
@@ -793,7 +854,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/pricing-options:
+  /v2/subscriptions/offerings/{offering_uuid}/pricing-options:
     parameters:
       - name: offering_uuid
         in: path
@@ -809,8 +870,6 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingPricingOptions
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of pricing options attached with the offering is returned.
@@ -866,7 +925,7 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}:
+  /v2/subscriptions/offerings/{offering_uuid}/pricing-options/{pricing_option_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -880,6 +939,27 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a pricing option in an offering
+      operationId: GetOfferingPricingOption
+      tags:
+        - Offerings
+      responses:
+        '200':
+          description: Success. The details of the pricing option are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingPricingOption'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Update a pricing option in an offering
       operationId: UpdateOfferingPricingOption
@@ -931,7 +1011,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
-  /subscriptions/offerings/{offering_uuid}/features:
+  /v2/subscriptions/offerings/{offering_uuid}/features:
     parameters:
       - name: offering_uuid
         in: path
@@ -947,8 +1027,6 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingFeatures
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of subscription features attached to the offering is returned.
@@ -1004,7 +1082,7 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/plans:
+  /v2/subscriptions/offerings/{offering_uuid}/plans:
     parameters:
       - name: offering_uuid
         in: path
@@ -1020,8 +1098,6 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListOfferingPlans
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of subscription plans attached to the offering is returned.
@@ -1077,7 +1153,7 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}:
+  /v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}:
     parameters:
       - name: offering_uuid
         in: path
@@ -1091,6 +1167,27 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a plan in an offering
+      operationId: GetOfferingPlan
+      tags:
+        - Offerings
+      responses:
+        '200':
+          description: Success. The details of the plan are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingPlan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       summary: Update a plan in an offering
       description: Use the unique identifier of the plan in the offering that you want to update. Any modifications that you make to the plans in an offering, does not affect any active subscriptions. The changes take effect on all new subscriptions that are created.
@@ -1143,7 +1240,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
-  /subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options:
+  /v2/subscriptions/offerings/{offering_uuid}/plans/{plan_uuid}/relationships/pricing_options:
     parameters:
       - name: offering_uuid
         in: path
@@ -1160,8 +1257,6 @@ paths:
     get:
       summary: List the pricing options available to a plan in an offering
       operationId: ListOfferingPlanPricingOptions
-      x-sdk-filter:
-        - shopper
       tags:
         - Offerings
       responses:
@@ -1246,9 +1341,7 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/subscriptions:
     post:
       tags:
         - Subscriptions
@@ -1283,12 +1376,11 @@ paths:
         - Subscriptions
       summary: List subscriptions
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
         - $ref: '#/components/parameters/SubscriptionInclude'
       operationId: ListSubscriptions
-      x-sdk-filter:
-        - shopper
       description: |
         Retrieves a list of all subscriptions.
 
@@ -1301,6 +1393,7 @@ paths:
         | Operator | Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
 
         ### Including Resources
 
@@ -1333,7 +1426,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}:
+  /v2/subscriptions/subscriptions/{subscription_uuid}:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1348,8 +1441,6 @@ paths:
         - Subscriptions
       summary: Get subscription
       operationId: GetSubscription
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. The details of a subscription are returned.
@@ -1401,6 +1492,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
@@ -1419,7 +1512,146 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/plans:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/features/{feature_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: feature_uuid
+        in: path
+        description: The unique identifier of the feature.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a feature in a subscription
+      operationId: GetSubscriptionFeature
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: Success. The details of the feature are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingFeature'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/subscriptions/{subscription_uuid}/plans/{plan_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: plan_uuid
+        in: path
+        description: The unique identifier of the plan.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a plan in a subscription
+      operationId: GetSubscriptionPlan
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: Success. The details of the plan are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingPlan'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options/{pricing_option_uuid}:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: pricing_option_uuid
+        in: path
+        description: The unique identifier of the pricing option.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      summary: Get a pricing option in a subscription
+      operationId: GetSubscriptionPricingOption
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: Success. The details of the pricing option are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OfferingPricingOption'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/subscriptions/{subscription_uuid}/features:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      tags:
+        - Subscriptions
+      summary: List an subscriptions features
+      operationId: ListSubscriptionFeatures
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      responses:
+        '200':
+          description: Success. A list of subscription features is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OfferingFeature'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/subscriptions/{subscription_uuid}/plans:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1433,8 +1665,6 @@ paths:
       summary: List subscription plans
       description: Retrieves a list of plans associated with the specified subscription. Using this endpoint you can see the plan that is currently active in a subscription. If `active_plan` is `true`, a plan is active in a subscription. If `active_plan` is null, the pricing option is not active.
       operationId: ListSubscriptionPlans
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of subscription plans is returned.
@@ -1491,7 +1721,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/pricing-options:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/pricing-options:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1505,8 +1735,6 @@ paths:
       summary: List subscription pricing options
       description: Retrieves a list of pricing options associated with the specified subscription. Using this endpoint you can see the pricing options that are currently active in a subscription. If `active_pricing_option` is `true`, a pricing option is active in a subscription. If `active_pricing_option` is null, the pricing option is not active.
       operationId: ListSubscriptionPricingOptions
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of subscription pricing options is returned.
@@ -1525,7 +1753,55 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/states:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/proration-preview:
+    parameters:
+      - name: subscription_uuid
+        in: path
+        description: The unique identifier of the subscription.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    post:
+      tags:
+        - Subscriptions
+      summary: Preview a subscription proration
+      description: |
+        Computes the proration amounts a prospective plan or pricing option change would produce, without
+        persisting anything or affecting billing. Use this to show a subscriber the cost impact of a change
+        before submitting it via a subscription update.
+
+        A `200` response with `would_prorate: false` is not an error - it means the prospective change would
+        not result in a proration being applied if actually submitted. See `rejection_reason`.
+      operationId: CreateSubscriptionProrationPreview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/ProrationPreviewRequest'
+      responses:
+        '200':
+          description: Success. The proration preview was computed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProrationPreview'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1537,8 +1813,6 @@ paths:
       tags:
         - Subscriptions
       summary: Create a subscription state
-      x-sdk-filter:
-        - shopper
       description: |
         The subscription lifecycle is the states that a subscription can go through when a customer subscribes to a service or a plan. 
 
@@ -1549,6 +1823,8 @@ paths:
         - `paused`
         - `resumed`
         For more information, see [Managing the Subscription Lifecycle](/docs/api/subscriptions/subscriptions#managing-the-subscription-lifecycle).
+
+        Immediate cancellation (`cancel` with `cancel_immediately: true`) ends the subscription and updates entitlements in this request; it does **not** issue refunds or modify paid invoices. Use payments refund flows separately if needed.
       operationId: CreateSubscriptionState
       requestBody:
         content:
@@ -1565,8 +1841,12 @@ paths:
           description: Success. The subscription's state has changed.
         '400':
           $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
         '500':
           $ref: '#/components/responses/InternalServerError'
     get:
@@ -1574,8 +1854,6 @@ paths:
         - Subscriptions
       summary: List subscription states
       operationId: ListSubscriptionStates
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of subscription states is returned.
@@ -1594,7 +1872,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/states/{state_uuid}:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1613,8 +1891,6 @@ paths:
         - Subscriptions
       summary: Get subscription state
       operationId: GetSubscriptionState
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A subscription state is returned.
@@ -1631,9 +1907,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/jobs:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/jobs:
     post:
       tags:
         - Jobs
@@ -1682,7 +1956,9 @@ paths:
         | Operator | Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListJobs
@@ -1702,7 +1978,7 @@ paths:
                     $ref: '#/components/schemas/Links'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/jobs/{job_uuid}:
+  /v2/subscriptions/jobs/{job_uuid}:
     parameters:
       - name: job_uuid
         in: path
@@ -1741,9 +2017,7 @@ paths:
           description: Success. The job was deleted.
         '409':
           $ref: '#/components/responses/WriteConflictError'
-  /subscriptions/imports:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/imports:
     post:
       tags:
         - Imports
@@ -1786,6 +2060,7 @@ paths:
       description: |
         Retrieves a list of all import jobs.
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListImportJobs
@@ -1805,7 +2080,7 @@ paths:
                     $ref: '#/components/schemas/Links'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/imports/{import_uuid}:
+  /v2/subscriptions/imports/{import_uuid}:
     parameters:
       - name: import_uuid
         in: path
@@ -1838,7 +2113,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/imports/{import_uuid}/errors:
+  /v2/subscriptions/imports/{import_uuid}/errors:
     parameters:
       - name: import_uuid
         in: path
@@ -1878,7 +2153,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/invoices:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1895,8 +2170,6 @@ paths:
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListSubscriptionInvoices
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of invoices is returned.
@@ -1913,7 +2186,7 @@ paths:
                     $ref: '#/components/schemas/Links'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1936,8 +2209,6 @@ paths:
       summary: List subscription invoice payments
       description: Lists all invoice payments for a given invoice.
       operationId: ListSubscriptionInvoicePayments
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. Payments for the invoice are returned.
@@ -1952,7 +2223,7 @@ paths:
                       $ref: '#/components/schemas/SubscriptionInvoicePayment'
                   links:
                     $ref: '#/components/schemas/Links'
-  /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}/payments/{payment_uuid}:
     parameters:
       - name: subscription_uuid
         in: path
@@ -1978,8 +2249,6 @@ paths:
       summary: Get subscription invoice payment
       description: Gets a specific payment for a given invoice.
       operationId: GetSubscriptionInvoicePayment
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. Specific payment for the invoice is returned.
@@ -1992,7 +2261,7 @@ paths:
                     $ref: '#/components/schemas/SubscriptionInvoicePayment'
         '404':
           $ref: '#/components/responses/NotFoundError'
-  /subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}:
+  /v2/subscriptions/subscriptions/{subscription_uuid}/invoices/{invoice_uuid}:
     parameters:
       - name: subscription_uuid
         in: path
@@ -2012,8 +2281,6 @@ paths:
       summary: Get subscription invoice
       description: Gets a specific invoice for a given subscription.
       operationId: GetSubscriptionInvoice
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. An invoice is returned.
@@ -2028,7 +2295,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/invoices:
+  /v2/subscriptions/invoices:
     get:
       tags:
         - Invoices
@@ -2045,13 +2312,12 @@ paths:
         | Operator |Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `subscriber_id`, `subscription_id`, `outstanding`, `tax_required` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `subscriber_id`, `subscription_id` | In. Checks if the value is in the specified list. If it is, the condition is true. |
       parameters:
         - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListInvoices
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. A list of invoices is returned.
@@ -2070,7 +2336,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/invoices/{invoice_uuid}:
+  /v2/subscriptions/invoices/{invoice_uuid}:
     parameters:
       - name: invoice_uuid
         in: path
@@ -2083,8 +2349,6 @@ paths:
         - Invoices
       summary: Get invoice
       operationId: GetInvoice
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. The details of the invoice are returned.
@@ -2101,7 +2365,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/invoices/{invoice_uuid}/payments:
+  /v2/subscriptions/invoices/{invoice_uuid}/payments:
     parameters:
       - name: invoice_uuid
         in: path
@@ -2131,7 +2395,7 @@ paths:
                       $ref: '#/components/schemas/SubscriptionInvoicePayment'
                   links:
                     $ref: '#/components/schemas/Links'
-  /subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}:
+  /v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}:
     parameters:
       - name: invoice_uuid
         in: path
@@ -2199,9 +2463,128 @@ paths:
           $ref: '#/components/responses/WriteConflictError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/schedules:
+  /v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}/refunds:
     parameters:
-      - $ref: '#/components/parameters/Filter'
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: payment_uuid
+        in: path
+        description: The unique identifier of the payment.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    post:
+      operationId: CreateInvoicePaymentRefund
+      summary: Create a refund for an invoice payment
+      description: Creates a refund for a paid invoice.
+      tags:
+        - Invoices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/CreateInvoicePaymentRefund'
+      responses:
+        '201':
+          description: Success. The payment refund is completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoicePaymentRefund'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/UnprocessableContent'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+      operationId: ListInvoicePaymentRefunds
+      summary: List invoice payment refunds
+      description: List all refunds for an invoice payments
+      tags:
+        - Invoices
+      responses:
+        '200':
+          description: Success. Refunds for an invoice payment are returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionInvoicePaymentRefund'
+                  links:
+                    $ref: '#/components/schemas/Links'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/invoices/{invoice_uuid}/payments/{payment_uuid}/refunds/{refund_uuid}:
+    parameters:
+      - name: invoice_uuid
+        in: path
+        description: The unique identifier of the invoice.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: payment_uuid
+        in: path
+        description: The unique identifier of the payment.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: refund_uuid
+        in: path
+        description: The unique identifier of the refund.
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+    get:
+      operationId: GetInvoicePaymentRefund
+      summary: Get a refund for an invoice payment
+      description: Get a refund for a paid invoice.
+      tags:
+        - Invoices
+      responses:
+        '200':
+          description: Success. Specific refund for the invoice payment is returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SubscriptionInvoicePaymentRefund'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/subscriptions/schedules:
     get:
       tags:
         - Schedules
@@ -2218,7 +2601,9 @@ paths:
         | Operator | Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListSchedules
@@ -2269,7 +2654,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/schedules/{schedule_uuid}:
+  /v2/subscriptions/schedules/{schedule_uuid}:
     parameters:
       - name: schedule_uuid
         in: path
@@ -2345,14 +2730,13 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscribers:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/subscribers:
     get:
       tags:
         - Subscribers
       summary: List subscribers
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       operationId: ListSubscribers
@@ -2368,6 +2752,9 @@ paths:
         | Operator | Attribute | Description |
         | --- | --- | --- | 
         | `eq` | `account_id`, `name`, `email`, `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `account_id`, `name`, `email`, `external_ref` | In. Checks if the value is in the specified list. If it is, the condition is true. |
+        | `like` | `name`, `email` | Partial match (case-sensitive). Use `*` at the start, end, or both to match any sequence of characters (e.g. `*substring`, `substring*`, `*substring*`). |
+        | `ilike` | `name`, `email` | Partial match (case-insensitive). Same as `like` but matching ignores case. Use `*` at the start, end, or both to match any sequence of characters. |
       responses:
         '200':
           description: Success. A list of subscribers is returned.
@@ -2415,7 +2802,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/subscribers/{subscriber_uuid}:
+  /v2/subscriptions/subscribers/{subscriber_uuid}:
     parameters:
       - name: subscriber_uuid
         in: path
@@ -2491,7 +2878,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/dunning-rules:
+  /v2/subscriptions/dunning-rules:
     post:
       tags:
         - Dunning Rules
@@ -2578,7 +2965,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/dunning-rules/{dunning_rule_uuid}:
+  /v2/subscriptions/dunning-rules/{dunning_rule_uuid}:
     parameters:
       - name: dunning_rule_uuid
         in: path
@@ -2656,7 +3043,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/proration-policies:
+  /v2/subscriptions/proration-policies:
     post:
       tags:
         - Proration Policies
@@ -2716,7 +3103,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/proration-policies/{proration_policy_uuid}:
+  /v2/subscriptions/proration-policies/{proration_policy_uuid}:
     parameters:
       - name: proration_policy_uuid
         in: path
@@ -2801,9 +3188,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/features:
-    parameters:
-      - $ref: '#/components/parameters/Filter'
+  /v2/subscriptions/features:
     post:
       tags:
         - Features
@@ -2837,6 +3222,7 @@ paths:
       tags:
         - Features
       parameters:
+        - $ref: '#/components/parameters/Filter'
         - $ref: '#/components/parameters/PageOffset'
         - $ref: '#/components/parameters/PageLimit'
       summary: List features
@@ -2853,6 +3239,7 @@ paths:
         | --- | --- | --- | 
         | `eq` | `external_ref` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
         | `eq` | `tag` | Equals. Checks if the values of two operands are equal. If they are, the condition is true. |
+        | `in` | `external_ref`, `tag` | In. Checks if the value is in the specified list. If it is, the condition is true. |
       operationId: ListFeatures
       responses:
         '200':
@@ -2872,7 +3259,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /subscriptions/features/{feature_uuid}:
+  /v2/subscriptions/features/{feature_uuid}:
     parameters:
       - name: feature_uuid
         in: path
@@ -2885,8 +3272,6 @@ paths:
         - Features
       summary: Get feature
       operationId: GetFeature
-      x-sdk-filter:
-        - shopper
       responses:
         '200':
           description: Success. The feature details are returned.
@@ -3057,6 +3442,19 @@ components:
                   - title: Permission denied
                     status: '404'
                     detail: 'Permission denied: plan tenancy mismatch'
+    UnprocessableContent:
+      description: Unprocessable Content.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            cannot-process-refund:
+              value:
+                errors:
+                  - title: Unprocessable Content
+                    status: '422'
+                    detail: 'Unprocessable Content: cannot process the refund'
     ValidationError:
       description: Bad request. The request failed validation.
       content:
@@ -3206,6 +3604,12 @@ components:
       example: subscription_invoice_payment
       enum:
         - subscription_invoice_payment
+    SubscriptionInvoicePaymentRefundType:
+      type: string
+      description: This represents the type of resource object being returned. Always `subscription_invoice_payment_refund`.
+      example: subscription_invoice_payment_refund
+      enum:
+        - subscription_invoice_payment_refund
     Links:
       type: object
       additionalProperties:
@@ -3421,6 +3825,7 @@ components:
           amount:
             type: integer
             format: int64
+            minimum: 0
             example: 100
             description: The value as a whole number of the currency's smallest subdivision.
           includes_tax:
@@ -3476,6 +3881,11 @@ components:
           $ref: '#/components/schemas/PriceFormatting'
         with_tax:
           $ref: '#/components/schemas/PriceFormatting'
+        tax:
+          description: |
+            Tax component when itemized (for example on subscription invoices). Omitted for catalog prices
+            that only expose with/without tax.
+          $ref: '#/components/schemas/PriceFormatting'
       example:
         without_tax:
           amount: 100
@@ -3485,6 +3895,10 @@ components:
           amount: 110
           currency: USD
           formatted: $1.10
+        tax:
+          amount: 10
+          currency: USD
+          formatted: $0.10
     PriceFormatting:
       required:
         - amount
@@ -3731,6 +4145,13 @@ components:
       allOf:
         - $ref: '#/components/schemas/PlanResponseAttributes'
         - $ref: '#/components/schemas/OfferingPlanResponseExtraAttributes'
+    PlanCustomAttributes:
+      type: object
+      description: A map of merchant-defined string attributes attached to the plan. Carried onto any subscription created from this plan.
+      maxProperties: 100
+      additionalProperties:
+        type: string
+        maxLength: 512
     OfferingPlanExtraAttributes:
       properties:
         feature_configurations:
@@ -3738,6 +4159,8 @@ components:
           description: A map of configurations indicating which features are available for the plan
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfiguration'
+        custom_attributes:
+          $ref: '#/components/schemas/PlanCustomAttributes'
     OfferingPlanResponseExtraAttributes:
       required:
         - feature_configurations
@@ -3747,6 +4170,11 @@ components:
           description: A map of configurations indicating which features are available for the plan
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfiguration'
+        custom_attributes:
+          type: object
+          description: A map of merchant-defined string attributes attached to the plan. Carried onto any subscription created from this plan.
+          additionalProperties:
+            type: string
     PlanResponseAttributes:
       allOf:
         - $ref: '#/components/schemas/PlanAttributes'
@@ -3794,6 +4222,14 @@ components:
           description: A map of configurations indicating which features are available for the plan
           additionalProperties:
             $ref: '#/components/schemas/FeaturePlanConfigurationUpdate'
+        custom_attributes:
+          type: object
+          description: A per-key add/replace/remove map of custom attributes. A key omitted from this map is left untouched; a key explicitly set to null is removed; a key set to a string value is added or replaced.
+          maxProperties: 100
+          additionalProperties:
+            type: string
+            nullable: true
+            maxLength: 512
     PlanUpdateAttributes:
       properties:
         external_ref:
@@ -4107,6 +4543,11 @@ components:
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
+        allow_negative_proration_refund:
+          type: boolean
+          default: false
+          example: false
+          description: Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
     ProrationPolicyUpdateAttributes:
       properties:
         external_ref:
@@ -4129,6 +4570,10 @@ components:
           x-go-type-import:
             name: model
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        allow_negative_proration_refund:
+          type: boolean
+          example: false
+          description: Set to `true` to allow an automatic gateway refund when a proration would otherwise be rejected for netting negative.
     ProrationPolicyMeta:
       readOnly: true
       required:
@@ -4199,6 +4644,13 @@ components:
           description: The number of intervals from the start of the subscription before billing starts. Used with `billing_interval_type`. For example, if `billing_interval_type` is `months`, and `trial_period` is `1`, the trial period is 1 month.
           example: 7
           minimum: 0
+        lead_time:
+          $ref: '#/components/schemas/LeadTime'
+        notification_schedule:
+          type: array
+          x-go-type-skip-optional-pointer: true
+          items:
+            $ref: '#/components/schemas/NotificationSchedule'
         plan_length:
           type: integer
           description: The number of intervals that the subscription runs for.
@@ -4280,6 +4732,12 @@ components:
           description: The length of time for which a subscription plan is valid. For example, six months after which the plan is renewed.
           example: 12
           minimum: 1
+        lead_time:
+          $ref: '#/components/schemas/NullableLeadTime'
+        notification_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSchedule'
         end_behavior:
           type: string
           description: Enables you to specify recurring payments. If `end_behavior` is `roll`, customers pay regularly and repeatedly. If `end_behavior` is `close`, customers pay a total amount in a limited number of partial payments.
@@ -4748,7 +5206,7 @@ components:
         currency:
           $ref: '#/components/schemas/CurrencyIdentifier'
         payment_authority:
-          $ref: '#/components/schemas/PaymentAuthority'
+          $ref: '#/components/schemas/CreatePaymentAuthority'
         manual_payments:
           $ref: '#/components/schemas/ManualPayments'
         name:
@@ -4774,6 +5232,11 @@ components:
           description: When importing an active subscription from an existing system you can specify the date and time of the start of the most recent period. This may only be supplied when `first_invoice_paid` is true. As well as creating the subscription a settled invoice is created to cover the correct billing period.
           type: string
           example: '2017-01-10T11:41:19.244842Z'
+        override_first_period_end_date:
+          description: Optional. May only be set when `started_at` is set. When supplied, overrides the default first billing period end (start + 1 interval). The first billing period runs from the subscription start date to this date. The subscriber is charged the standard period price for the first period. Subsequent billing periods start from this date. Must be after the subscription start date.
+          type: string
+          format: date-time
+          example: '2027-02-01T00:00:00Z'
         offering:
           $ref: '#/components/schemas/OfferingAttributes'
         features:
@@ -4815,6 +5278,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/PlanAttributes'
         - $ref: '#/components/schemas/SelectedMeta'
+        - $ref: '#/components/schemas/EmbeddedOfferingPlanExtraAttributes'
+    EmbeddedOfferingPlanExtraAttributes:
+      properties:
+        custom_attributes:
+          $ref: '#/components/schemas/PlanCustomAttributes'
     SelectedMeta:
       properties:
         meta:
@@ -4876,12 +5344,16 @@ components:
     SubscriptionUpdateAttributes:
       properties:
         pricing_option_id:
+          type: string
+          format: uuid
           x-go-type: uuid.UUID
           x-go-type-import:
             name: uuid
             path: github.com/google/uuid
           example: 00000000-0000-0000-0000-000000000001
         plan_id:
+          type: string
+          format: uuid
           x-go-type: uuid.UUID
           x-go-type-import:
             name: uuid
@@ -4967,6 +5439,36 @@ components:
           description: The time when the subscription becomes eligible for a new invoice. The next invoice will be generated at the next billing run after this point.
           type: string
           example: '2017-01-10T11:41:19.244842Z'
+        pending_price_change:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+        price_update_history:
+          description: A history of price updates that have been applied to this subscription.
+          type: array
+          x-go-type-skip-optional-pointer: true
+          items:
+            $ref: '#/components/schemas/SubscriptionPriceUpdateHistoryEntry'
+        last_refund_id:
+          description: The ID of the most recent Proration Refund issued for this subscription, if any.
+          type: string
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        last_refund_amount:
+          description: The amount of the most recent Proration Refund issued for this subscription, if any.
+          type: integer
+          format: int64
+          example: 1480
+        paused_by:
+          description: Who or what most recently paused this subscription, while it remains paused. Absent when the subscription has never been paused, or is not currently paused (cleared on resume). Only visible to merchandizer/store or organization-scoped callers.
+          type: string
+          example: subscriber
+          enum:
+            - subscriber
+            - merchandizer
+            - dunning
+          x-go-type: model.PausedBy
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
     SubscriptionTimestamps:
       allOf:
         - $ref: '#/components/schemas/Timestamps'
@@ -4984,7 +5486,10 @@ components:
               type: string
               example: '2017-01-10T11:41:19.244842Z'
             end_date:
-              description: The date and time a subscription will end.
+              description: |
+                The date and time a subscription will end.
+                - If the subscription offering pricing option end behavior is `close`, `end_date` is set to the billing period end date upon subscription creation.
+                - If the subscription offering pricing option end behavior is "roll": `end_date` is set to the billing period end date when the subscription is cancelled.
               type: string
               example: '2017-01-10T11:41:19.244842Z'
             go_live_after:
@@ -5036,6 +5541,20 @@ components:
       properties:
         action:
           $ref: '#/components/schemas/SubscriptionStateAction'
+        cancel_immediately:
+          type: boolean
+          default: false
+          example: false
+          description: |
+            When `action` is `cancel`, if `true`, the subscription moves to `inactive` immediately with entitlements updated in this request,
+            and a `canceled` event is emitted (not `pending_cancel`). Omitted or `false` preserves end-of-period cancellation.
+            Subscribers may not set this to `true` and will receive a 403.
+
+            Immediate cancellation does **not** trigger any sort of refund; those require separate API flows.
+
+            Canceling a subscription that is still `pending` (has not reached its `go_live_after` date and has no invoices) is always immediate,
+            regardless of this flag's value, since there is no billing period in progress to defer to. Subscribers may cancel their own pending
+            subscription without needing to set this flag.
     SubscriptionStateType:
       type: string
       description: This represents the type of resource object being returned. Always `subscription_state`.
@@ -5083,6 +5602,148 @@ components:
           $ref: '#/components/schemas/SubscriptionStateAttributes'
         meta:
           $ref: '#/components/schemas/StateMeta'
+    ProrationPreviewTriggerType:
+      type: string
+      description: |
+        The kind of prospective subscription change being previewed. Only `plan_pricing_option_change`
+        exists today; this discriminator allows other proration triggers to be added later without a
+        breaking change.
+      example: plan_pricing_option_change
+      enum:
+        - plan_pricing_option_change
+    ProrationPreviewRequestType:
+      type: string
+      description: This represents the type of resource object being sent. Always `proration_preview_request`.
+      example: proration_preview_request
+      enum:
+        - proration_preview_request
+    ProrationPreviewRequestAttributes:
+      required:
+        - trigger
+        - pricing_option_id
+        - plan_id
+      properties:
+        trigger:
+          $ref: '#/components/schemas/ProrationPreviewTriggerType'
+        pricing_option_id:
+          $ref: '#/components/schemas/UUID'
+        plan_id:
+          $ref: '#/components/schemas/UUID'
+    ProrationPreviewRequest:
+      required:
+        - type
+        - attributes
+      properties:
+        type:
+          $ref: '#/components/schemas/ProrationPreviewRequestType'
+        attributes:
+          $ref: '#/components/schemas/ProrationPreviewRequestAttributes'
+    ProrationPreviewType:
+      type: string
+      description: This represents the type of resource object being returned. Always `proration_preview`.
+      example: proration_preview
+      enum:
+        - proration_preview
+    ProrationPreviewAttributes:
+      required:
+        - trigger
+        - would_prorate
+        - rejection_reason
+      properties:
+        trigger:
+          $ref: '#/components/schemas/ProrationPreviewTriggerType'
+        would_prorate:
+          type: boolean
+          description: Whether submitting this prospective change would actually result in a proration.
+          example: true
+        would_refund:
+          type: boolean
+          nullable: true
+          description: |
+            Whether this change would result in a Proration Refund - a real refund issued against the
+            subscription's previous invoice payment because the unused-time credit exceeds the new pricing
+            option's cost. Set alongside `would_prorate: true` for this case; omitted otherwise.
+          example: true
+        refund_amount:
+          type: integer
+          format: int64
+          nullable: true
+          description: |
+            The amount that would be refunded as a Proration Refund, as a whole number of the currency's
+            smallest subdivision. Set only when `would_refund` is `true`.
+          example: 1400
+        rejection_reason:
+          type: string
+          nullable: true
+          description: |
+            Why a previewed change would not result in a proration if actually submitted. Returned alongside
+            `would_prorate: false`; this is not an error response. `negative_amount` is retained for backward
+            compatibility but is no longer returned - a negative-net change now either proceeds with a
+            Proration Refund (`would_refund: true`), is rejected as `refund_not_possible`, or is rejected as
+            `refund_disallowed_by_policy` when the applicable proration policy does not allow refunds.
+          example: refund_not_possible
+          enum:
+            - negative_amount
+            - no_change
+            - refund_not_possible
+            - refund_disallowed_by_policy
+          x-go-type: model.ProrationRejectionReason
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        billing_cost_before_proration:
+          type: integer
+          format: int64
+          nullable: true
+          description: The value as a whole number of the currency's smallest subdivision.
+          example: 1200
+        refunded_cost_for_unused_pricing_option_period:
+          type: integer
+          format: int64
+          nullable: true
+          description: The value as a whole number of the currency's smallest subdivision.
+          example: 300
+        new_pricing_option_cost:
+          type: integer
+          format: int64
+          nullable: true
+          description: The value as a whole number of the currency's smallest subdivision.
+          example: 900
+        proration_policy_id:
+          type: string
+          format: uuid
+          nullable: true
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            name: uuid
+            path: github.com/google/uuid
+          example: 00000000-0000-0000-0000-000000000001
+        prorated_at:
+          description: The date and time the proration would be applied.
+          type: string
+          nullable: true
+          example: '2017-01-10T11:41:19.244842Z'
+        billing_period_end_date_after_proration:
+          description: |
+            The subscription's new billing period end date, if the change would alter it (only set when the
+            current and prospective pricing options differ in billing interval type or frequency).
+          type: string
+          nullable: true
+          example: '2017-01-10T11:41:19.244842Z'
+        refund_period_end_date:
+          description: The end of the period being refunded for the current pricing option's unused time.
+          type: string
+          nullable: true
+          example: '2017-01-10T11:41:19.244842Z'
+    ProrationPreview:
+      required:
+        - type
+        - attributes
+      properties:
+        type:
+          $ref: '#/components/schemas/ProrationPreviewType'
+        attributes:
+          $ref: '#/components/schemas/ProrationPreviewAttributes'
     ManualPayments:
       type: boolean
       example: false
@@ -5091,12 +5752,14 @@ components:
     PaymentAuthority:
       type: object
       oneOf:
+        - $ref: '#/components/schemas/PaymentAuthorityEPPayments'
         - $ref: '#/components/schemas/PaymentAuthorityStripe'
         - $ref: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       discriminator:
         propertyName: type
         mapping:
-          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityStripe'
+          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/PaymentAuthorityStripe'
           authorize_net: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       required:
         - type
@@ -5108,6 +5771,7 @@ components:
           enum:
             - authorize_net
             - elastic_path_payments_stripe
+            - stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
@@ -5116,12 +5780,14 @@ components:
       type: object
       nullable: true
       oneOf:
+        - $ref: '#/components/schemas/PaymentAuthorityEPPayments'
         - $ref: '#/components/schemas/PaymentAuthorityStripe'
         - $ref: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       discriminator:
         propertyName: type
         mapping:
-          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityStripe'
+          elastic_path_payments_stripe: '#/components/schemas/PaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/PaymentAuthorityStripe'
           authorize_net: '#/components/schemas/PaymentAuthorityAuthorizeNet'
       required:
         - type
@@ -5133,10 +5799,127 @@ components:
           enum:
             - authorize_net
             - elastic_path_payments_stripe
+            - stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
             path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+    CreatePaymentAuthority:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/CreatePaymentAuthorityEPPayments'
+        - $ref: '#/components/schemas/CreatePaymentAuthorityStripe'
+        - $ref: '#/components/schemas/CreatePaymentAuthorityAuthorizeNet'
+      discriminator:
+        propertyName: type
+        mapping:
+          elastic_path_payments_stripe: '#/components/schemas/CreatePaymentAuthorityEPPayments'
+          stripe_payment_intents: '#/components/schemas/CreatePaymentAuthorityStripe'
+          authorize_net: '#/components/schemas/CreatePaymentAuthorityAuthorizeNet'
+      required:
+        - type
+      properties:
+        type:
+          description: The name of the payment gateway facilitating the secure transmission of payment data.
+          type: string
+          example: elastic_path_payments_stripe
+          enum:
+            - authorize_net
+            - elastic_path_payments_stripe
+            - stripe_payment_intents
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+    CreatePaymentAuthorityAuthorizeNet:
+      type: object
+      required:
+        - type
+        - payment_profile_id
+        - customer_profile_id
+      properties:
+        type:
+          description: The name of the payment gateway facilitating the secure transmission of payment data.
+          type: string
+          example: authorize_net
+          enum:
+            - authorize_net
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        payment_profile_id:
+          description: The customer's payment profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: '1511660856'
+        customer_profile_id:
+          description: The customer's profile id, unique to Authorize.net, used to facilitate payment of the subscription.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: '1511736979'
+    CreatePaymentAuthorityEPPayments:
+      writeOnly: true
+      type: object
+      required:
+        - type
+        - customer_id
+        - card_id
+      properties:
+        type:
+          description: The name of the payment gateway facilitating the secure transmission of payment data.
+          type: string
+          example: elastic_path_payments_stripe
+          enum:
+            - elastic_path_payments_stripe
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: cus_OPfKlxWV3hp9h6
+        card_id:
+          description: The unique identifier of the card used to facilitate payment of the subscription.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: card_8Diw3FQPhxK27WADPVMeXieP
+    CreatePaymentAuthorityStripe:
+      writeOnly: true
+      type: object
+      required:
+        - type
+        - customer_id
+        - card_id
+      properties:
+        type:
+          description: The name of the payment gateway facilitating the secure transmission of payment data.
+          type: string
+          example: stripe_payment_intents
+          enum:
+            - stripe_payment_intents
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: cus_OPfKlxWV3hp9h6
+        card_id:
+          description: The unique identifier of the card used to facilitate payment of the subscription.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: card_8Diw3FQPhxK27WADPVMeXieP
     PaymentAuthorityAuthorizeNet:
       type: object
       required:
@@ -5164,7 +5947,7 @@ components:
           minLength: 3
           maxLength: 1024
           example: '1511736979'
-    PaymentAuthorityStripe:
+    PaymentAuthorityEPPayments:
       writeOnly: true
       type: object
       required:
@@ -5176,6 +5959,34 @@ components:
           example: elastic_path_payments_stripe
           enum:
             - elastic_path_payments_stripe
+          x-go-type: paymentgateways.GatewayName
+          x-go-type-import:
+            name: paymentgateways
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/paymentgateways
+        customer_id:
+          description: The unique identifier for a customer.
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: cus_OPfKlxWV3hp9h6
+        card_id:
+          description: The unique identifier of the card used to facilitate payment of the subscription. If a card payment fails, you can use the `card_id` and `customer_id` attributes to program your front-end implementation to allow your preferred payment service provider to update a subscription with new card details. See [Card declines](/docs/api/subscriptions/invoices#card-declines).
+          type: string
+          minLength: 3
+          maxLength: 1024
+          example: card_8Diw3FQPhxK27WADPVMeXieP
+    PaymentAuthorityStripe:
+      writeOnly: true
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          description: The name of the payment gateway facilitating the secure transmission of payment data.
+          type: string
+          example: stripe_payment_intents
+          enum:
+            - stripe_payment_intents
           x-go-type: paymentgateways.GatewayName
           x-go-type-import:
             name: paymentgateways
@@ -5331,6 +6142,8 @@ components:
         - $ref: '#/components/schemas/BillingRunReport'
         - $ref: '#/components/schemas/TaxRunReport'
         - $ref: '#/components/schemas/PaymentRunReport'
+        - $ref: '#/components/schemas/NotificationRunReport'
+        - $ref: '#/components/schemas/SubscriptionUpdateReport'
     BillingRunReport:
       required:
         - invoices_ready_for_payment
@@ -5390,6 +6203,37 @@ components:
           allOf:
             - description: The total amount collected by the payment run, segmented by currency.
             - $ref: '#/components/schemas/Price'
+    NotificationRunReport:
+      required:
+        - total_notifications_sent
+        - failed_notifications
+      properties:
+        total_notifications_sent:
+          description: The total number of notifications sent.
+          type: integer
+          example: 100
+        failed_notifications:
+          description: The number of failed notifications.
+          type: integer
+          example: 0
+    SubscriptionUpdateReport:
+      required:
+        - subscriptions_updated
+        - subscription_failures
+        - total_processed
+      properties:
+        subscriptions_updated:
+          description: The total number of subscriptions updated.
+          type: integer
+          example: 100
+        subscription_failures:
+          description: The total number of subscriptions that failed to be updated.
+          type: integer
+          example: 0
+        total_processed:
+          description: The total number of subscriptions processed.
+          type: integer
+          example: 100
     JobTimestamps:
       allOf:
         - $ref: '#/components/schemas/Timestamps'
@@ -5416,18 +6260,17 @@ components:
         - $ref: '#/components/schemas/JobCreateAttributes'
         - $ref: '#/components/schemas/JobAttributes'
         - $ref: '#/components/schemas/Timestamps'
-    JobType:
+    ScheduleJobType:
       type: string
       description: |
         The type of job. One of the following:
-         - `billing_run` - a billing run job.
-         - `payment_run` - a payment run job.
-         - `tax_run` - a tax run job.
+         - `billing-run` - a billing run job.
+         - `payment-run` - a payment run job.
+         - `notification-run` - a notification run job.
       enum:
         - billing-run
-        - tax-run
         - payment-run
-        - import
+        - notification-run
       example: billing-run
       x-go-type: model.JobType
       x-go-type-import:
@@ -5440,12 +6283,166 @@ components:
         external_ref:
           $ref: '#/components/schemas/ExternalRef'
         job_type:
-          $ref: '#/components/schemas/JobType'
+          type: string
+          description: |
+            The type of job. One of the following:
+             - `billing-run` - a billing run job.
+             - `tax-run` - a tax run job.
+             - `payment-run` - a payment run job.
+             - `import` - an import job.
+             - `notification-run` - a notification run job.
+             - `subscription-update` - a subscription update run job.
+          enum:
+            - billing-run
+            - tax-run
+            - payment-run
+            - import
+            - notification-run
+            - subscription-update
+          example: billing-run
+          x-go-type: string
+      oneOf:
+        - $ref: '#/components/schemas/BillingRunJobAttributes'
+        - $ref: '#/components/schemas/TaxRunJobAttributes'
+        - $ref: '#/components/schemas/PaymentRunJobAttributes'
+        - $ref: '#/components/schemas/ImportJobAttributes'
+        - $ref: '#/components/schemas/NotificationRunJobAttributes'
+        - $ref: '#/components/schemas/SubscriptionUpdateRunJobAttributes'
+      discriminator:
+        propertyName: job_type
+        mapping:
+          billing-run: '#/components/schemas/BillingRunJobAttributes'
+          tax-run: '#/components/schemas/TaxRunJobAttributes'
+          payment-run: '#/components/schemas/PaymentRunJobAttributes'
+          import: '#/components/schemas/ImportJobAttributes'
+          notification-run: '#/components/schemas/NotificationRunJobAttributes'
+          subscription-update: '#/components/schemas/SubscriptionUpdateRunJobAttributes'
+    BillingRunJobAttributes:
+      required:
+        - job_type
+      properties:
+        job_type:
+          type: string
+          example: billing-run
+    TaxRunJobAttributes:
+      required:
+        - job_type
+      properties:
+        job_type:
+          type: string
+          example: tax-run
         taxes:
           type: array
           minItems: 1
           items:
             $ref: '#/components/schemas/InvoiceTaxItems'
+    PaymentRunJobAttributes:
+      required:
+        - job_type
+      properties:
+        job_type:
+          type: string
+          example: payment-run
+    ImportJobAttributes:
+      required:
+        - job_type
+      properties:
+        job_type:
+          type: string
+          example: import
+    NotificationRunJobAttributes:
+      required:
+        - job_type
+      properties:
+        job_type:
+          type: string
+          example: notification-run
+    SubscriptionUpdateRunJobAttributes:
+      required:
+        - job_type
+        - price_changes
+      properties:
+        job_type:
+          type: string
+          example: subscription-update
+        offering_id:
+          description: |
+            The ID of the offering whose subscriptions should be updated. Mutually exclusive with `subscription_ids`.
+          type: string
+          format: uuid
+          x-go-type: uuid.UUID
+          x-go-type-import:
+            name: uuid
+            path: github.com/google/uuid
+          example: 11111111-2222-3333-4444-555555555555
+        excluded_subscription_ids:
+          description: |
+            Subscriptions to exclude from the price update. Only valid when `offering_id` is provided.
+          type: array
+          items:
+            $ref: '#/components/schemas/UUID'
+          x-go-type-skip-optional-pointer: true
+        subscription_ids:
+          description: |
+            Specific subscriptions to update. Mutually exclusive with `offering_id`.
+          type: array
+          items:
+            $ref: '#/components/schemas/UUID'
+          x-go-type-skip-optional-pointer: true
+        price_changes:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+    SubscriptionPriceChanges:
+      properties:
+        plan_prices:
+          x-go-type-skip-optional-pointer: true
+          additionalProperties:
+            $ref: '#/components/schemas/Price'
+          example:
+            197a11f4-d341-4594-9574-7fbfbe6a671d:
+              USD:
+                amount: 100
+                includes_tax: false
+              GBP:
+                amount: 90
+                includes_tax: true
+        pricing_option_prices:
+          x-go-type-skip-optional-pointer: true
+          additionalProperties:
+            $ref: '#/components/schemas/PricingOptionPrice'
+          example:
+            83f6b8e3-031c-4f2a-a1d7-b1c83cb5ac3c:
+              base_price_percentage: 90
+            197a11f4-d341-4594-9574-7fbfbe6a671d:
+              USD:
+                amount: 100
+                includes_tax: false
+              GBP:
+                amount: 90
+                includes_tax: true
+    SubscriptionPriceUpdateHistoryEntry:
+      description: A record of the previous prices of a subscription before a price change was applied
+      required:
+        - price_changes
+        - valid_until
+      properties:
+        price_changes:
+          $ref: '#/components/schemas/SubscriptionPriceChanges'
+        valid_until:
+          description: The date and time when the prices were changed (when these previous prices stopped being active)
+          type: string
+          format: date-time
+          example: '2017-01-10T11:41:19.244842Z'
+    PricingOptionPrice:
+      properties:
+        base_price_percentage:
+          type: number
+          format: double
+          description: A percentage discount on the total cost of any plans within an offering. For example, you can configure a percentage that equates the cost of a pricing option to the total value of all plans within the offering, reduced by a percentage. For example, if you specify `10`, a 10% discount is applied to the total value of all repeat plans in an offering.
+          example: 90
+          minimum: 0
+          maximum: 100
+        fixed_price:
+          $ref: '#/components/schemas/Price'
     JobAttributes:
       required:
         - status
@@ -5507,6 +6504,26 @@ components:
           type: string
           maxLength: 1024
           example: USA
+    InvoiceNotification:
+      description: A notification scheduled for an invoice.
+      required:
+        - name
+        - due
+      properties:
+        name:
+          description: The name of the notification schedule that generated this notification.
+          type: string
+          example: 7 days before renewal
+        due:
+          description: The date and time when the notification is due to be sent.
+          type: string
+          format: date-time
+          example: '2024-01-24T00:00:00Z'
+        sent_at:
+          description: The date and time when the notification was sent.
+          type: string
+          format: date-time
+          example: '2024-01-24T00:00:00Z'
     SubscriptionInvoice:
       required:
         - type
@@ -5577,6 +6594,8 @@ components:
         - owner
         - timestamps
         - proration_events
+        - pro_rata_remaining_value
+        - display_price
       properties:
         owner:
           $ref: '#/components/schemas/OwnerMeta'
@@ -5586,12 +6605,31 @@ components:
           $ref: '#/components/schemas/UUID'
         price:
           $ref: '#/components/schemas/SingleCurrencyPrice'
+        display_price:
+          description: |
+            Invoice totals formatted for display (`with_tax`, `without_tax`, `tax`). Amounts are in the
+            currency's smallest subdivision.
+          $ref: '#/components/schemas/DisplayPrice'
+        notifications:
+          description: |
+            A list of notifications scheduled for this invoice. These are derived from the notification
+            schedules configured on the pricing option at the time the invoice was created. Each notification
+            has a due date calculated relative to the billing period end date.
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceNotification'
         timestamps:
           $ref: '#/components/schemas/InvoiceTimestamps'
         proration_events:
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/ProrationEvent'
+        pro_rata_remaining_value:
+          type: integer
+          format: int64
+          description: The pro-rated remaining value for the billing period
+          example: 500
     ProrationEvent:
       required:
         - proration_policy_id
@@ -5621,6 +6659,79 @@ components:
           description: The date and time the subscription was prorated.
           type: string
           example: '2017-01-10T11:41:19.244842Z'
+    SubscriptionInvoicePaymentRefund:
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundType'
+        attributes:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundAttributes'
+        relationships:
+          $ref: '#/components/schemas/Relationships'
+    SubscriptionInvoicePaymentRefundAttributes:
+      required:
+        - amount
+        - reason
+        - gateway
+        - external_refund_id
+        - created_at
+      properties:
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+          description: The value as a whole number of the currency's smallest subdivision.
+          example: 100
+        reason:
+          type: string
+          maxLength: 1024
+          description: The reason or note for the refund
+          example: Customer requested cancellation
+        gateway:
+          type: string
+          maxLength: 1024
+          example: elastic_path_payments_stripe
+          description: Specifies the payment gateway.
+        external_refund_id:
+          type: string
+          maxLength: 1024
+          example: 33e7ec6b-8b34-4c92-a95b-2e2647922e47
+          description: An optional external ID that is specific to the gateway used.
+        created_at:
+          description: The date and time a resource was created.
+          type: string
+          example: '2017-01-10T11:41:19.244842Z'
+    CreateInvoicePaymentRefund:
+      required:
+        - type
+        - attributes
+      properties:
+        type:
+          $ref: '#/components/schemas/SubscriptionInvoicePaymentRefundType'
+        attributes:
+          type: object
+          required:
+            - amount
+            - reason
+          properties:
+            amount:
+              type: integer
+              format: int64
+              minimum: 1
+              description: The value as a whole number of the currency's smallest subdivision.
+              example: 100
+            reason:
+              type: string
+              minLength: 1
+              maxLength: 1024
+              description: The reason or note for the refund
+              example: Customer requested cancellation
     InvoiceTimestamps:
       allOf:
         - $ref: '#/components/schemas/Timestamps'
@@ -5664,6 +6775,7 @@ components:
     SubscriptionInvoiceAttributes:
       required:
         - billing_period
+        - pro_forma
         - invoice_items
         - outstanding
         - tax_required
@@ -5702,6 +6814,25 @@ components:
           example: '2017-01-10T11:41:19.244842Z'
         created_at:
           description: The date and time an invoice was created.
+          type: string
+          example: '2017-01-10T11:41:19.244842Z'
+        pro_forma:
+          description: |
+            Whether the invoice is a Pro Forma invoice (generated ahead of payment) or not.
+
+            Pro Forma Invoices are created ahead of payment time (for example, a week in advance of payment so
+            you can notify customers) and will not be picked up by a payment run until on or after their valid_from
+            date.
+          type: boolean
+          example: false
+        valid_from:
+          description: |
+            The date and time at which an invoice will be valid from.
+
+            If generated with no lead time then the invoice will be valid immediately.
+
+            If generated with a lead time, then the valid_from will be the data at which the Invoice transitions from
+            it's Pro Forma state to one that can have payment taken.
           type: string
           example: '2017-01-10T11:41:19.244842Z'
         manual_payment_pending:
@@ -5803,6 +6934,7 @@ components:
     UUID:
       type: string
       description: The unique identifier.
+      format: uuid
       x-go-type: uuid.UUID
       x-go-type-import:
         name: uuid
@@ -6030,7 +7162,7 @@ components:
         - job_type
       properties:
         job_type:
-          $ref: '#/components/schemas/JobType'
+          $ref: '#/components/schemas/ScheduleJobType'
     ScheduleUpdate:
       required:
         - id
@@ -6043,3 +7175,81 @@ components:
           $ref: '#/components/schemas/SubscriptionScheduleType'
         attributes:
           $ref: '#/components/schemas/ScheduleUpdateAttributes'
+    LeadTime:
+      type: object
+      description: Configuration of the lead time to generate an invoice ahead of time in a pro-forma state
+      properties:
+        type:
+          type: string
+          description: The unit of time that lead time is measured in.
+          example: day
+          enum:
+            - day
+            - week
+          x-go-type: model.LeadTimeType
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        time:
+          type: integer
+          description: The lead time to generate an invoice ahead of time in a pro-forma state
+          example: 14
+          minimum: 1
+      required:
+        - type
+        - time
+    NullableLeadTime:
+      type: object
+      description: Configuration of the lead time to generate an invoice ahead of time in a pro-forma state
+      nullable: true
+      properties:
+        type:
+          type: string
+          description: The unit of time that lead time is measured in.
+          example: week
+          enum:
+            - day
+            - week
+          x-go-type: model.LeadTimeType
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        time:
+          type: integer
+          description: The lead time to generate an invoice ahead of time in a pro-forma state
+          example: 14
+          minimum: 1
+      required:
+        - type
+        - time
+    NotificationSchedule:
+      type: object
+      required:
+        - name
+        - unit
+        - amount
+      properties:
+        name:
+          type: string
+          description: The name of the schedule.
+          minLength: 1
+          maxLength: 1024
+          example: Daily billing run.
+        unit:
+          type: string
+          description: The unit of time that the schedule is measured in.
+          example: day
+          enum:
+            - day
+            - week
+            - month
+          x-go-type: model.NotificationScheduleUnit
+          x-go-type-import:
+            name: model
+            path: gitlab.elasticpath.com/commerce-cloud/subscriptions.svc/internal/domain/model
+        amount:
+          type: integer
+          format: int64
+          description: The number of units between each notification.
+          example: 100
+          minimum: 1

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates a pricing option in an offering, such as its billing interval,
+  frequency, trial period, plan length or whether the subscriber can pause,
+  resume or cancel. A value of null removes an optional field. Subscriptions
+  that already exist keep their snapshot of the offering.

@@ -1,0 +1,5 @@
+x-mcp-name: authentication_realms_get_user_authentication_info
+x-mcp-description: >-
+  Gets one user (user authentication info) by ID: name, given, middle and family
+  names, email, creation status and timestamps. Use it to check a user. To see
+  how they sign in, list their OIDC profile info or password profile info.

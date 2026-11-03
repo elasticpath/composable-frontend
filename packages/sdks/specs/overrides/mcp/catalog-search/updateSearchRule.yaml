@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Updates one or more attributes of a search rule: slug, description, execution
+  order, trigger, actions or stop_after_match. The rule stays in its group, and
+  the new execution order must be unique there. It takes effect for subsequent
+  searches. It returns 403 when the rule is not yours to modify.

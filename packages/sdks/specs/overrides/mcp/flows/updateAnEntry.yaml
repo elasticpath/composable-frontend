@@ -1,0 +1,6 @@
+x-mcp-title: Update a Flow Entry
+x-mcp-description: >-
+  Updates an entry of a flow by the flow slug and entry ID, or in Product
+  Experience Manager of a template. Send type entry plus the field slugs and
+  values to set. To change a relationship field, use the entry relationship
+  calls instead.

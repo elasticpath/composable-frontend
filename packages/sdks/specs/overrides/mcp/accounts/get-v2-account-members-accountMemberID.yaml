@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one account member by ID, with name, given, middle and family names, and
+  email. Use it when you know the member ID; to search by name or email, list
+  account members with a filter.

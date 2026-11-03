@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets a merchant realm mapping by its ID, with its store prefix, realm ID and
+  store ID. The prefix is used during sign-in to pick the authentication realm,
+  and it can be null if none has been assigned.

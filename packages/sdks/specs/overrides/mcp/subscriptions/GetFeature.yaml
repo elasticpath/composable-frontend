@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one feature by ID. Returns the name, description and configuration: the
+  type (access, promotion or usage) with its tag, promotions or usage label and
+  default value.

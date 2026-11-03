@@ -1,0 +1,4 @@
+x-mcp-name: authentication_realms_delete_oidc_profile
+x-mcp-description: >-
+  Deletes an OIDC profile from a realm. This also deletes the user OIDC profile
+  info records that link users to the profile, and it cannot be undone.

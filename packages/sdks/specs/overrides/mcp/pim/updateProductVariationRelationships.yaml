@@ -1,0 +1,5 @@
+x-mcp-title: Replace a Product's Variations
+x-mcp-description: >-
+  Replaces the variations attached to a product with the variations listed in
+  the body. Variations not in the list are detached. Rebuild the product's
+  child products afterwards for the change to take effect.

@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists all the integrations of the store: webhooks, Amazon SQS queues and STOMP
+  queues that receive Elastic Path events. Each shows its name, enabled state,
+  observed events and delivery configuration. Use it to find an integration ID.
+  Configuration can include secrets, so avoid repeating them.

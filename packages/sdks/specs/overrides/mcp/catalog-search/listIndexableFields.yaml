@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the indexable fields configured for the store: the extra custom fields,
+  core field overrides and index-wide tokenization settings that extend the
+  search index. To see every field that is actually indexed and whether each is
+  searchable or filterable, list the indexed fields instead.

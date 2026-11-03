@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Lists Promotions Standard promotions, with paging. Use it to find a promotion
+  ID or review cart-level and item-level discounts. Filter by code to search the
+  codes within promotions.

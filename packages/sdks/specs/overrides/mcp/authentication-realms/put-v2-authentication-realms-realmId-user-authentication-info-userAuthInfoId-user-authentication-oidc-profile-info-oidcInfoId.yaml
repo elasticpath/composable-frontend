@@ -1,0 +1,5 @@
+x-mcp-name: authentication_realms_update_oidc_profile_info
+x-mcp-description: >-
+  Updates the subject or issuer of a user's OIDC profile info. Only type is
+  required. The OIDC profile it links to cannot be changed: delete the OIDC
+  profile info and create a new one instead.

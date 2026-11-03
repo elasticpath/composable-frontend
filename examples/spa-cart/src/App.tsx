@@ -6,6 +6,7 @@ import {
   type ProductListData,
 } from "@epcc-sdk/sdks-shopper"
 import { CartView } from "./components/CartView"
+import { getErrorMessage } from "./lib/get-error-message"
 
 function App() {
   const [products, setProducts] = useState<ProductListData["data"]>([])
@@ -42,7 +43,7 @@ function App() {
         throw new Error("No cart found. Please refresh the page.")
       }
 
-      await manageCarts({
+      const { error } = await manageCarts({
         path: {
           cartID: cartId,
         },
@@ -55,14 +56,16 @@ function App() {
         },
       })
 
+      if (error) {
+        console.error("Failed to add to cart:", error)
+        setAddToCartError(getErrorMessage(error))
+        return
+      }
+
       window.dispatchEvent(new Event("cart:updated"))
     } catch (error) {
       console.error("Failed to add to cart:", error)
-      setAddToCartError(
-        error instanceof Error
-          ? error.message
-          : "Failed to add product to cart",
-      )
+      setAddToCartError(getErrorMessage(error))
     } finally {
       setIsAddingToCart((prev) => ({ ...prev, [productId]: false }))
     }

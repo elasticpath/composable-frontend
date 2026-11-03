@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one payment gateway by its slug, such as manual, stripe, adyen or
+  authorize_net, with its name and whether it is enabled or in test mode. Use it
+  to check how a single gateway is set up. To see all gateways at once, list the
+  gateways instead.

@@ -1,0 +1,7 @@
+x-mcp-description: >-
+  Updates a subscription: switch its plan or pricing option, change its address,
+  replace its payment authority or change when a pending subscription goes live.
+  If the offering has a proration policy, switching plan or pricing option makes
+  a prorated invoice due immediately, for the next billing run to create, and
+  can refund through the payment gateway; without a policy the switch happens
+  with no proration. To preview the cost first, preview the proration.

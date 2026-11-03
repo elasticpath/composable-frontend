@@ -1,0 +1,5 @@
+x-mcp-name: accounts_delete_account_membership
+x-mcp-description: >-
+  Deletes a membership from an account by account ID and membership ID, ending
+  that account member's link to the account. It returns no content on success.
+  To find a membership ID, list the account's memberships.

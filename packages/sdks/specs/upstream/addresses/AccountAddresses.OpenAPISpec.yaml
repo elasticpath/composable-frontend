@@ -1,0 +1,512 @@
+openapi: 3.1.0
+info:
+  version: 25.1126.6886238
+  x-version-timestamp: 2025-11-26T19:10:23Z
+  title: Addresses Introduction
+  description: |
+    The Addresses API allows you to organize account addresses. Addresses are a sub-resource of `account` resources, an account can have multiple addresses, such as home, work, and neighbour.
+
+    You can use an account address with either [client_credentials access token](/docs/api/authentication/create-an-access-token) or a combination of [implicit access token](/docs/api/authentication/create-an-access-token) and [Account Management authentication](/docs/api/accounts/post-v-2-account-members-tokens) token.
+  contact:
+    name: Elastic Path
+    url: https://www.elasticpath.com
+    email: support@elasticpath.com
+  license:
+    url: https://elasticpath.dev
+    name: MIT
+servers:
+  - url: https://useast.api.elasticpath.com
+    description: US East
+  - url: https://euwest.api.elasticpath.com
+    description: EU West
+security:
+  - BearerToken: []
+tags:
+  - name: Account Addresses
+    description: The API to organize account addresses.
+paths:
+  /v2/accounts/{accountID}/addresses:
+    post:
+      tags:
+        - Account Addresses
+      summary: Create an Account Address
+      description: Create an address for an Account.
+      operationId: post-v2-account-address
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to create an address for.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+    get:
+      tags:
+        - Account Addresses
+      summary: Get Account Addresses
+      description: |
+        Get all addresses for an Account.
+
+        You can use pagination with this resource. For more information, see [pagination](/guides/Getting-Started/pagination).
+
+        ### Filtering
+
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) addresses:
+
+        | Attribute      | Operators                       | Example                               |
+        |----------------|---------------------------------|---------------------------------------|
+        | `name`         | `eq`,`in`,`like`,`ilike`,`text` | `ilike(name,"*home*")`                |
+        | `first_name`   | `eq`,`in`,`like`,`ilike`,`text` | `ilike(first_name,"Ron*")`            |
+        | `last_name`    | `eq`,`in`,`like`,`ilike`,`text` | `ilike(last_name,"*swan*")`           |
+        | `phone_number` | `eq`,`in`,`like`,`ilike`,`text` | `ilike(phone_number,"*555*")`         |
+        | `company_name` | `eq`,`in`,`like`,`ilike`,`text` | `ilike(company_name,"*enterprises*")` |
+        | `instructions` | `eq`,`in`,`like`,`ilike`,`text` | `text(instructions,"behind bin")`     |
+        | `line_1`       | `eq`,`in`,`like`,`ilike`,`text` | `ilike(line_1,"*Sunny Street*")`      |
+        | `line_2`       | `eq`,`in`,`like`,`ilike`,`text` | `ilike(line_2,"*Unit*")`              |
+        | `city`         | `eq`,`in`,`like`,`ilike`,`text` | `eq(city,"Sunny Town")`               |
+        | `county`       | `eq`,`in`,`like`,`ilike`,`text` | `eq(county,"Sunnyville")`             |
+        | `region`       | `eq`,`in`,`like`,`ilike`,`text` | `eq(region,"California")`             |
+        | `postcode`     | `eq`,`in`,`like`,`ilike`,`text` | `eq(postcode,"SU33 1YY")`             |
+        | `country`      | `eq`,`in`,`like`,`ilike`,`text` | `eq(country,"GB")`                    |
+      operationId: get-v2-account-addresses
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: page[offset]
+          in: query
+          description: The number of records to offset the results by.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+            default: 0
+        - name: page[limit]
+          in: query
+          description: The number of records per page. If not specified, defaults to the `page_length` setting from the Settings API.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+        - name: page[total_method]
+          in: query
+          description: The method used to calculate the total count. `lower_bound` limits expensive count operations, `observed` uses a lightweight +1 fetch strategy that will indicate if there is a next page.
+          required: false
+          schema:
+            type: string
+            enum:
+              - lower_bound
+              - observed
+            default: lower_bound
+        - name: filter
+          in: query
+          description: Filter addresses using a simple query language.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountAddressResponse'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+      security:
+        - BearerToken: []
+  /v2/accounts/{accountID}/addresses/{addressID}:
+    get:
+      tags:
+        - Account Addresses
+      summary: Get an Account Address
+      description: Get a specific address for an Account.
+      operationId: get-v2-account-address
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to retrieve.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address you want to retrieve.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+      security:
+        - BearerToken: []
+    put:
+      tags:
+        - Account Addresses
+      summary: Update an Account Address
+      description: Update an address for an Account.
+      operationId: put-v2-account-address
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account you want to create an address for.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address you want to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/AccountAddressResponse'
+        '400':
+          $ref: '#/components/responses/ErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+      security:
+        - BearerToken: []
+    delete:
+      tags:
+        - Account Addresses
+      summary: Delete an Account Address
+      description: Delete an address for an Account.
+      operationId: delete-v2-account-address
+      parameters:
+        - name: accountID
+          in: path
+          description: The ID of the account that contains the address to delete.
+          required: true
+          schema:
+            type: string
+        - name: addressID
+          in: path
+          description: The ID of the address to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '404':
+          $ref: '#/components/responses/ErrorNotFound'
+      security:
+        - BearerToken: []
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+  schemas:
+    MetaTimestamps:
+      type: object
+      properties:
+        timestamps:
+          type: object
+          properties:
+            created_at:
+              description: The date the address is created.
+              type: string
+              example: '2021-02-23T09:40:33.882Z'
+            updated_at:
+              description: The date the address is updated.
+              type: string
+              example: '2021-02-23T09:40:33.882Z'
+    PaginationPage:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: The maximum number of records per page.
+          example: 25
+        offset:
+          type: integer
+          description: The current offset by number of records.
+          example: 0
+        current:
+          type: integer
+          description: The current page number.
+          example: 1
+        total:
+          type: integer
+          description: The total number of pages.
+          example: 3
+    PaginationResults:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: The total number of results.
+          example: 75
+        total_method:
+          type: string
+          description: The method used to calculate the total. `exact` means the precise count is known, `lower_bound` means the count is at least this value, `observed` means the count is estimated from observations.
+          enum:
+            - exact
+            - lower_bound
+            - observed
+          example: exact
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          $ref: '#/components/schemas/PaginationPage'
+        results:
+          $ref: '#/components/schemas/PaginationResults'
+    PaginationLinks:
+      type: object
+      properties:
+        current:
+          type: string
+          description: The URL to the current page.
+          example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=0&page[limit]=25
+        first:
+          type: string
+          description: The URL to the first page.
+          example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=0&page[limit]=25
+        last:
+          type:
+            - string
+            - 'null'
+          description: The URL to the last page. May be null if the total is unknown.
+          example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=50&page[limit]=25
+        next:
+          type:
+            - string
+            - 'null'
+          description: The URL to the next page. Null if on the last page.
+          example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses?page[offset]=25&page[limit]=25
+        prev:
+          type:
+            - string
+            - 'null'
+          description: The URL to the previous page. Null if on the first page.
+          example: null
+    Address:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Specifies the type of object. Set this value to `address`.
+          const: address
+        first_name:
+          type: string
+          description: The first name of the recipient on this address.
+          example: Ron
+        last_name:
+          type: string
+          description: The last name of the recipient on this address.
+          example: Swanson
+        name:
+          type: string
+          description: The name for the address saved, such as `home`, `work` or `wife’s office`.
+          example: Home
+        phone_number:
+          type: string
+          description: A phone number for this address.
+          example: (555) 555-1234
+        instructions:
+          type: string
+          description: Any delivery instructions for this address.
+          example: Leave behind bin
+        company_name:
+          type: string
+          description: The company name at this address.
+          example: Ron Swanson Enterprises
+        line_1:
+          type: string
+          description: The first portion of the address, usually the street address.
+          example: 1 Sunny Street
+        line_2:
+          type: string
+          description: The second portion of the address, usually an apartment or unit number.
+          example: Unit 101
+        city:
+          type: string
+          description: The city for this address.
+          example: Sunny Town
+        county:
+          type: string
+          description: The county for this address.
+          example: Sunnyville
+        region:
+          type: string
+          description: The state, province, territory, etc. for this address.
+          example: acc-legal-name
+        postcode:
+          type: string
+          description: The ZIP Code, Postcode, or other postal reference string for this delivery address.
+          example: SU33 1YY
+        country:
+          type: string
+          description: A two digit code for the country this address is in, expressed as per the ISO 3166-2 standard.
+          example: GB
+    AddressResponse:
+      allOf:
+        - $ref: '#/components/schemas/Address'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: The unique identifier for an Address.
+              example: 5f8da740-6680-463e-b31c-190b2db4bf9d
+            meta:
+              $ref: '#/components/schemas/MetaTimestamps'
+            links:
+              type: object
+              properties:
+                self:
+                  description: A URL to the specific resource.
+                  type: string
+                  example: https://useast.api.elasticpath.com/v2/accounts/deb6b25f-8451-4211-9a22-95610333df23/addresses
+    AccountAddressResponse:
+      allOf:
+        - $ref: '#/components/schemas/AddressResponse'
+        - type: object
+          properties:
+            relationships:
+              type: object
+              properties:
+                account:
+                  type: object
+                  properties:
+                    id:
+                      description: The ID of the account.
+                      type: string
+                      example: 11afcf9b-971b-4fdb-8e10-f2ecf970718e
+                    type:
+                      description: The type of object being returned.
+                      type: string
+                      example: account
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The HTTP response code of the error.
+        title:
+          type: string
+          description: A brief summary of the error.
+        detail:
+          type: string
+          description: Optional additional detail about the error.
+        source:
+          type: string
+          description: Optional field indicating the source of the error.
+    ErrorResponse:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+  responses:
+    ErrorBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            bad-request-error:
+              value:
+                errors:
+                  - status: 400
+                    title: Bad Request
+                    detail: 'Validation failed: field ''Name'' on the ''min'' tag.'
+    ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not-found-error:
+              value:
+                errors:
+                  - status: 404
+                    title: Not Found
+                    detail: account not found

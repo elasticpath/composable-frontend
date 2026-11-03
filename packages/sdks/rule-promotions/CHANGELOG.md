@@ -1,5 +1,244 @@
 # @epcc-sdk/rule-promotions
 
+## 0.6.1
+
+### Patch Changes
+
+- abade3e3: Rewrite the README: install, quick start, credentials, Zod schemas and MCP tools, checked against the package exports.
+- Updated dependencies [abade3e3]
+  - @epcc-sdk/sdks-runtime@0.1.1
+
+## 0.6.0
+
+### Minor Changes
+
+- e003cd0a: The `/mcp` export now targets MCP SDK v2. Register its tools on an `McpServer` from `@modelcontextprotocol/server` with no adapter. The optional peer dependency is now `@modelcontextprotocol/server` `^2`, in place of `@modelcontextprotocol/sdk`.
+
+  This is a breaking change for `/mcp` consumers:
+
+  - `Tool`, `ToolConfig` and each handler use v2's types. `outputSchema` is a Standard Schema.
+  - A handler takes v2's request context as its second argument and passes `ctx.mcpReq.signal` to the API call, so a cancelled MCP request aborts it. A wrapped handler passes `ctx` through as before.
+
+  Tool names, descriptions, risk tiers and zod schemas do not change. MCP SDK v2 lists input schemas as JSON Schema 2020-12, so a schema shared within a tool's input is now listed under `$defs` in place of `definitions`. The main entry does not change.
+
+## 0.5.3
+
+### Patch Changes
+
+- 69b99a4f: `@epcc-sdk/rule-promotions/mcp`: a large schema that a tool's body uses in more than one place is now listed once, under `definitions`, and each place points to it with `$ref`. `rule_promotions_create_rule_promotion`'s input schema goes from 92,948 to 35,132 characters, and all the tools together from 203,312 to 87,708. The tools accept and reject the same arguments as before.
+
+## 0.5.2
+
+### Patch Changes
+
+- 7cd1177c: The copied MCP support file gains the helpers that decode `data:` URI uploads. The generated tools are unchanged.
+
+## 0.5.1
+
+### Patch Changes
+
+- 64f86d08: `@epcc-sdk/rule-promotions/mcp`: each of the 16 tools now has a short description written for a model choosing between tools, at most 600 characters, in place of the operation's full spec description. The full spec description stays in the doc comment of the function and its tool factory. One title changes: `rule_promotions_delete_single_rule_promotion_code` is now "Delete a Rule Promotion Code".
+
+## 0.5.0
+
+### Minor Changes
+
+- 5d07fd7e: `@epcc-sdk/rule-promotions` has a new `/mcp` export. It has one Model Context Protocol (MCP) tool factory for each of its 16 operations, such as `getRulePromotionsTool`, and `tools()`, which returns all 16. A factory returns the `name`, `config` and `handler` that `McpServer.registerTool` takes. Without a `client`, a tool uses the package's module level `client`, which has no credentials until you configure it. `@modelcontextprotocol/sdk` is an optional peer dependency. The main entry does not change.
+
+## 0.4.0
+
+### Minor Changes
+
+- 349317cf: The `/zod` export now generates Zod 4 schemas, and each schema carries its description from the spec. `z.toJSONSchema()` includes those descriptions.
+
+  The `zod` peer dependency moves from `^3.22.0` to `^4.0.0`. Upgrade `zod` to 4 and upgrade every `@epcc-sdk` package that has a `/zod` export at the same time. The packages cannot share one install of zod while their peer ranges are on different majors. The SDK functions and types do not change.
+
+  Zod 4 validates `format: uuid` fields strictly. A value whose version or variant digits do not follow RFC 9562 now fails to parse, although Zod 3 accepted it. Validation errors use Zod 4's issue format. For example, a missing enum value is reported as `invalid_value` where Zod 3 reported `invalid_type`.
+
+  `@epcc-sdk/sdks-nextjs` accepts `@epcc-sdk/sdks-shopper` 0.8 as a peer dependency, as well as 0.7.
+
+## 0.3.1
+
+### Patch Changes
+
+- abf74ccb: Regenerate from the upstream `rule-promotions` spec (spec version 26.1008.8283824, published 2026-10-08T16:32:19Z).
+
+## 0.3.0
+
+### Minor Changes
+
+- b1c89251: The `/zod` schemas parse `int64` values as `number`, the type the TypeScript types already use, instead of `bigint`. A value validated with the schema can now be passed straight to the operation or field that takes it.
+
+  - `z.coerce.bigint()` becomes `z.number().int()` behind a step that turns a string into a number, so a query string value such as `"20"` still parses, to `20`.
+  - The bounds the specification declares stay, as plain numbers. The 64-bit range of the format itself is no longer emitted, because a `number` cannot hold it.
+  - No `BigInt(…)` is left in the generated schemas.
+
+  The TypeScript types, the SDK functions and the exported names do not change.
+
+  Breaking in practice, although the version is a minor:
+
+  - `.parse()` returns a `number` where it returned a `bigint` for `zPageLimit`, `zPageOffset` and `zGetRulePromotionsQuery`. Code that compared the result with a `bigint` literal such as `20n`, or did `bigint` arithmetic on it, needs to use numbers.
+  - Only strings are converted. A boolean is rejected, where `z.coerce.bigint()` turned `true` into `1n` and `false` into `0n`. `null` on a required field is still rejected.
+  - `z.input` of the affected schemas is now `unknown`, because `z.preprocess` in Zod v3 types its input that way.
+
+## 0.2.0
+
+### Minor Changes
+
+- da9b30ac: Regenerate the rule promotions SDK with `@hey-api/openapi-ts` 0.99.0 (previously 0.61.2), add
+  `createRulePromotionsClient`, and publish the Zod schemas.
+
+  The package now generates from a `rule-promotions-standalone@v1` bundle: the published
+  specification, unchanged in this repository, plus three corrections in
+  `specs/overrides/rule_promotions_service_corrections.yaml` where it disagrees with the
+  service. Each is listed below.
+
+  What is new:
+
+  - `createRulePromotionsClient` binds the generated `createClient` and `createConfig` to
+    `@epcc-sdk/sdks-runtime`, so one install and one call give you a client with a caching
+    token source, the `auth` hook and a `fetch` that refreshes and replays once on a 401 and
+    backs off on a 429 or a 408, and on a 500, 502, 503, 504 or a transport failure where a
+    replay cannot duplicate work.
+
+    ```ts
+    const client = createRulePromotionsClient({
+      baseUrl: "https://euwest.api.elasticpath.com",
+      clientId: process.env.EPCC_CLIENT_ID!,
+      clientSecret: process.env.EPCC_CLIENT_SECRET!,
+    })
+    ```
+
+    Credentials are resolved from `source`, `provider`, `token`, `clientId` plus
+    `clientSecret`, or `clientId` alone for the implicit grant. `retry`, `storage`,
+    `leewaySeconds`, `fetch` and `config` tune the rest; `config` is merged last, so
+    anything the factory chose can be overridden. The runtime helpers are re-exported from
+    the package root, so a consumer who assembles the stack by hand still installs only this
+    package.
+
+  - Zod schemas for every request body, path and response are generated and exposed on the
+    `@epcc-sdk/rule-promotions/zod` subpath. `zod` is an optional peer dependency (3.x) and
+    the root entry never imports it. `zPageOffset`, `zPageLimit` and the query schema of
+    `getRulePromotions` coerce `page[offset]` and `page[limit]`, which the specification
+    declares `int64`, to `bigint`, as the zod plugin does for every `int64`; the TypeScript
+    types keep them `number`.
+
+  Breaking in practice, although the version is a minor:
+
+  - The `@hey-api/client-fetch` dependency is gone. The fetch client is vendored into
+    `src/client/{client,core}`, and the root entry exports `createClient`, `createConfig`,
+    the shared `client` instance and the `Client`, `Config`, `CreateClientConfig`,
+    `RequestOptions` and `RequestResult` types. Import those from this package instead of
+    from `@hey-api/client-fetch`, which is deprecated.
+  - The shared `client` instance now carries a default base URL of
+    `https://euwest.api.elasticpath.com`; before, it had none. The specification lists US
+    East first, so the region is chosen in the generator config instead; every other package
+    on this generator already defaults to EU West, and a consumer installing two of them and
+    configuring neither would otherwise talk to two regions with no warning and no type
+    error.
+  - The nine `date-time` fields are typed `string`, not `Date`: `start`, `end`,
+    `meta.timestamps.created_at` and `meta.timestamps.updated_at` on
+    `RulePromotionBaseAttributes` (and so on every rule promotion), `used_on` and
+    `meta.timestamps.updated_at` on `RulePromotionUsage`, `meta.timestamps.created_at` on
+    `GetPromotionCodeResponse`, and `meta.timestamps.created_at` and
+    `meta.timestamps.updated_at` on `PromotionJobResponse`. The old `@hey-api/transformers`
+    plugin declared them `Date`, but no operation called its transformer, so the value at
+    runtime was always the string the API sends. Code that called a `Date` method on one of
+    these fields stops compiling; wrap the value in `new Date(...)` where you need one.
+  - `createRulePromotion` and `updateRulePromotion` take `{ data: RulePromotionItem }`
+    (`RulePromotionRequest`, new), not the bare `RulePromotionItem`. The service reads both
+    bodies as `data`, and every create and update example in the specification sends it, so
+    the old body type could not describe a request the service accepts.
+  - An action's `condition` is typed. The specification discriminates `Condition` on
+    `strategy` without a mapping, which by OpenAPI's rules makes the values the schema names
+    (`"AndCondition"`, ...) rather than the strategies the service reads (`"and"`, ...). The
+    old types therefore accepted only a condition with no `strategy`; 0.99 typed `Condition`
+    as `never`, and the `/zod` entry threw on import. `Condition` is now a union discriminated
+    on `strategy`, and `AndCondition`, `OrCondition` and the other eight condition types require
+    it. A condition without `strategy` stops compiling; the service rejects one anyway.
+  - The inline enum types `ConsumeUnit`, `JobType`, `PriceStrategy`, `Operator`, `Status` and
+    `Sort` are no longer exported, because the `exportInlineEnums` option does not exist in
+    0.99. Their unions are unchanged and are now written inline at each use site. Replace a
+    reference with the literal union, or derive it:
+    `NonNullable<NonNullable<NonNullable<PromotionCodesRequest["data"]>["codes"]>[number]["consume_unit"]>`,
+    `NonNullable<PromotionJob["job_type"]>`,
+    `NonNullable<NonNullable<NonNullable<ItemDiscount["limitations"]>["items"]>["price_strategy"]>`,
+    `NonNullable<ItemAttribute["operator"]>`, `NonNullable<PromotionJobResponse["status"]>` and
+    `NonNullable<NonNullable<GetRulePromotionCodesData["query"]>["sort"]>`.
+  - Two fields follow the specification's OpenAPI 3.1 type arrays, where the old generator kept
+    one type:
+    - An error's `status` in `ResponseError`, and so in every operation's `Error` type, is
+      `string | number`, not `number`. Code that assigns it straight to a `number` must narrow
+      it first.
+    - The value in the `args` of `CartCustomAttributes`, `CartItemCustomAttributes`,
+      `CartItemCustomAttributeCondition`, `ItemAttribute` and `ItemAttributeCondition` is
+      `string | boolean | number`, not `number`, so a string or boolean attribute value now
+      compiles. Code that reads it as a `number` must narrow it first.
+
+  What is fixed:
+
+  - `PageOffset`, `PageLimit` and the `page[offset]` and `page[limit]` query parameters of
+    `getRulePromotions` are typed `number`, not `BigInt`. The `@hey-api/transformers` plugin
+    declared `BigInt` for these `int64` fields while nothing converted the values, so the
+    declared type was wrong. A caller that passed a `bigint` such as `10n` must pass a
+    `number`.
+  - The `Authorization` header parameter is optional. The specification declares it required
+    on 11 operations, on top of its bearer security scheme, so the old types made those calls
+    pass `headers: { Authorization }`. Leave it out: a client from
+    `createRulePromotionsClient` sends a header it is given as it is, with no token of its own
+    and no replay after a 401.
+
+  All 16 operations keep their names — `getRulePromotions`, `createRulePromotion`,
+  `deleteRulePromotion`, `getRulePromotionById`, `updateRulePromotion`,
+  `deleteRulePromotionCodes`, `getRulePromotionCodes`, `createRulePromotionCodes`,
+  `deleteSingleRulePromotionCode`, `getRulePromotionJobs`, `createRulePromotionJob`,
+  `getRulePromotionJobFile`, `cancelRulePromotionJob`, `anonymizeRulePromotionUsages`,
+  `getRulePromotionUsages` and `getRulePromotionCodeUsages` — and their `Data` / `Response` /
+  `Error` types. `ClientOptions`, the known base URL union, is new; apart from the changes
+  listed above, nothing in the exported type surface is renamed or removed.
+
+## 0.1.0
+
+### Minor Changes
+
+- b195c7b5: Regenerate from the upstream `rule-promotions` spec (spec version 26.0504.7552059, published 2026-05-04T17:39:21Z).
+
+  Adds 79 exported symbols.
+
+  **Breaking.** Removes 25 exported symbols:
+
+  - `rule-promotions: Type`
+  - `rule-promotions: RulePromotionRequest`
+  - `rule-promotions: PromotionJobCreatedResponse`
+  - `rule-promotions: PromotionJobCanceledResponse`
+  - `rule-promotions: ResponsePaginationMeta`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsData`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsResponses`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsResponse`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsData`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsErrors`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsError`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsResponses`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsResponse`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsByJobUuidFileData`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsByJobUuidFileResponses`
+  - `rule-promotions: GetV2RulePromotionsByUuidJobsByJobUuidFileResponse`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsByJobUuidCancelData`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsByJobUuidCancelErrors`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsByJobUuidCancelError`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsByJobUuidCancelResponses`
+  - `rule-promotions: PostV2RulePromotionsByUuidJobsByJobUuidCancelResponse`
+  - `rule-promotions: getV2RulePromotionsByUuidJobs`
+  - `rule-promotions: postV2RulePromotionsByUuidJobs`
+  - `rule-promotions: getV2RulePromotionsByUuidJobsByJobUuidFile`
+  - `rule-promotions: postV2RulePromotionsByUuidJobsByJobUuidCancel`
+
+## 0.0.3
+
+### Patch Changes
+
+- 38ea71fc: add max unit in rule promotion limitation
+
 ## 0.0.2
 
 ### Patch Changes
