@@ -18,12 +18,14 @@ import {
   createStopwordSet,
   createSynonymSet,
   deleteIndexableFields,
+  deleteSearchOverride,
   deleteSearchProfile,
   deleteSearchRule,
   deleteSearchRuleGroup,
   deleteStopwordSet,
   deleteSynonymSet,
   getIndexableFields,
+  getSearchOverride,
   getSearchProfile,
   getSearchRule,
   getSearchRuleGroup,
@@ -46,6 +48,7 @@ import {
   searchByContext,
   setDefaultSearchProfile,
   updateIndexableFields,
+  updateSearchOverride,
   updateSearchProfile,
   updateSearchRule,
   updateSearchRuleGroup,
@@ -61,12 +64,14 @@ import {
   zCreateStopwordSetBody,
   zCreateSynonymSetBody,
   zDeleteIndexableFieldsPath,
+  zDeleteSearchOverridePath,
   zDeleteSearchProfilePath,
   zDeleteSearchRuleGroupPath,
   zDeleteSearchRulePath,
   zDeleteStopwordSetPath,
   zDeleteSynonymSetPath,
   zGetIndexableFieldsPath,
+  zGetSearchOverridePath,
   zGetSearchProfilePath,
   zGetSearchRuleGroupPath,
   zGetSearchRulePath,
@@ -92,6 +97,8 @@ import {
   zSetDefaultSearchProfilePath,
   zUpdateIndexableFieldsBody,
   zUpdateIndexableFieldsPath,
+  zUpdateSearchOverrideBody,
+  zUpdateSearchOverridePath,
   zUpdateSearchProfileBody,
   zUpdateSearchProfilePath,
   zUpdateSearchRuleBody,
@@ -1471,6 +1478,154 @@ export const updateSynonymSetTool = (options?: ToolOptions) => {
   }
 }
 
+const deleteSearchOverrideInput = z
+  .object({
+    path: zDeleteSearchOverridePath.strict(),
+  })
+  .strict()
+
+/**
+ * Delete search override
+ *
+ * Remove the search override for a product. The search override no longer shows on search hits. Search keeps matching the last search values until the product is next indexed.
+ */
+export const deleteSearchOverrideTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof deleteSearchOverrideInput> = (args, ctx) =>
+    toToolResult(
+      deleteSearchOverride({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "catalog_search_delete_search_override" as const,
+    config: {
+      title: "Delete search override",
+      description:
+        "Delete search override. Remove the search override for a product. The search override no longer shows on search hits. Search keeps matching the last search values until the product is next indexed.",
+      inputSchema: deleteSearchOverrideInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "catalog_search.deleteSearchOverride",
+          method: "DELETE",
+          path: "/pcm/catalogs/search/overrides/{product_id}",
+          risk: "delete" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const getSearchOverrideInput = z
+  .object({
+    path: zGetSearchOverridePath.strict(),
+  })
+  .strict()
+
+/**
+ * Get search override
+ *
+ * Get the search override for a product.
+ */
+export const getSearchOverrideTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getSearchOverrideInput> = (args, ctx) =>
+    toToolResult(
+      getSearchOverride({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "catalog_search_get_search_override" as const,
+    config: {
+      title: "Get search override",
+      description:
+        "Get search override. Get the search override for a product.",
+      inputSchema: getSearchOverrideInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "catalog_search.getSearchOverride",
+          method: "GET",
+          path: "/pcm/catalogs/search/overrides/{product_id}",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const updateSearchOverrideInput = withSharedSchemaIds(
+  "catalog_search",
+  z
+    .object({
+      path: zUpdateSearchOverridePath.strict(),
+      body: loose(zUpdateSearchOverrideBody),
+    })
+    .strict(),
+)
+
+/**
+ * Create or update search override
+ *
+ * Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.
+ *
+ * A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. `expires_at` and `persist_across_releases` are ignored.
+ *
+ */
+export const updateSearchOverrideTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof updateSearchOverrideInput> = (args, ctx) =>
+    toToolResult(
+      updateSearchOverride({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "catalog_search_update_search_override" as const,
+    config: {
+      title: "Create or update search override",
+      description:
+        "Create or update search override. Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.",
+      inputSchema: updateSearchOverrideInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "catalog_search.updateSearchOverride",
+          method: "PUT",
+          path: "/pcm/catalogs/search/overrides/{product_id}",
+          risk: "update" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
 const listSearchRuleGroupsInput = z.object({}).strict()
 
 /**
@@ -2102,6 +2257,9 @@ export const tools = (options?: ToolOptions): Array<Tool> => [
   deleteSynonymSetTool(options),
   getSynonymSetTool(options),
   updateSynonymSetTool(options),
+  deleteSearchOverrideTool(options),
+  getSearchOverrideTool(options),
+  updateSearchOverrideTool(options),
   listSearchRuleGroupsTool(options),
   createSearchRuleGroupTool(options),
   deleteSearchRuleGroupTool(options),

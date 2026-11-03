@@ -30,6 +30,9 @@ import type {
   DeleteIndexableFieldsData,
   DeleteIndexableFieldsErrors,
   DeleteIndexableFieldsResponses,
+  DeleteSearchOverrideData,
+  DeleteSearchOverrideErrors,
+  DeleteSearchOverrideResponses,
   DeleteSearchProfileData,
   DeleteSearchProfileErrors,
   DeleteSearchProfileResponses,
@@ -48,6 +51,9 @@ import type {
   GetIndexableFieldsData,
   GetIndexableFieldsErrors,
   GetIndexableFieldsResponses,
+  GetSearchOverrideData,
+  GetSearchOverrideErrors,
+  GetSearchOverrideResponses,
   GetSearchProfileData,
   GetSearchProfileErrors,
   GetSearchProfileResponses,
@@ -114,6 +120,9 @@ import type {
   UpdateIndexableFieldsData,
   UpdateIndexableFieldsErrors,
   UpdateIndexableFieldsResponses,
+  UpdateSearchOverrideData,
+  UpdateSearchOverrideErrors,
+  UpdateSearchOverrideResponses,
   UpdateSearchProfileData,
   UpdateSearchProfileErrors,
   UpdateSearchProfileResponses,
@@ -973,6 +982,97 @@ export const updateSynonymSet = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/pcm/catalogs/search/synonym-sets/{synonym_set_id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+
+/**
+ * Delete search override
+ *
+ * Remove the search override for a product. The search override no longer shows on search hits. Search keeps matching the last search values until the product is next indexed.
+ */
+export const deleteSearchOverride = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteSearchOverrideData, ThrowOnError>,
+): RequestResult<
+  DeleteSearchOverrideResponses,
+  DeleteSearchOverrideErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteSearchOverrideResponses,
+    DeleteSearchOverrideErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "BearerToken",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/overrides/{product_id}",
+    ...options,
+  })
+
+/**
+ * Get search override
+ *
+ * Get the search override for a product.
+ */
+export const getSearchOverride = <ThrowOnError extends boolean = false>(
+  options: Options<GetSearchOverrideData, ThrowOnError>,
+): RequestResult<
+  GetSearchOverrideResponses,
+  GetSearchOverrideErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetSearchOverrideResponses,
+    GetSearchOverrideErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "BearerToken",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/overrides/{product_id}",
+    ...options,
+  })
+
+/**
+ * Create or update search override
+ *
+ * Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.
+ *
+ * A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. `expires_at` and `persist_across_releases` are ignored.
+ *
+ */
+export const updateSearchOverride = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateSearchOverrideData, ThrowOnError>,
+): RequestResult<
+  UpdateSearchOverrideResponses,
+  UpdateSearchOverrideErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateSearchOverrideResponses,
+    UpdateSearchOverrideErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "BearerToken",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/overrides/{product_id}",
     ...options,
     headers: {
       "Content-Type": "application/json",
