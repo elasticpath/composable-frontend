@@ -226,7 +226,7 @@ export type Pricebook = {
  */
 export type PricebookUpdate = {
   /**
-   * The unique identifier of a price book.
+   * The unique identifier of a price book. It must match the price book ID in the path, or the request fails with 409.
    */
   id: string
   /**
@@ -488,7 +488,7 @@ export type ProductPrice = {
     shopper_attributes?: ShopperAttributes
   }
   /**
-   * The unique identifier for the product price.
+   * The unique identifier for the product price. In an update, it must match the price ID in the path, or the request fails with 409.
    */
   id: string
   /**
@@ -768,7 +768,7 @@ export type PriceModifierData = {
  */
 export type PriceModifierUpdate = {
   /**
-   * A unique identifier for the price modifier.
+   * A unique identifier for the price modifier. It must match the price modifier ID in the path, or the request fails with 409.
    */
   id: string
   type: "price-modifier"

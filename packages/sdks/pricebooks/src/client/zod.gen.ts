@@ -246,7 +246,8 @@ export const zPricebook = z
 export const zPricebookUpdate = z
   .object({
     id: z.string().register(z.globalRegistry, {
-      description: "The unique identifier of a price book.",
+      description:
+        "The unique identifier of a price book. It must match the price book ID in the path, or the request fails with 409.",
     }),
     type: z
       .enum(["pricebook"])
@@ -526,7 +527,8 @@ export const zProductPrice = z.object({
     shopper_attributes: zShopperAttributes.optional(),
   }),
   id: z.string().register(z.globalRegistry, {
-    description: "The unique identifier for the product price.",
+    description:
+      "The unique identifier for the product price. In an update, it must match the price ID in the path, or the request fails with 409.",
   }),
   meta: z
     .object({
@@ -811,7 +813,8 @@ export const zPriceModifierData = z
 export const zPriceModifierUpdate = z
   .object({
     id: z.string().register(z.globalRegistry, {
-      description: "A unique identifier for the price modifier.",
+      description:
+        "A unique identifier for the price modifier. It must match the price modifier ID in the path, or the request fails with 409.",
     }),
     type: z.enum(["price-modifier"]).default("price-modifier"),
     attributes: z.object({
