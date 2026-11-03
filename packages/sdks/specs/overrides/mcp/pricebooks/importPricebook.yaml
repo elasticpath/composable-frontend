@@ -1,8 +1,40 @@
+x-mcp-max-file-bytes: 52428800
 x-mcp-risk: update
 x-mcp-title: Import Price Books and Prices
 x-mcp-description: >-
-  Starts a bulk import that creates and updates price books and their prices
-  from a JSONL file, optionally GZIP compressed, so it can overwrite existing
-  prices. If an error occurs the import stops and the job fails, but objects
-  already created or updated stay. Imports are processed one at a time, in the
-  order sent.
+  Creates and updates price books and prices in bulk from a JSONL file, at most
+  50,000 objects; split larger sets across several imports. Each price line
+  updates the price in its book that matches id, then external_ref, then sku,
+  and creates the price if none matches. Send the file as a
+  data:application/octet-stream;base64 URI. A line without sku rejects the whole
+  file with 422. Otherwise it starts a job; read the job until it finishes. A
+  price book reference that does not exist fails the job, and nothing from the
+  file is applied. Imports run one at a time, in the order sent.
+# The published spec declares no request body, so the SDK typed this operation as body?: never.
+# The body is what pricebooks.svc's import handler reads (importer_handlers.go, service/import.go).
+# Remove this requestBody once the published spec carries it (pricebooks.svc!696).
+requestBody:
+  required: true
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        required:
+          - file
+        properties:
+          file:
+            description: >-
+              A JSONL file with up to 50,000 objects, one on each line, or the
+              same file compressed with GZIP; then set file_compression to gzip.
+              Each object is {"data": {...}}, and
+              data.type is pricebook or product-price. A product-price object
+              needs attributes.sku, and pricebook_id or pricebook_external_ref,
+              for example {"data":{"type":"product-price","pricebook_external_ref":"wholesale","attributes":{"sku":"SKU-1","currencies":{"USD":{"amount":1000,"includes_tax":false}}}}}.
+              A pricebook object has the attributes of a price book create.
+            type: string
+            format: binary
+          file_compression:
+            description: >-
+              Set to gzip when the file is compressed with GZIP. Without it, a
+              compressed file fails with a 422. Other values are ignored.
+            type: string

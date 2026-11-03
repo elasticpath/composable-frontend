@@ -2910,7 +2910,16 @@ export type Filtercr = string
 export type GetAllJobsData = {
   body?: never
   path?: never
-  query?: never
+  query?: {
+    /**
+     * The number of records to offset the results by.
+     */
+    "page[offset]"?: number
+    /**
+     * The number of records per page. The maximum limit is 100.
+     */
+    "page[limit]"?: number
+  }
   url: "/pcm/jobs"
 }
 

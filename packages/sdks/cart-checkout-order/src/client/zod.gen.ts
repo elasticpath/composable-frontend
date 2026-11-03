@@ -1984,15 +1984,18 @@ export const zCartsItemsTaxesCommon = z.object({
     })
     .optional(),
   amount: z
-    .number()
+    .int()
     .register(z.globalRegistry, {
       description:
         "The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). You must specify either `rate` or `amount`, but not both.\n",
     })
     .optional(),
-  type: z.literal("tax_item").register(z.globalRegistry, {
-    description: "The type of object being returned. Use `tax_item`.",
-  }),
+  type: z
+    .literal("tax_item")
+    .register(z.globalRegistry, {
+      description: "The type of object being returned. Use `tax_item`.",
+    })
+    .default("tax_item"),
   id: z
     .uuid()
     .register(z.globalRegistry, {
@@ -2026,7 +2029,7 @@ export const zCartsItemsTaxesWithRate = zCartsItemsTaxesCommon.and(
  */
 export const zCartsItemsTaxesWithAmount = zCartsItemsTaxesCommon.and(
   z.object({
-    amount: z.number().register(z.globalRegistry, {
+    amount: z.int().register(z.globalRegistry, {
       description:
         "The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). Required when using amount-based taxation.\n",
     }),
@@ -5011,15 +5014,18 @@ export const zCartsItemsTaxesCommonWritable = z.object({
     })
     .optional(),
   amount: z
-    .number()
+    .int()
     .register(z.globalRegistry, {
       description:
         "The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). You must specify either `rate` or `amount`, but not both.\n",
     })
     .optional(),
-  type: z.literal("tax_item").register(z.globalRegistry, {
-    description: "The type of object being returned. Use `tax_item`.",
-  }),
+  type: z
+    .literal("tax_item")
+    .register(z.globalRegistry, {
+      description: "The type of object being returned. Use `tax_item`.",
+    })
+    .default("tax_item"),
 })
 
 /**
@@ -5048,7 +5054,7 @@ export const zCartsItemsTaxesWithRateWritable =
 export const zCartsItemsTaxesWithAmountWritable =
   zCartsItemsTaxesCommonWritable.and(
     z.object({
-      amount: z.number().register(z.globalRegistry, {
+      amount: z.int().register(z.globalRegistry, {
         description:
           "The tax as an absolute amount in the smallest currency unit (e.g., $10 -> 1000). Required when using amount-based taxation.\n",
       }),

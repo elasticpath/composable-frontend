@@ -1,0 +1,11 @@
+# Where the published spec and pim.svc disagree, the service wins. Remove an entry once
+# the published spec agrees.
+components:
+  schemas:
+    # pim.svc requires type, and hierarchy is its only value (internal/api/schema/hierarchies/update.json).
+    update_hierarchy:
+      properties:
+        data:
+          properties:
+            type:
+              default: hierarchy

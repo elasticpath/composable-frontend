@@ -3,3 +3,5 @@ x-mcp-description: >-
   and end dates, automatic, stackable, override_stacking or rule set. The change
   is validated, so invalid values such as a start date after the end date are
   rejected.
+  To change rule_set, send all of it, with both rules and actions, in the shapes
+  create uses.

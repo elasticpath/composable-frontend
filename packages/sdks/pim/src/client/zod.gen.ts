@@ -3411,10 +3411,13 @@ export const zUpdateHierarchy = z.object({
       description:
         "The unique identifier of the hierarchy. Must match the hierarchy ID specified in the request path.",
     }),
-    type: z.enum(["hierarchy"]).register(z.globalRegistry, {
-      description:
-        "This represents the type of resource object being returned. Always `hierarchy`.",
-    }),
+    type: z
+      .enum(["hierarchy"])
+      .register(z.globalRegistry, {
+        description:
+          "This represents the type of resource object being returned. Always `hierarchy`.",
+      })
+      .default("hierarchy"),
     attributes: zReqAttributesHierarchy,
   }),
 })
@@ -3895,6 +3898,27 @@ export const zTagId = z.string().register(z.globalRegistry, {
 export const zFiltercr = z.string().register(z.globalRegistry, {
   description:
     "Many Commerce API endpoints support filtering. The general syntax is described [**here**](/guides/Getting-Started/filtering).\n",
+})
+
+export const zGetAllJobsQuery = z.object({
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description: "The number of records to offset the results by.",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description: "The number of records per page. The maximum limit is 100.",
+    })
+    .optional(),
 })
 
 /**

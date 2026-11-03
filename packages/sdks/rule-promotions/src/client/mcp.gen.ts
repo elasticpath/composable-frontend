@@ -161,7 +161,7 @@ export const createRulePromotionTool = (options?: ToolOptions) => {
     config: {
       title: "Create a Rule Promotion",
       description:
-        "Creates a rule promotion: a cart-wide, item or shipping discount, fixed or percentage, with eligibility rules on things such as the cart total, products, SKUs or custom attributes. It applies automatically or only with codes, which are added afterwards. A store can have at most 50 active and future automatic rule promotions.",
+        'Creates a rule promotion: a cart, item or shipping discount with eligibility rules. Requires name, enabled, start, end (no offset means UTC) and rule_set with rules and actions. rules is one object; combine with strategy "and" and children. item_category args are node IDs, not names, and a parent node covers its children. item_sku takes SKUs, item_product_id product IDs. account_tags takes account tag IDs, not names, and only matches carts of a signed-in account member, never guest carts. It applies automatically, or only with codes added afterwards.',
       inputSchema: createRulePromotionInput,
       annotations: {
         readOnlyHint: false,
@@ -331,7 +331,7 @@ export const updateRulePromotionTool = (options?: ToolOptions) => {
     config: {
       title: "Update a Rule Promotion",
       description:
-        "Updates a rule promotion by ID: its name, description, enabled state, start and end dates, automatic, stackable, override_stacking or rule set. The change is validated, so invalid values such as a start date after the end date are rejected.",
+        "Updates a rule promotion by ID: its name, description, enabled state, start and end dates, automatic, stackable, override_stacking or rule set. The change is validated, so invalid values such as a start date after the end date are rejected. To change rule_set, send all of it, with both rules and actions, in the shapes create uses.",
       inputSchema: updateRulePromotionInput,
       annotations: {
         readOnlyHint: false,
