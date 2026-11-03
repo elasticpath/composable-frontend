@@ -179,8 +179,8 @@ info:
       - `fixed_price` – Sets a fixed total price for the group (e.g., If the fixed price is set at $100, then the group's subtotal is exactly $100)
       - `percent` – Applies a percentage-based discount to the group.
       - `fixed` – Deducts a fixed amount from the group's total price.
-  version: 26.1008.8283824
-  x-version-timestamp: 2026-10-08T16:32:19Z
+  version: 26.1030.8414225
+  x-version-timestamp: 2026-10-30T23:50:05Z
   contact:
     name: Elastic Path
     url: https://elasticpath.com
@@ -1857,11 +1857,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                description: Promotion job response
-                properties:
-                  data:
-                    $ref: '#/components/schemas/PromotionJobResponse'
+                $ref: '#/components/schemas/PromotionJobSingleResponse'
         '400':
           description: Bad Request
           content:
@@ -2030,11 +2026,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                description: Promotion job response
-                properties:
-                  data:
-                    $ref: '#/components/schemas/PromotionJobResponse'
+                $ref: '#/components/schemas/PromotionJobSingleResponse'
               examples:
                 PromotionJobCancellingResponse:
                   summary: Successful Cancellation Request for a Rule Promotion Job
@@ -2147,29 +2139,22 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/RulePromotionUsage'
-                  - $ref: '#/components/schemas/Response.Error'
-                example:
-                  data:
-                    - id: ca4385ec-7fb2-4a95-8690-f752c508d68a
-                      order_id: 8edd5ca8-39b7-468d-aea9-a470690ca98d
-                      code_id: 00fc633b-9932-4e18-b122-fd5c3173caa3
-                      code: node1off
-                      times_used: 1
-                      used_on: '2023-06-19T18:05:20.846Z'
-                      customer_id: 9ef25142-d67a-41d3-99b2-4d30aeef6c9d
-                      customer_email: '**'
-                      meta:
-                        timestamps:
-                          updated_at: '2023-06-19T18:05:39.141Z'
-                      updated_by: Key-2439657140697170361
-                      anonymized: true
+                $ref: '#/components/schemas/AnonymizeRulePromotionUsagesResponse'
+              example:
+                data:
+                  - id: ca4385ec-7fb2-4a95-8690-f752c508d68a
+                    order_id: 8edd5ca8-39b7-468d-aea9-a470690ca98d
+                    code_id: 00fc633b-9932-4e18-b122-fd5c3173caa3
+                    code: node1off
+                    times_used: 1
+                    used_on: '2023-06-19T18:05:20.846Z'
+                    customer_id: 9ef25142-d67a-41d3-99b2-4d30aeef6c9d
+                    customer_email: '**'
+                    meta:
+                      timestamps:
+                        updated_at: '2023-06-19T18:05:39.141Z'
+                    updated_by: Key-2439657140697170361
+                    anonymized: true
         '400':
           description: Bad Request
           content:
@@ -2260,16 +2245,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RulePromotionUsage'
-                  links:
-                    $ref: '#/components/schemas/PaginationLinks'
-                  meta:
-                    $ref: '#/components/schemas/PaginationMeta'
+                $ref: '#/components/schemas/RulePromotionUsagesListResponse'
               example:
                 data:
                   - id: a9b73e4d-637f-4f1c-9b3e-2de1f8a70351
@@ -2375,16 +2351,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RulePromotionUsage'
-                  links:
-                    $ref: '#/components/schemas/PaginationLinks'
-                  meta:
-                    $ref: '#/components/schemas/PaginationMeta'
+                $ref: '#/components/schemas/RulePromotionUsagesListResponse'
               example:
                 data:
                   - id: c2f45a8d-6ebf-4b6a-8b1c-d2e7c9e0f45f
@@ -2510,6 +2477,27 @@ components:
         anonymized:
           type: boolean
           description: Indicates whether the usage record has been anonymized.
+    RulePromotionUsagesListResponse:
+      type: object
+      description: A paginated list of rule promotion usage records.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RulePromotionUsage'
+        links:
+          $ref: '#/components/schemas/PaginationLinks'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+    AnonymizeRulePromotionUsagesResponse:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/RulePromotionUsage'
+        - $ref: '#/components/schemas/Response.Error'
     RulePromotionBaseAttributes:
       type: object
       properties:
@@ -2616,7 +2604,8 @@ components:
                 - $ref: '#/components/schemas/Or'
             actions:
               type: array
-              description: Describes how this promotion should be applied to the cart and order.
+              description: Describes how this promotion should be applied to the cart and order. A rule set can have a maximum of 10 actions.
+              maxItems: 10
               items:
                 oneOf:
                   - $ref: '#/components/schemas/CartDiscount'
@@ -2857,6 +2846,12 @@ components:
           $ref: '#/components/schemas/PaginationLinks'
         meta:
           $ref: '#/components/schemas/PaginationMeta'
+    PromotionJobSingleResponse:
+      type: object
+      description: Promotion job response
+      properties:
+        data:
+          $ref: '#/components/schemas/PromotionJobResponse'
     Response.Error:
       type: object
       properties:
@@ -2908,6 +2903,10 @@ components:
       type: object
       summary: Item Discount
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
         strategy:
           type: string
           const: item_discount
@@ -2950,7 +2949,7 @@ components:
                   description: Specifies the strategy for determining which items to discount based on their individual prices.
                 auto_add:
                   type: boolean
-                  description: 'This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog.'
+                  description: 'This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog. We recommend using a target item that is different from the items that qualify for the promotion to avoid inconsistent auto add behavior and discounts. To discount a unit of the same product, use an `items_bundle_discount` action instead, which doesn''t auto add items.'
                 show_suggestions:
                   type: boolean
                   description: A flag indicating whether to show suggestions for eligible items in the cart if the item is not in the cart.
@@ -2958,6 +2957,10 @@ components:
       type: object
       summary: Cart Discount
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
         strategy:
           type: string
           const: cart_discount
@@ -2979,6 +2982,10 @@ components:
       type: object
       summary: Items Bundle Discount
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
         strategy:
           type: string
           const: items_bundle_discount
@@ -3000,6 +3007,10 @@ components:
       type: object
       summary: Shipping Discount
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
         strategy:
           type: string
           const: shipping_discount

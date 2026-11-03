@@ -469,6 +469,12 @@ export const zResponseError = z.object({
     .optional(),
 })
 
+export const zAnonymizeRulePromotionUsagesResponse = z
+  .object({
+    data: z.array(zRulePromotionUsage).optional(),
+  })
+  .and(zResponseError)
+
 /**
  * Represents the result of a promotion job, including the number of generated and deleted promotion codes.
  *
@@ -1327,6 +1333,13 @@ export const zCondition = z.discriminatedUnion("strategy", [
 ])
 
 export const zCartDiscount = z.object({
+  id: z
+    .uuid()
+    .register(z.globalRegistry, {
+      description:
+        "Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.",
+    })
+    .optional(),
   strategy: z
     .literal("cart_discount")
     .register(z.globalRegistry, {
@@ -1367,6 +1380,13 @@ export const zFixedPriceQuantityArg = z
   })
 
 export const zItemDiscount = z.object({
+  id: z
+    .uuid()
+    .register(z.globalRegistry, {
+      description:
+        "Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.",
+    })
+    .optional(),
   strategy: z
     .literal("item_discount")
     .register(z.globalRegistry, {
@@ -1420,7 +1440,7 @@ export const zItemDiscount = z.object({
             .boolean()
             .register(z.globalRegistry, {
               description:
-                "This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog.",
+                "This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog. We recommend using a target item that is different from the items that qualify for the promotion to avoid inconsistent auto add behavior and discounts. To discount a unit of the same product, use an `items_bundle_discount` action instead, which doesn't auto add items.",
             })
             .optional(),
           show_suggestions: z
@@ -1446,6 +1466,13 @@ export const zFixedPriceArg = z
   })
 
 export const zBundleDiscount = z.object({
+  id: z
+    .uuid()
+    .register(z.globalRegistry, {
+      description:
+        "Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.",
+    })
+    .optional(),
   strategy: z
     .literal("items_bundle_discount")
     .register(z.globalRegistry, {
@@ -1469,6 +1496,13 @@ export const zBundleDiscount = z.object({
 })
 
 export const zShippingDiscount = z.object({
+  id: z
+    .uuid()
+    .register(z.globalRegistry, {
+      description:
+        "Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.",
+    })
+    .optional(),
   strategy: z
     .literal("shipping_discount")
     .register(z.globalRegistry, {
@@ -1523,9 +1557,10 @@ export const zRulePromotionBaseRuleSetBaseAttributes = z.object({
             zBundleDiscount,
           ]),
         )
+        .max(10)
         .register(z.globalRegistry, {
           description:
-            "Describes how this promotion should be applied to the cart and order.",
+            "Describes how this promotion should be applied to the cart and order. A rule set can have a maximum of 10 actions.",
         })
         .optional(),
     })
@@ -1630,6 +1665,19 @@ export const zRulePromotionListResponse = z.object({
   meta: zPaginationMeta.optional(),
 })
 
+/**
+ * A paginated list of rule promotion usage records.
+ */
+export const zRulePromotionUsagesListResponse = z
+  .object({
+    data: z.array(zRulePromotionUsage).optional(),
+    links: zPaginationLinks.optional(),
+    meta: zPaginationMeta.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A paginated list of rule promotion usage records.",
+  })
+
 export const zGetPromotionCodesResponse = z.object({
   data: z.array(zGetPromotionCodeResponse).optional(),
   links: zPaginationLinks.optional(),
@@ -1693,6 +1741,17 @@ export const zPromotionJobsListResponse = z
   })
   .register(z.globalRegistry, {
     description: "Successful response",
+  })
+
+/**
+ * Promotion job response
+ */
+export const zPromotionJobSingleResponse = z
+  .object({
+    data: zPromotionJobResponse.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "Promotion job response",
   })
 
 export const zRulePromotionRequest = z.object({
@@ -2000,15 +2059,9 @@ export const zCreateRulePromotionJobPath = z.object({
 })
 
 /**
- * Promotion job response
+ * Promotion job created
  */
-export const zCreateRulePromotionJobResponse = z
-  .object({
-    data: zPromotionJobResponse.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Promotion job response",
-  })
+export const zCreateRulePromotionJobResponse = zPromotionJobSingleResponse
 
 export const zGetRulePromotionJobFilePath = z.object({
   uuid: z.string().register(z.globalRegistry, {
@@ -2035,15 +2088,9 @@ export const zCancelRulePromotionJobPath = z.object({
 })
 
 /**
- * Promotion job response
+ * Successfully Canceled the Rule Promotion Job
  */
-export const zCancelRulePromotionJobResponse = z
-  .object({
-    data: zPromotionJobResponse.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Promotion job response",
-  })
+export const zCancelRulePromotionJobResponse = zPromotionJobSingleResponse
 
 export const zAnonymizeRulePromotionUsagesBody = z.object({
   data: z.object({
@@ -2060,11 +2107,8 @@ export const zAnonymizeRulePromotionUsagesBody = z.object({
 /**
  * OK
  */
-export const zAnonymizeRulePromotionUsagesResponse = z
-  .object({
-    data: z.array(zRulePromotionUsage).optional(),
-  })
-  .and(zResponseError)
+export const zAnonymizeRulePromotionUsagesResponse2 =
+  zAnonymizeRulePromotionUsagesResponse
 
 export const zGetRulePromotionUsagesHeaders = z.object({
   Authorization: z
@@ -2106,15 +2150,7 @@ export const zGetRulePromotionUsagesQuery = z.object({
 /**
  * Successful response
  */
-export const zGetRulePromotionUsagesResponse = z
-  .object({
-    data: z.array(zRulePromotionUsage).optional(),
-    links: zPaginationLinks.optional(),
-    meta: zPaginationMeta.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Successful response",
-  })
+export const zGetRulePromotionUsagesResponse = zRulePromotionUsagesListResponse
 
 export const zGetRulePromotionCodeUsagesHeaders = z.object({
   Authorization: z
@@ -2160,12 +2196,5 @@ export const zGetRulePromotionCodeUsagesQuery = z.object({
 /**
  * Successful response
  */
-export const zGetRulePromotionCodeUsagesResponse = z
-  .object({
-    data: z.array(zRulePromotionUsage).optional(),
-    links: zPaginationLinks.optional(),
-    meta: zPaginationMeta.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Successful response",
-  })
+export const zGetRulePromotionCodeUsagesResponse =
+  zRulePromotionUsagesListResponse
