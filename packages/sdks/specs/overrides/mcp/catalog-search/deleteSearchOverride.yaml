@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes the search override for one product. Search hits stop showing its
+  values, but search keeps matching them until the product is next indexed. It
+  succeeds even when the product has no override.

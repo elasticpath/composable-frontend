@@ -133,7 +133,12 @@ describe("the /zod entry", () => {
     expect(result.error?.issues).toEqual([
       expect.objectContaining({
         code: "invalid_value",
-        values: ["index-release", "delete-release", "reindex-tenant-releases"],
+        values: [
+          "index-release",
+          "delete-release",
+          "reindex-tenant-releases",
+          "migrate-store-to-cluster",
+        ],
         path: ["attributes", "type"],
       }),
     ])

@@ -1504,7 +1504,7 @@ export const deleteSearchOverrideTool = (options?: ToolOptions) => {
     config: {
       title: "Delete search override",
       description:
-        "Delete search override. Remove the search override for a product. The search override no longer shows on search hits. Search keeps matching the last search values until the product is next indexed.",
+        "Deletes the search override for one product. Search hits stop showing its values, but search keeps matching them until the product is next indexed. It succeeds even when the product has no override.",
       inputSchema: deleteSearchOverrideInput,
       annotations: {
         readOnlyHint: false,
@@ -1551,7 +1551,7 @@ export const getSearchOverrideTool = (options?: ToolOptions) => {
     config: {
       title: "Get search override",
       description:
-        "Get search override. Get the search override for a product.",
+        "Gets the search override for one product: the field values search uses in place of the product's own, and which of those fields are private. Returns 404 when the product has no override or its override was deleted.",
       inputSchema: getSearchOverrideInput,
       annotations: {
         readOnlyHint: true,
@@ -1605,7 +1605,7 @@ export const updateSearchOverrideTool = (options?: ToolOptions) => {
     config: {
       title: "Create or update search override",
       description:
-        "Create or update search override. Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.",
+        "Creates or updates the search override for one product, which sets field values that search uses in place of the product's own. Send fields to set values, cleared to remove fields, or both; a request with neither returns 400. Fields left out stay unchanged. Each name must be a core product field or one of the store's indexable fields, admin_attributes fields must be private, and each value must match its field type. Otherwise it returns 400 with meta.field naming the field, and nothing is stored. Search picks up the change shortly after.",
       inputSchema: updateSearchOverrideInput,
       annotations: {
         readOnlyHint: false,
