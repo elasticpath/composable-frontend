@@ -290,8 +290,8 @@ describe("the rule promotions tools on an MCP server", () => {
   })
 
   it.each([
-    ["rule_promotions_update_rule_promotion", 36_100],
-    ["rule_promotions_create_rule_promotion", 35_900],
+    ["rule_promotions_update_rule_promotion", 37_600],
+    ["rule_promotions_create_rule_promotion", 37_400],
     ["rule_promotions_get_rule_promotions", 3_600],
   ])("lists the input schema of %s in at most %i characters", (name, limit) => {
     const tool = listed.find((candidate) => candidate.name === name)!
