@@ -1,6 +1,6 @@
 {
   "name": "@epcc-sdk/compatibility-layer",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Compatibility layer enabling new TypeScript SDKs to use old JS SDK auth, retry, and throttle logic",
   "type": "module",
   "main": "./dist/index.cjs",
