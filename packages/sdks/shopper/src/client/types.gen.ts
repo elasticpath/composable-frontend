@@ -10177,6 +10177,10 @@ export type SearchQuery = {
   highlight_full_fields?: string
   q?: string
   facet_by?: FacetByField
+  /**
+   * Searches within the values of one facet named in `facet_by`, in the form `field:value`. Only that facet's values matching the text are returned, each with its count and a highlighted label.
+   */
+  facet_query?: string
   filter_by?: FilterByField
   sort_by?: SortByField
   max_facet_values?: number
@@ -10242,39 +10246,39 @@ export type FacetValue = {
  *
  * These are **internal ranking signals** for debugging relevance and tuning Search Profiles — not user-facing match percentages. Scores are not normalized to a 0–100 scale. Higher `score` values indicate greater relevance **within the same search result set**; scores are not comparable across different queries.
  *
- * The overall relevance integer is available as `score` (string). Catalog Search does not expose the search engine's separate top-level `text_match` field.
+ * The overall relevance integer is available as `score` (string). Searches with no keyword (`q=*`), searches whose `sort_by` uses three fields (or two fields when boosts apply), and pinned products have no relevance score and return no `text_match_info`.
  *
  * **Good uses:** debugging why one product ranks above another; building custom relative metrics (e.g. `tokens_matched` vs query length); merchandising and relevance tuning.
  *
  * **Poor uses:** displaying "match %" to shoppers; filtering by absolute thresholds without per-query calibration; comparing scores across unrelated searches.
  *
  * How the final `score` is aggregated depends on the active Search Profile's `text_match_type`:
- * - `max_score` (default): best field score wins; weights break ties
- * - `max_weight`: highest-weighted matching field drives the score
- * - `sum_score`: weighted field scores are summed
+ * - `max_score` (default): products matching more query words, counted across all fields, rank first. Among those, the best single field score wins and weights break ties
+ * - `max_weight`: products matching more query words, counted across all fields, rank first. Among those, the score of the highest-weighted matching field represents the product, even when a lower-weighted field matches more query words
+ * - `sum_score`: weighted field scores are summed. The number of query words matched is not ranked. Only `score` and `fields_matched` are meaningful in this mode
  *
  */
 export type TextMatchInfo = {
   /**
-   * Raw text match score of the single best-performing field in the Search Profile's `query_by` list.
-   * A large opaque integer — field-level, not normalized. In `max_score` mode (default), this is the strongest per-field signal driving the document score.
+   * Raw text match score of the single best-performing field in the Search Profile's `fields` list.
+   * A large opaque integer — field-level, not normalized. In `max_score` mode (default), this is the strongest per-field signal driving the document score. Under `max_weight`, it is the score of the highest-weighted matching field. Not meaningful under `sum_score`.
    *
    */
   best_field_score?: string
   /**
-   * The `query_by_weights` value of the best-matching field (0–127). For example, `15` indicates the winning match came from a high-priority profile field such as `meta.search.nodes.name`.
-   * Under `max_score`, weight is mainly a tie-breaker when two documents share the same field score. Under `max_weight`, it determines which field's score represents the document.
+   * The Search Profile field weight of the best-matching field (0–15). For example, `15` indicates the winning match came from a high-priority profile field such as `meta.search.nodes.name`.
+   * Under `max_score`, weight is mainly a tie-breaker when two documents share the same field score. Under `max_weight`, it determines which field's score represents the document. Not meaningful under `sum_score`.
    *
    */
   best_field_weight?: number
   /**
-   * Number of `query_by` fields that contained at least one query token. May differ from the number of highlighted fields — highlighting scans all queried fields for display, while scoring weights fields differently.
+   * Number of Search Profile `fields` that contained at least one query token, capped at 7. May differ from the number of highlighted fields, because highlighting scans `highlight_settings.fields` when set, otherwise every profile field, while this counts only fields that contributed to the score.
    *
    */
   fields_matched?: number
   /**
    * Number of query tokens not matched in this document (`max(0, total_query_tokens − tokens_matched)`). `0` means full query coverage; `1` means one token was missing (e.g. searching "Blue Vase Ceramic" but the document only matches "Blue Vase").
-   * Reports token coverage for this specific hit, not the global `drop_tokens_threshold` query-relaxation behaviour.
+   * Reports token coverage for this specific hit, not the global `drop_tokens_threshold` query-relaxation behaviour. Not meaningful under `sum_score`, where it always equals the number of query tokens.
    *
    */
   num_tokens_dropped?: number
@@ -10284,12 +10288,12 @@ export type TextMatchInfo = {
    */
   score?: string
   /**
-   * Number of distinct query words found in the document. Each query token is counted at most once per document, even if it appears multiple times in the text. Highlighting may show repeated occurrences; this count will not.
+   * Number of query words found in the document, counted across all fields and capped at 15. A word that occurs several times in the document counts once, but a word repeated in the query counts once per repetition. When a synonym applies to the query, hits found without dropping query words report the larger of the query length and the longest synonym expansion. Always `0` under `sum_score`.
    *
    */
   tokens_matched?: number
   /**
-   * Diagnostic signal indicating how much prefix matching or typo correction contributed to the match. `0` typically indicates an exact token match with no fuzzy or prefix-based relaxation; higher values may appear when `num_typos` or `prefix` matching was involved. Not a directly configurable parameter — treat as a tuning/debugging signal, not a display metric.
+   * Typo and prefix cost of the match: 2 for each corrected typo plus 1 for each query word completed from a prefix. `0` means every query word matched as typed; `1` means one word was completed from a prefix; `2` means one typo was corrected. Synonym matches can report a reduced cost, and products found after dropping query words report the cost of the shortened query. Lower ranks higher. Not meaningful under `sum_score`, or under `max_weight` for products that match only fields with weight `0` (reported as `255`). Not a directly configurable parameter — treat as a tuning/debugging signal, not a display metric.
    *
    */
   typo_prefix_score?: number
@@ -10307,7 +10311,7 @@ export type Hit = {
     [key: string]: unknown
   }>
   /**
-   * Relevance metadata for this hit, included when the search engine returns it. Omitted when relevance metadata is unavailable (e.g. some autocomplete results).
+   * Relevance metadata for this hit, included when the search engine returns it. Omitted when relevance metadata is unavailable (e.g. pinned products, some autocomplete results).
    * Hit order in the response reflects ranking driven by these scores.
    *
    */
@@ -10389,7 +10393,7 @@ export type IndexableFieldsRequestAttributes = {
    */
   symbols_to_index?: Array<string>
   /**
-   * Enables word stemming across every text field in the index, using the [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form when indexing and when searching, so a search for `running` also matches products containing `run`, `runs`, or `runner`.
+   * Enables word stemming across every text field in the index, using the [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form when indexing and when searching, so a search for `running` also matches products containing `run` or `runs`.
    * Defaults to `true`, so stemming applies to all text fields unless you turn it off here. Set `stem: false` to disable stemming for the whole index.
    * This is the recommended way to configure stemming. A `stem` value set on an individual field or core field override takes precedence over this setting for that field.
    *
@@ -10434,8 +10438,8 @@ export type IndexableFieldRequest = {
    * The name of the field to index. Two formats are supported:
    *
    * - **Extension fields**: `extensions.products(<template_slug>).<field_name>` — indexes a field from a product extension template. The field must exist and be enabled in the flows service.
-   * - **Shopper attribute fields**: `shopper_attributes.<attribute_name>` — indexes a merchant-defined shopper attribute. Always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
-   * - **Admin attribute fields**: `admin_attributes.<attribute_name>` — indexes a merchant-defined admin attribute. Always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
+   * - **Shopper attribute fields**: `shopper_attributes.<attribute_name>` — indexes a merchant-defined shopper attribute. At store level, the type comes from the store's `shopper` attribute definition for that name, or `string` with no definition. At organization level, always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
+   * - **Admin attribute fields**: `admin_attributes.<attribute_name>` — indexes a merchant-defined admin attribute. At store level, the type comes from the store's `admin` attribute definition for that name, or `string` with no definition. At organization level, always typed as `string`. The attribute name must be no longer than **64 characters** and can only contain alphanumeric characters, underscores (`_`), and hyphens (`-`).
    *
    */
   name: string
@@ -10467,6 +10471,16 @@ export type IndexableFieldRequest = {
    * @deprecated
    */
   symbols_to_index?: Array<string>
+  /**
+   * Marks a `string` field whose value is a stringified JSON object as a JSON Root Field. A JSON Root Field is not indexed itself. Its top-level keys are indexed by declaring JSON Child Fields named `<root>.<key>`, for example `extensions.products(Details).attributes.color`.
+   *
+   */
+  json_string?: boolean
+  /**
+   * The type a JSON Child Field is indexed as. Required on a JSON Child Field. One of `string`, `int32`, `int64`, `bool`, `float` or `date`. Ignored on every other field, whose type comes from its definition.
+   *
+   */
+  type?: string
 }
 
 export type IndexableField = {
@@ -10502,6 +10516,11 @@ export type IndexableField = {
    * @deprecated
    */
   symbols_to_index?: Array<string>
+  /**
+   * `true` when the field is a JSON Root Field: a `string` field holding a stringified JSON object whose keys are indexed as JSON Child Fields. Omitted otherwise.
+   *
+   */
+  json_string?: boolean
 }
 
 export type CoreFieldOverride = {
@@ -10539,7 +10558,7 @@ export type CoreFieldOverride = {
 
 /**
  * Deprecated. Prefer the index-wide `stem` on the indexable fields resource, which applies to every text field. A per-field value still overrides it, but mixing tokenization settings across the query fields of one search profile changes how queries are matched — see the Indexable Fields guide.
- * When true, enables word stemming on this field using [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form at index and query time, so a search for "running" will also match products containing "run", "runs", or "runner". This improves search recall for descriptive text fields where shoppers may use different word forms than those used in product data. Only valid for string-typed fields.
+ * When true, enables word stemming on this field using [Snowball stemmer](https://snowballstem.org/). Stemming reduces words to their root form at index and query time, so a search for "running" will also match products containing "run" or "runs". This improves search recall for descriptive text fields where shoppers may use different word forms than those used in product data. Only valid for string-typed fields.
  * Text fields stem by default. Set `false` to turn stemming off for this field, overriding the index-wide `stem` setting.
  *
  *
@@ -10715,6 +10734,9 @@ export type SearchProfileUpdateAttributes = {
   prefix?: boolean | null
   typo_tolerance?: TypoTolerance
   synonym_settings?: SynonymSettings
+  highlight_settings?: HighlightSettings
+  facet_settings?: FacetSettings
+  ranking_settings?: RankingSettings
   /**
    * Optional list of synonym set IDs to apply at search time. Each synonym set must exist and must have been synced to the search engine at least once. Organization-level search profiles may only reference organization-level synonym sets. Store-level search profiles may reference organization-level and same-store synonym sets. Set to an empty array to remove all synonym sets from the search profile.
    *
@@ -10725,6 +10747,11 @@ export type SearchProfileUpdateAttributes = {
    *
    */
   rule_groups?: Array<string>
+  /**
+   * Optional Ranking Order: the order in which the Request Sort, boosts, text relevance and product attribute criteria rank products. Omit to keep the current Ranking Order. Set to an empty array to reset it to the default order `request_sort`, `boosts`, `text_relevance`. A non-empty Ranking Order lists `request_sort`, `boosts` and `text_relevance` exactly once each, has at most three `attribute` criteria, and does not repeat an attribute field in either direction. No criterion may follow three criteria that apply to every search: `attribute` criteria, and `boosts` when the profile has its own boosts. Such a criterion can never rank and is rejected.
+   *
+   */
+  ranking_order?: Array<RankingCriterion>
   /**
    * When set to true, the default price is used for faceting and sorting for segmented catalogs even if the catalog rule has a supported price book.
    */
@@ -11000,6 +11027,120 @@ export type StopwordSetMeta = {
   last_synced_at?: string
 }
 
+export type SearchOverrideResponse = {
+  data: SearchOverride
+}
+
+export type SearchOverride = {
+  /**
+   * The ID of the product the search override applies to.
+   */
+  id: string
+  type: SearchOverrideType
+  attributes: SearchOverrideAttributes
+  meta: SearchOverrideMeta
+}
+
+/**
+ * Represents the type of object being returned. Always `catalog_search_override`.
+ */
+export type SearchOverrideType = "catalog_search_override"
+
+export type SearchOverrideAttributes = {
+  /**
+   * Each overridden field, keyed by indexed field name.
+   */
+  fields: {
+    [key: string]: SearchOverrideField
+  }
+  /**
+   * Reserved. Ignored until a search override can expire. Omitted means no expiry.
+   */
+  expires_at?: string
+  /**
+   * Reserved. Ignored until a search override can stop at the next release. Omitted means the override persists.
+   */
+  persist_across_releases?: boolean
+}
+
+export type SearchOverrideField = {
+  /**
+   * The search value of the field.
+   */
+  value: unknown
+  /**
+   * True when the value changes search and is left off the search hit. False when the hit shows the value.
+   */
+  private: boolean
+}
+
+export type SearchOverrideMeta = {
+  /**
+   * The date and time the search override was created.
+   */
+  created_at: string
+  /**
+   * The date and time the search override was last updated.
+   */
+  updated_at: string
+}
+
+export type SearchOverrideFieldInput = {
+  /**
+   * The search value of the field. A value cannot be null. Use `cleared` to remove a field. A number or boolean set on a string field is stored as a string. A date field takes a date such as `2026-03-05` or Unix milliseconds. That value is stored and returned as sent. An empty string is allowed only on a string field.
+   *
+   */
+  value:
+    | string
+    | null
+    | number
+    | null
+    | boolean
+    | null
+    | {
+        [key: string]: unknown
+      }
+    | null
+    | Array<unknown>
+    | null
+  /**
+   * When true, the value changes search and is left off the search hit. Omit means false. An `admin_attributes` field must set this to true.
+   */
+  private?: boolean
+}
+
+export type UpdateSearchOverrideAttributes = {
+  /**
+   * Each field to override, keyed by field name. A name is a core product field that is not a pattern, or a field configured on the tenant's indexable fields. A pattern such as `price.*.amount` is not a name. A concrete nested path such as `price.USD.amount` is accepted only when that path is configured as an indexable field. A name indexed as an object, such as `price`, is rejected; set a nested field name instead. Each entry is an object with `value` and an optional `private` boolean.
+   *
+   */
+  fields?: {
+    [key: string]: SearchOverrideFieldInput
+  }
+  /**
+   * Reserved. Ignored until a search override can expire. Omit means no expiry.
+   */
+  expires_at?: string
+  /**
+   * Reserved. Ignored until a search override can stop at the next release. Omit means the override persists.
+   */
+  persist_across_releases?: boolean
+  /**
+   * The field names whose override to remove. A name follows the same rule as `fields`: a core product field that is not a pattern, or a name configured on the tenant's indexable fields. A name indexed as an object, such as `price`, is rejected. A cleared field is removed from the search hit's `meta.search_overrides`.
+   *
+   * Search keeps the field's last override value until the product is next indexed. The catalog value is not put back.
+   *
+   */
+  cleared?: Array<string>
+}
+
+export type UpdateSearchOverrideRequest = {
+  data: {
+    type: SearchOverrideType
+    attributes: UpdateSearchOverrideAttributes
+  }
+}
+
 export type CreateStopwordSetRequest = {
   data: {
     type: StopwordSetType
@@ -11180,6 +11321,9 @@ export type SearchProfileAttributes = {
   prefix?: boolean
   typo_tolerance?: TypoTolerance
   synonym_settings?: SynonymSettings
+  highlight_settings?: HighlightSettings
+  facet_settings?: FacetSettings
+  ranking_settings?: RankingSettings
   /**
    * Optional list of synonym set IDs to apply at search time. Each synonym set must exist and must have been synced to the search engine at least once. Organization-level search profiles may only reference organization-level synonym sets. Store-level search profiles may reference organization-level and same-store synonym sets.
    *
@@ -11190,6 +11334,11 @@ export type SearchProfileAttributes = {
    *
    */
   rule_groups?: Array<string>
+  /**
+   * Optional Ranking Order: the order in which the Request Sort, boosts, text relevance and product attribute criteria rank products. Each criterion that applies to a search adds its sort, in this order, until three sort positions are filled. A criterion that does not apply to a search is skipped: the Request Sort when no `sort_by` is sent, boosts when no boosts apply, and text relevance on a `*` search. When unset, the default order `request_sort`, `boosts`, `text_relevance` is used and returned. A non-empty Ranking Order lists `request_sort`, `boosts` and `text_relevance` exactly once each, has at most three `attribute` criteria, and does not repeat an attribute field in either direction. No criterion may follow three criteria that apply to every search: `attribute` criteria, and `boosts` when the profile has its own boosts. Such a criterion can never rank and is rejected.
+   *
+   */
+  ranking_order?: Array<RankingCriterion>
   /**
    * When set to true, the default price is used for faceting and sorting for segmented catalogs even if the catalog rule has a supported price book.
    */
@@ -11253,12 +11402,65 @@ export type SearchField = {
 /**
  * When a search profile has multiple fields defined, this parameter determines how the representative text match score of a product is calculated.
  *
- * - `max_score (Default)`: In this mode, the products's representative score is simply the highest score from any single matching field. The field weights are used only as a tie-breaker if two products have the exact same highest score. This mode prioritizes the quality of the match in the single best-matching field.
- * - `max_weight`: This mode uses the score from the matching field that has the highest weight. This means a partial, lower-quality match on a heavily weighted field (e.g., name) can be prioritized over a perfect match on a lower-weighted field (e.g., description). This mode prioritizes matches in the most important fields, regardless of match quality.
- * - `sum_score`: This mode calculates a holistic score by summing the weighted scores from all matching fields. Its advantage is that it rewards products that match a query across multiple attributes. However, it carries the risk that a product with many weak, partial matches across several low-weighted fields could outrank a product with a single strong, perfect match in a high-weighted field.
+ * - `max_score (Default)`: Products matching more query words, counted across all fields, rank first. Among those, the representative score is the highest score from any single matching field. The field weights are used only as a tie-breaker if two products have the exact same highest score. This mode prioritizes the quality of the match in the single best-matching field.
+ * - `max_weight`: Products matching more query words, counted across all fields, rank first. Among those, the representative score comes from the matching field with the highest weight. A lower-quality match on a heavily weighted field (e.g., name) is prioritized over a better match on a lower-weighted field (e.g., description), as long as both products match the same number of query words. This mode prioritizes matches in the most important fields.
+ * - `sum_score`: This mode calculates a holistic score by summing the weighted scores from all matching fields. Its advantage is that it rewards products that match a query across multiple attributes. However, it does not rank by how many query words a product matched: a product matching one query word in several fields can outrank a product matching every query word in one field. A product with many weak, partial matches across several low-weighted fields can also outrank a product with a single strong, perfect match in a high-weighted field.
  *
  */
 export type TextMatchType = "max_score" | "max_weight" | "sum_score"
+
+/**
+ * One criterion in a search profile's Ranking Order.
+ */
+export type RankingCriterion =
+  | ({
+      type: "request_sort"
+    } & RequestSortRankingCriterion)
+  | ({
+      type: "boosts"
+    } & BoostsRankingCriterion)
+  | ({
+      type: "text_relevance"
+    } & TextRelevanceRankingCriterion)
+  | ({
+      type: "attribute"
+    } & AttributeRankingCriterion)
+
+/**
+ * The `sort_by` fields on the search request, in the order they are sent.
+ */
+export type RequestSortRankingCriterion = {
+  type: "request_sort"
+}
+
+/**
+ * The search profile and search rule boosts that apply to a search.
+ */
+export type BoostsRankingCriterion = {
+  type: "boosts"
+}
+
+/**
+ * How well a product matches the search text.
+ */
+export type TextRelevanceRankingCriterion = {
+  type: "text_relevance"
+}
+
+/**
+ * A product field and direction. Products without a value for a numeric or date field rank last in both directions. Products without a value for a text field rank last in ascending order and first in descending order.
+ */
+export type AttributeRankingCriterion = {
+  type: "attribute"
+  /**
+   * The product field to sort by.
+   */
+  field: string
+  /**
+   * The sort direction.
+   */
+  order: "asc" | "desc"
+}
 
 /**
  * Defines a boosting rule that assigns a score to products matching a specific field value.
@@ -11280,6 +11482,8 @@ export type SearchBoostRule = {
    * * **Bury (Negative):** Pushes products to the bottom.
    *
    * **Rule Evaluation:** Within a rule, higher-weight matching clauses take precedence. Unmatched products use an implicit weight of `0`.
+   *
+   * **Profile and Search Rule Boosts:** On one search, always-on search profile boosts and boosts from matching search rules are combined. Each product takes the single highest matching weight from either source; a lower matching clause, including a bury, does not also apply.
    *
    */
   weight: number
@@ -11310,6 +11514,117 @@ export type SearchHideRule = {
 }
 
 /**
+ * Highlight configuration applied at search time.
+ */
+export type HighlightSettings = {
+  /**
+   * Text fields to highlight. A field named here is highlighted even when it is not one of
+   * the profile's query fields. Omit the property, or send an empty array, to highlight
+   * every query field.
+   *
+   */
+  fields?: Array<string>
+  /**
+   * Fields that return their whole value instead of a snippet, however long the value is.
+   * Each entry must also be one of the fields being highlighted: `fields` when that is
+   * set, otherwise the profile's query fields.
+   *
+   * The `highlight_full_fields` search request parameter replaces this list outright when
+   * it is supplied — the two are not combined.
+   *
+   * Omit the property, or send an empty array, to snippet every highlighted field.
+   *
+   */
+  full_fields?: Array<string>
+  /**
+   * Opening tag placed immediately before each matched term in a highlight. The same tags are applied to facet value highlights.
+   *
+   * Default: `<mark>`
+   *
+   */
+  start_tag?: string
+  /**
+   * Closing tag placed immediately after each matched term in a highlight. The same tags are applied to facet value highlights.
+   *
+   * Default: `</mark>`
+   *
+   */
+  end_tag?: string
+  /**
+   * Field length, in tokens/words, above which a highlight returns a snippet — a trimmed window around each match — instead of the field's whole value. A field at or below this length is returned whole.
+   *
+   * Counts **tokens, not characters**. A value of `0` windows every field.
+   *
+   * Default: `30`
+   *
+   */
+  snippet_threshold?: number
+  /**
+   * Number of tokens/words kept either side of each match when a field is returned as a snippet. Has no effect on a field short enough to be returned whole.
+   *
+   * Counts **tokens, not characters**. A value of `0` returns the matched term alone.
+   *
+   * Default: `4`
+   *
+   */
+  context_num_tokens?: number
+} | null
+
+/**
+ * Facet configuration applied at search time.
+ */
+export type FacetSettings = {
+  /**
+   * Maximum number of character corrections allowed when matching a `facet_query` against
+   * a facet's values. A value of `0` means a facet value must match the text as typed.
+   *
+   * Shorter facet values are corrected less readily than longer ones: correction is only
+   * attempted once a value is long enough, whatever this setting allows.
+   *
+   * This bounds facet value matching only; product matching is configured by `typo_tolerance`.
+   *
+   * Default: `2`
+   *
+   */
+  query_num_typos?: number
+} | null
+
+/**
+ * Relevance ranking configuration applied at search time. These settings change how a match is scored, and so the order results are returned in.
+ */
+export type RankingSettings = {
+  /**
+   * When true, a product whose field matches a query term nearer the start of that field
+   * ranks above a product that matches the same term later in the field, all other
+   * ranking components being equal.
+   *
+   * Leave this off for catalogs whose field values are descriptive prose, where position
+   * carries no meaning. Turn it on for catalogs whose values lead with the most
+   * significant words, such as a name that starts with the brand.
+   *
+   * Default: `false`
+   *
+   */
+  prioritize_token_position?: boolean
+  /**
+   * When true, a product whose field value contains only the query words ranks above a
+   * product whose field value contains the query words among other words, all other ranking
+   * components being equal. Word order and case do not matter: for `cordless drill`,
+   * "Drill Cordless" is an exact match and "Pro Cordless Drill Kit" is not. A single-word
+   * query is exact only when matched as typed, without typo correction or prefix completion.
+   *
+   * Turning this off degrades relevance for most catalogs: a shopper who types a product
+   * name in full no longer sees that product ahead of every longer name containing the same
+   * words. Only turn it off for catalogs where an exact field match carries no more intent
+   * than a partial one.
+   *
+   * Default: `true`
+   *
+   */
+  prioritize_exact_match?: boolean
+} | null
+
+/**
  * Optional synonym tuning applied at search time. These settings control how synonym
  * matches are ranked and how query tokens are resolved against the synonym sets attached
  * to the search profile. All fields are optional; defaults are noted on each field.
@@ -11318,7 +11633,7 @@ export type SearchHideRule = {
  */
 export type SynonymSettings = {
   /**
-   * When true, results matched via a synonym are ranked below direct (non-synonym) matches. When false, synonym matches and direct matches are ranked equally.
+   * When true, a product matched via a synonym ranks below a product matched directly when the two are otherwise equal on query words matched, query words in the field, typos, proximity, exact match and word position. Under `max_score`, this applies even when the synonym match is in a higher-weighted field. It does not apply to products found after the search drops query words to return more results. When false, synonym and direct matches are not separated by this setting.
    * Default: false
    *
    */
@@ -11425,7 +11740,7 @@ export type TypoTolerance = {
    */
   drop_tokens_mode?: string
   /**
-   * When false, typo tolerance is disabled for query tokens that are purely numeric (every character is a digit, e.g. "98765"). Such a token must then match exactly.
+   * When false, typo tolerance is disabled for query tokens that are purely numeric (every character is a digit, e.g. "98765"). Such a token must then match exactly. This applies only to the first search of the query. When too few products match and the search drops query words to return more results, typos are allowed again: with this set to false, "98766 drill" can still return a product containing "98765".
    * Default: true
    *
    */
@@ -11433,7 +11748,17 @@ export type TypoTolerance = {
   /**
    * When false, typo tolerance is disabled for query tokens that contain at least one non-alphanumeric character
    * (any character outside `a-z`, `A-Z`, `0-9`), forcing such tokens to match exactly.
-   * Useful for keeping product codes / SKUs precise.
+   * Useful for keeping product codes / SKUs precise. Like `enable_typos_for_numerical_tokens`, it
+   * applies only to the first search of the query, not after query words are dropped.
+   *
+   * Which letters count as non-alphanumeric depends on the `locale` of the highest-weighted search field:
+   * - No locale or `en`: accented Latin letters such as `é` are converted to plain letters and
+   * keep typo tolerance. Letters in other alphabets, such as Greek, lose it.
+   * - `el`, `bg`, `ru`, `sr`, `uk` or `be`: words in any alphabet are converted to Latin letters first
+   * and keep typo tolerance.
+   * - Any other locale, such as `fr` or `de`: accented letters count and lose typo tolerance. With stemming
+   * on (the default), the language's own accents are removed first, so `crème` keeps typo tolerance under
+   * `fr` and `Größe` under `de`, while `Größe` under `fr` loses it.
    *
    * Tokens like `abc-123`, `abc-def`, `123-456`, and `v1.2.0` are affected;
    * a plain alphanumeric token like `abc123` is not.
@@ -11508,7 +11833,7 @@ export type FacetByField = string
 export type FilterByField = string
 
 /**
- * Orders search results by specified fields. See [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+ * Orders search results by specified fields. See [request sort](/guides/How-To/Catalogs/Search/ranking/request-sort) for more details.
  */
 export type SortByField = string
 
@@ -11563,7 +11888,11 @@ export type CatalogSearchJobAttributes = {
   /**
    * The type of the job.
    */
-  type: "index-release" | "delete-release" | "reindex-tenant-releases"
+  type:
+    | "index-release"
+    | "delete-release"
+    | "reindex-tenant-releases"
+    | "migrate-store-to-cluster"
 }
 
 /**
@@ -13457,6 +13786,11 @@ export type SearchProfile2 = string
 export type SearchQueryParamFacetBy = string
 
 /**
+ * Searches within the values of one facet named in `facet_by`, in the form `field:value`. Only that facet's values matching the text are returned, each with its count and a highlighted label.
+ */
+export type SearchQueryParamFacetQuery = string
+
+/**
  * Applies conditions to narrow down search results based on specific field values. See [filtering](/guides/How-To/Catalogs/Search/filtering) for more details.
  */
 export type SearchQueryParamFilterBy = string
@@ -13467,7 +13801,7 @@ export type SearchQueryParamFilterBy = string
 export type SearchQueryParamHighlightFullFields = string
 
 /**
- * Maximum number of facet values to return
+ * Maximum number of facet values to return. Defaults to 10. Facet values longer than 255 bytes are truncated.
  */
 export type SearchQueryParamMaxFacetValues = number
 
@@ -13477,7 +13811,7 @@ export type SearchQueryParamMaxFacetValues = number
 export type SearchQueryParamQ = string
 
 /**
- * Orders search results by specified fields. See [sorting](/guides/How-To/Catalogs/Search/sorting) for more details.
+ * Orders search results by specified fields. See [request sort](/guides/How-To/Catalogs/Search/ranking/request-sort) for more details.
  */
 export type SearchQueryParamSortBy = string
 
