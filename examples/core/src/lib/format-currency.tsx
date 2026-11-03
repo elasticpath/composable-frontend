@@ -2,7 +2,7 @@ import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
 export function formatCurrency(
   amount: number,
-  currency: ResponseCurrency,
+  currency: Partial<ResponseCurrency>,
   options: {
     locals?: Parameters<typeof Intl.NumberFormat>[0];
   } = { locals: "en-US" },
