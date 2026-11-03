@@ -78,6 +78,19 @@ export type RulePromotionUsage = {
   anonymized?: boolean
 }
 
+/**
+ * A paginated list of rule promotion usage records.
+ */
+export type RulePromotionUsagesListResponse = {
+  data?: Array<RulePromotionUsage>
+  links?: PaginationLinks
+  meta?: PaginationMeta
+}
+
+export type AnonymizeRulePromotionUsagesResponse = {
+  data?: Array<RulePromotionUsage>
+} & ResponseError
+
 export type RulePromotionBaseAttributes = {
   type?: "rule_promotion"
   /**
@@ -178,7 +191,7 @@ export type RulePromotionBaseRuleSetBaseAttributes = {
       | ItemSku
       | Or
     /**
-     * Describes how this promotion should be applied to the cart and order.
+     * Describes how this promotion should be applied to the cart and order. A rule set can have a maximum of 10 actions.
      */
     actions?: Array<
       CartDiscount | ItemDiscount | ShippingDiscount | BundleDiscount
@@ -377,6 +390,13 @@ export type PromotionJobsListResponse = {
   meta?: PaginationMeta
 }
 
+/**
+ * Promotion job response
+ */
+export type PromotionJobSingleResponse = {
+  data?: PromotionJobResponse
+}
+
 export type ResponseError = {
   errors?: Array<{
     /**
@@ -421,6 +441,10 @@ export type GenerateResult = {
 
 export type ItemDiscount = {
   /**
+   * Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
+   */
+  id?: string
+  /**
    * Applies a discount to particular items in the cart matching the supplied conditions.
    */
   strategy?: "item_discount"
@@ -452,7 +476,7 @@ export type ItemDiscount = {
        */
       price_strategy?: "cheapest" | "expensive"
       /**
-       * This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog.
+       * This flag determines whether eligible items should be automatically added to the cart. This can only be set to `true` when the target item discount is 100% and the promotion is **automatic**.  Otherwise, the API returns a validation error. NOTE: Item to be auto added should be from PXM catalog. We recommend using a target item that is different from the items that qualify for the promotion to avoid inconsistent auto add behavior and discounts. To discount a unit of the same product, use an `items_bundle_discount` action instead, which doesn't auto add items.
        */
       auto_add?: boolean
       /**
@@ -464,6 +488,10 @@ export type ItemDiscount = {
 }
 
 export type CartDiscount = {
+  /**
+   * Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
+   */
+  id?: string
   /**
    * Applies a discount across the entire cart.
    */
@@ -483,6 +511,10 @@ export type CartDiscount = {
 
 export type BundleDiscount = {
   /**
+   * Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
+   */
+  id?: string
+  /**
    * Applies a discount to specific combinations of items purchased together.
    */
   strategy?: "items_bundle_discount"
@@ -497,6 +529,10 @@ export type BundleDiscount = {
 }
 
 export type ShippingDiscount = {
+  /**
+   * Unique identifier for this action, assigned automatically on creation. Do not include this when creating a promotion. On update, include it for existing actions so they can be matched and preserved; omit it to add a new action or if the promotion was created before action ids were introduced.
+   */
+  id?: string
   /**
    * Applies a discount to the shipping costs on a cart
    */
@@ -1648,11 +1684,9 @@ export type CreateRulePromotionJobError =
 
 export type CreateRulePromotionJobResponses = {
   /**
-   * Promotion job response
+   * Promotion job created
    */
-  201: {
-    data?: PromotionJobResponse
-  }
+  201: PromotionJobSingleResponse
 }
 
 export type CreateRulePromotionJobResponse =
@@ -1718,11 +1752,9 @@ export type CancelRulePromotionJobError =
 
 export type CancelRulePromotionJobResponses = {
   /**
-   * Promotion job response
+   * Successfully Canceled the Rule Promotion Job
    */
-  200: {
-    data?: PromotionJobResponse
-  }
+  200: PromotionJobSingleResponse
 }
 
 export type CancelRulePromotionJobResponse =
@@ -1766,12 +1798,10 @@ export type AnonymizeRulePromotionUsagesResponses = {
   /**
    * OK
    */
-  200: {
-    data?: Array<RulePromotionUsage>
-  } & ResponseError
+  200: AnonymizeRulePromotionUsagesResponse
 }
 
-export type AnonymizeRulePromotionUsagesResponse =
+export type AnonymizeRulePromotionUsagesResponse2 =
   AnonymizeRulePromotionUsagesResponses[keyof AnonymizeRulePromotionUsagesResponses]
 
 export type GetRulePromotionUsagesData = {
@@ -1827,11 +1857,7 @@ export type GetRulePromotionUsagesResponses = {
   /**
    * Successful response
    */
-  200: {
-    data?: Array<RulePromotionUsage>
-    links?: PaginationLinks
-    meta?: PaginationMeta
-  }
+  200: RulePromotionUsagesListResponse
 }
 
 export type GetRulePromotionUsagesResponse =
@@ -1893,11 +1919,7 @@ export type GetRulePromotionCodeUsagesResponses = {
   /**
    * Successful response
    */
-  200: {
-    data?: Array<RulePromotionUsage>
-    links?: PaginationLinks
-    meta?: PaginationMeta
-  }
+  200: RulePromotionUsagesListResponse
 }
 
 export type GetRulePromotionCodeUsagesResponse =
