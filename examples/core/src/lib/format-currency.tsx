@@ -1,8 +1,10 @@
 import { ResponseCurrency } from "@epcc-sdk/sdks-shopper";
 
+export type FormattableCurrency = Pick<ResponseCurrency, "code"> & Partial<ResponseCurrency>;
+
 export function formatCurrency(
   amount: number,
-  currency: ResponseCurrency,
+  currency: FormattableCurrency,
   options: {
     locals?: Parameters<typeof Intl.NumberFormat>[0];
   } = { locals: "en-US" },
