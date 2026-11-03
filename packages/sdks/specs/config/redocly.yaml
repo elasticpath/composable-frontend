@@ -590,12 +590,14 @@ apis:
           createSynonymSet: ../overrides/mcp/catalog-search/createSynonymSet.yaml
           deleteIndexableFields: ../overrides/mcp/catalog-search/deleteIndexableFields.yaml
           deleteSearchProfile: ../overrides/mcp/catalog-search/deleteSearchProfile.yaml
+          deleteSearchOverride: ../overrides/mcp/catalog-search/deleteSearchOverride.yaml
           deleteSearchRule: ../overrides/mcp/catalog-search/deleteSearchRule.yaml
           deleteSearchRuleGroup: ../overrides/mcp/catalog-search/deleteSearchRuleGroup.yaml
           deleteStopwordSet: ../overrides/mcp/catalog-search/deleteStopwordSet.yaml
           deleteSynonymSet: ../overrides/mcp/catalog-search/deleteSynonymSet.yaml
           getIndexableFields: ../overrides/mcp/catalog-search/getIndexableFields.yaml
           getSearchProfile: ../overrides/mcp/catalog-search/getSearchProfile.yaml
+          getSearchOverride: ../overrides/mcp/catalog-search/getSearchOverride.yaml
           getSearchRule: ../overrides/mcp/catalog-search/getSearchRule.yaml
           getSearchRuleGroup: ../overrides/mcp/catalog-search/getSearchRuleGroup.yaml
           getStopwordSet: ../overrides/mcp/catalog-search/getStopwordSet.yaml
@@ -617,6 +619,7 @@ apis:
           setDefaultSearchProfile: ../overrides/mcp/catalog-search/setDefaultSearchProfile.yaml
           updateIndexableFields: ../overrides/mcp/catalog-search/updateIndexableFields.yaml
           updateSearchProfile: ../overrides/mcp/catalog-search/updateSearchProfile.yaml
+          updateSearchOverride: ../overrides/mcp/catalog-search/updateSearchOverride.yaml
           updateSearchRule: ../overrides/mcp/catalog-search/updateSearchRule.yaml
           updateSearchRuleGroup: ../overrides/mcp/catalog-search/updateSearchRuleGroup.yaml
           updateStopwordSet: ../overrides/mcp/catalog-search/updateStopwordSet.yaml

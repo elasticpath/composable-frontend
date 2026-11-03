@@ -1,0 +1,9 @@
+x-mcp-description: >-
+  Creates or updates the search override for one product, which sets field
+  values that search uses in place of the product's own. Send fields to set
+  values, cleared to remove fields, or both; a request with neither returns
+  400. Fields left out stay unchanged. Each name must be a core product field
+  or one of the store's indexable fields, admin_attributes fields must be
+  private, and each value must match its field type. Otherwise it returns 400
+  with meta.field naming the field, and nothing is stored. Search picks up the
+  change shortly after.
