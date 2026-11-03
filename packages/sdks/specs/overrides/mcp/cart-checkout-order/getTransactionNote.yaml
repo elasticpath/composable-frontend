@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Gets one note on a transaction by ID. Returns 404 when the order, the
+  transaction or the note does not exist. Needs a client credentials token; a
+  shopper or account token returns 422.
