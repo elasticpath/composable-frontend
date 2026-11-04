@@ -1,5 +1,11 @@
 # @epcc-sdk/sdks-pricebooks
 
+## 0.6.1
+
+### Patch Changes
+
+- be9719ef: Say that the `data.id` of a price book, price or price modifier update must match the ID in the path; pricebooks.svc returns 409 when it does not.
+
 ## 0.6.0
 
 ### Minor Changes
