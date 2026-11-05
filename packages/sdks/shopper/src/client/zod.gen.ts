@@ -13220,14 +13220,14 @@ export const zSearchOverrideAttributes = z.object({
     .datetime()
     .register(z.globalRegistry, {
       description:
-        "Reserved. Ignored until a search override can expire. Omitted means no expiry.",
+        "The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omitted means the override does not expire until it is cleared or superseded.",
     })
     .optional(),
   persist_across_releases: z
     .boolean()
     .register(z.globalRegistry, {
       description:
-        "Reserved. Ignored until a search override can stop at the next release. Omitted means the override persists.",
+        "When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. Omitted reads back as true.",
     })
     .optional(),
 })
@@ -13285,14 +13285,14 @@ export const zUpdateSearchOverrideAttributes = z.object({
     .datetime()
     .register(z.globalRegistry, {
       description:
-        "Reserved. Ignored until a search override can expire. Omit means no expiry.",
+        "The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omit means the override does not expire until it is cleared or superseded.",
     })
     .optional(),
   persist_across_releases: z
     .boolean()
     .register(z.globalRegistry, {
       description:
-        "Reserved. Ignored until a search override can stop at the next release. Omit means the override persists.",
+        "When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. An omitted value reads back as true.",
     })
     .optional(),
   cleared: z
@@ -14441,6 +14441,11 @@ export const zListSearchRulesResponse = z.object({
 
 export const zListStopwordSetsResponse = z.object({
   data: z.array(zStopwordSet),
+  meta: zListResponseMeta,
+})
+
+export const zListSearchOverridesResponse = z.object({
+  data: z.array(zSearchOverride),
   meta: zListResponseMeta,
 })
 
@@ -17398,6 +17403,24 @@ export const zProductsInclude = z
     description:
       "Using the include parameter, you can retrieve top-level resources.\n\n- Files or main image. For example, `include=files,main_image`.\n- Component product data. For example, `include=component_products`.\n- Key attribute data, such as SKU or slug.\n",
   })
+
+/**
+ * Limits which overrides are returned. Omit it to return every override on the page.
+ *
+ * | Operator | Attribute | Description |
+ * | --- | --- | --- |
+ * | `eq` | `id` | The override of this product. |
+ * | `in` | `id` | The overrides of any of the listed products. |
+ * | `eq` | `fields.<name>.value` | Overrides that set field `<name>` to this value. |
+ * | `is_null` | `fields.<name>.value` | Overrides that do not set field `<name>`. |
+ *
+ * A colon combines expressions that must all match. A pipe combines expressions where any one may match. Any other operator, attribute, or name is an invalid filter.
+ *
+ */
+export const zSearchOverrideListFilter = z.string().register(z.globalRegistry, {
+  description:
+    "Limits which overrides are returned. Omit it to return every override on the page.\n\n| Operator | Attribute | Description |\n| --- | --- | --- |\n| `eq` | `id` | The override of this product. |\n| `in` | `id` | The overrides of any of the listed products. |\n| `eq` | `fields.<name>.value` | Overrides that set field `<name>` to this value. |\n| `is_null` | `fields.<name>.value` | Overrides that do not set field `<name>`. |\n\nA colon combines expressions that must all match. A pipe combines expressions where any one may match. Any other operator, attribute, or name is an invalid filter.\n",
+})
 
 /**
  * The slug of the search profile to use for this search.

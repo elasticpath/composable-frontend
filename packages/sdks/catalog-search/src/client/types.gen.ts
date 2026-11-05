@@ -935,6 +935,11 @@ export type SearchOverrideResponse = {
   data: SearchOverride
 }
 
+export type ListSearchOverridesResponse = {
+  data: Array<SearchOverride>
+  meta: ListResponseMeta
+}
+
 export type SearchOverride = {
   /**
    * The ID of the product the search override applies to.
@@ -958,11 +963,11 @@ export type SearchOverrideAttributes = {
     [key: string]: SearchOverrideField
   }
   /**
-   * Reserved. Ignored until a search override can expire. Omitted means no expiry.
+   * The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omitted means the override does not expire until it is cleared or superseded.
    */
   expires_at?: string
   /**
-   * Reserved. Ignored until a search override can stop at the next release. Omitted means the override persists.
+   * When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. Omitted reads back as true.
    */
   persist_across_releases?: boolean
 }
@@ -1022,11 +1027,11 @@ export type UpdateSearchOverrideAttributes = {
     [key: string]: SearchOverrideFieldInput
   }
   /**
-   * Reserved. Ignored until a search override can expire. Omit means no expiry.
+   * The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omit means the override does not expire until it is cleared or superseded.
    */
   expires_at?: string
   /**
-   * Reserved. Ignored until a search override can stop at the next release. Omit means the override persists.
+   * When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. An omitted value reads back as true.
    */
   persist_across_releases?: boolean
   /**
@@ -1868,6 +1873,21 @@ export type CatalogSearchError = {
     [key: string]: unknown
   }
 }
+
+/**
+ * Limits which overrides are returned. Omit it to return every override on the page.
+ *
+ * | Operator | Attribute | Description |
+ * | --- | --- | --- |
+ * | `eq` | `id` | The override of this product. |
+ * | `in` | `id` | The overrides of any of the listed products. |
+ * | `eq` | `fields.<name>.value` | Overrides that set field `<name>` to this value. |
+ * | `is_null` | `fields.<name>.value` | Overrides that do not set field `<name>`. |
+ *
+ * A colon combines expressions that must all match. A pipe combines expressions where any one may match. Any other operator, attribute, or name is an invalid filter.
+ *
+ */
+export type SearchOverrideListFilter = string
 
 /**
  * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
@@ -3218,6 +3238,52 @@ export type UpdateSynonymSetResponses = {
 
 export type UpdateSynonymSetResponse =
   UpdateSynonymSetResponses[keyof UpdateSynonymSetResponses]
+
+export type ListSearchOverridesData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * Limits which overrides are returned. Omit it to return every override on the page.
+     *
+     * | Operator | Attribute | Description |
+     * | --- | --- | --- |
+     * | `eq` | `id` | The override of this product. |
+     * | `in` | `id` | The overrides of any of the listed products. |
+     * | `eq` | `fields.<name>.value` | Overrides that set field `<name>` to this value. |
+     * | `is_null` | `fields.<name>.value` | Overrides that do not set field `<name>`. |
+     *
+     * A colon combines expressions that must all match. A pipe combines expressions where any one may match. Any other operator, attribute, or name is an invalid filter.
+     *
+     */
+    filter?: string
+  }
+  url: "/pcm/catalogs/search/overrides"
+}
+
+export type ListSearchOverridesErrors = {
+  /**
+   * Bad request - invalid search filter
+   */
+  400: CatalogSearchErrorResponse
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: CatalogSearchErrorResponse
+}
+
+export type ListSearchOverridesError =
+  ListSearchOverridesErrors[keyof ListSearchOverridesErrors]
+
+export type ListSearchOverridesResponses = {
+  /**
+   * Successfully listed search overrides
+   */
+  200: ListSearchOverridesResponse
+}
+
+export type ListSearchOverridesResponse2 =
+  ListSearchOverridesResponses[keyof ListSearchOverridesResponses]
 
 export type DeleteSearchOverrideData = {
   body?: never

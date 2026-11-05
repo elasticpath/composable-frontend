@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   title: Catalog Search Introduction
-  version: 26.1102.8426924
-  x-version-timestamp: 2026-11-02T13:48:31Z
+  version: 26.1104.8438036
+  x-version-timestamp: 2026-11-04T10:00:48Z
   description: |
     Elastic Path Catalog Search provides fast, relevant product search capabilities for your published catalogs. Catalog Search enables shoppers to find products quickly using full-text search, filtering, faceting, and sorting, while giving merchandisers powerful tools to customize search relevance and ranking.
 
@@ -1649,6 +1649,40 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /pcm/catalogs/search/overrides:
+    get:
+      tags:
+        - Search Overrides
+      operationId: listSearchOverrides
+      summary: List search overrides
+      description: |
+        List the search overrides of the current store or organization, newest updated first, with offset/limit pagination.
+
+        Filter with the `filter` query, for example `filter=eq(fields.name.value,Zorblax Beacon)`. `eq` and `in` match `id`. `eq` matches `fields.<name>.value`. `is_null` matches an override that does not set that field. `<name>` is a field a search override can set. A colon means both expressions match. A pipe means either expression matches. Any other operator, attribute, or name is an invalid filter. See [Filtering](/guides/Getting-Started/filtering).
+      parameters:
+        - $ref: '#/components/parameters/search-override-list-filter'
+      responses:
+        '200':
+          description: Successfully listed search overrides
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSearchOverridesResponse'
+        '400':
+          description: Bad request - invalid search filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid-filter:
+                  value:
+                    errors:
+                      - title: Bad Request
+                        status: '400'
+                        detail: Invalid search filter.
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /pcm/catalogs/search/overrides/{product_id}:
     parameters:
       - name: product_id
@@ -1688,7 +1722,7 @@ paths:
       description: |
         Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.
 
-        A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. `expires_at` and `persist_across_releases` are ignored.
+        A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. An `expires_at` in the past is stored and is not applied. `persist_across_releases` false keeps the override on releases that already have a search index, including a reindex or migration rebuild of those releases, and leaves it off a release created later. Omit it, or send true, and the override is written onto later releases as well. An omitted value reads back as true.
       requestBody:
         required: true
         content:
@@ -3840,6 +3874,18 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/SearchOverride'
+    ListSearchOverridesResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchOverride'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
     SearchOverride:
       type: object
       required:
@@ -3882,11 +3928,11 @@ components:
         expires_at:
           type: string
           format: date-time
-          description: Reserved. Ignored until a search override can expire. Omitted means no expiry.
+          description: The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omitted means the override does not expire until it is cleared or superseded.
           example: '2026-12-01T00:00:00Z'
         persist_across_releases:
           type: boolean
-          description: Reserved. Ignored until a search override can stop at the next release. Omitted means the override persists.
+          description: When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. Omitted reads back as true.
           example: true
     SearchOverrideField:
       type: object
@@ -3965,11 +4011,11 @@ components:
         expires_at:
           type: string
           format: date-time
-          description: Reserved. Ignored until a search override can expire. Omit means no expiry.
+          description: The instant the override stops being applied. When this instant is before the current time, the override is not written onto the index and is not copied onto a later index. A value already in the index stays. Omit means the override does not expire until it is cleared or superseded.
           example: '2026-12-01T00:00:00Z'
         persist_across_releases:
           type: boolean
-          description: Reserved. Ignored until a search override can stop at the next release. Omit means the override persists.
+          description: When false, the override is written only onto releases that already have a search index. A reindex or a migration rebuild of one of those releases keeps it. A release created later does not. True, and omitted, write the override onto later releases as well. An omitted value reads back as true.
           example: true
         cleared:
           type: array
@@ -5010,6 +5056,24 @@ components:
       schema:
         type: string
       example: en-US
+      required: false
+    search-override-list-filter:
+      in: query
+      name: filter
+      description: |
+        Limits which overrides are returned. Omit it to return every override on the page.
+
+        | Operator | Attribute | Description |
+        | --- | --- | --- |
+        | `eq` | `id` | The override of this product. |
+        | `in` | `id` | The overrides of any of the listed products. |
+        | `eq` | `fields.<name>.value` | Overrides that set field `<name>` to this value. |
+        | `is_null` | `fields.<name>.value` | Overrides that do not set field `<name>`. |
+
+        A colon combines expressions that must all match. A pipe combines expressions where any one may match. Any other operator, attribute, or name is an invalid filter.
+      schema:
+        type: string
+        example: eq(fields.name.value,Zorblax Beacon)
       required: false
     channel:
       description: The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
