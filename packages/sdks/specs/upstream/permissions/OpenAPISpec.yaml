@@ -9,8 +9,8 @@ info:
     name: Elastic Path
     url: https://www.elasticpath.com
     email: support@elasticpath.com
-  version: 26.0827.8090714
-  x-version-timestamp: 2026-08-27T05:25:45Z
+  version: 26.1104.8439853
+  x-version-timestamp: 2026-11-04T17:58:37Z
   license:
     name: MIT
     url: assets/LICENSE
@@ -41,6 +41,13 @@ tags:
       | **Read**   | Get a Custom API Entry.                  |
       | **Update** | Update a Custom API Entry.               |
       | **Delete** | Delete a Custom API Entry.               |
+  - name: Custom User Roles
+    description: |
+      A Custom User Role represents a role with custom levels of access to Commerce Manager.
+
+      Custom User Roles can be created in an organization or in a store. A store inherits the Custom User Roles of its organization: listing or getting Custom User Roles in a store returns both the store's own roles and the roles of its organization. The `meta.owner` field shows where each role is managed.
+
+      Inherited roles are read-only in the store. To change or delete a role owned by the organization, make the request in the organization. Updating or deleting it in the store returns `409 Conflict`.
 paths:
   /v2/permissions/standard-user-roles:
     get:
@@ -210,6 +217,112 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /v2/permissions/custom-user-roles:
+    post:
+      tags:
+        - Custom User Roles
+      summary: Create A Custom User Role
+      operationId: CreateACustomUserRole
+      description: Create A Custom User Role
+      requestBody:
+        $ref: '#/components/requestBodies/CreateCustomUserRole'
+      responses:
+        '201':
+          $ref: '#/components/responses/CustomUserRole'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags:
+        - Custom User Roles
+      summary: List Custom User Roles
+      operationId: ListCustomUserRoles
+      description: |
+        Retrieves a list of Custom User Roles
+
+        ## Filtering
+        The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom User Roles:
+
+        | Attribute        | Operators                      | Example                                                  |
+        |------------------|--------------------------------|----------------------------------------------------------|
+        | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in`  | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`            |
+        | `name`           | `eq`                           | `eq(name,"Custom Role")`                                 |
+        | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `ge(created_at,2024-04-29T00:00:00.000Z)`                |
+        | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `le(updated_at,2024-04-29T00:00:00.000Z)`                |
+
+        ## Sorting
+        The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
+        - `id`
+        - `name`
+        - `created_at`
+        - `updated_at`
+      parameters:
+        - $ref: '#/components/parameters/PageOffset'
+        - $ref: '#/components/parameters/PageLimit'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/CustomUserRoleSort'
+      responses:
+        '200':
+          $ref: '#/components/responses/ListOfCustomUserRoles'
+        '400':
+          $ref: '#/components/responses/BadFilterError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /v2/permissions/custom-user-roles/{custom-user-role-id}:
+    parameters:
+      - $ref: '#/components/parameters/CustomUserRoleID'
+    get:
+      tags:
+        - Custom User Roles
+      summary: Get a Custom User Role
+      operationId: GetACustomUserRole
+      description: Get A Custom User Role
+      responses:
+        '200':
+          $ref: '#/components/responses/CustomUserRole'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Custom User Roles
+      summary: Update a Custom User Role
+      operationId: UpdateACustomUserRole
+      description: Update A Custom User Role
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCustomUserRole'
+      responses:
+        '200':
+          $ref: '#/components/responses/CustomUserRole'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Custom User Roles
+      summary: Delete a Custom User Role
+      operationId: DeleteACustomUserRole
+      description: Delete A Custom User Role
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -270,10 +383,12 @@ components:
             - manage
         content_and_pages:
           type: string
-          description: The access level for Content and Pages.
+          description: The access level for Content and Pages. `content` (content creator) and `design` (designer) grant the same API access as `view` and set the Visual Builder access level. Only Custom User Roles can hold `content` or `design`.
           enum:
             - none
             - view
+            - content
+            - design
             - manage
         currencies:
           type: string
@@ -291,6 +406,13 @@ components:
         custom_apis:
           type: string
           description: The access level for Custom APIs.
+          enum:
+            - none
+            - view
+            - manage
+        extended_attributes:
+          type: string
+          description: The access level for Extended Attributes.
           enum:
             - none
             - view
@@ -625,6 +747,66 @@ components:
           $ref: '#/components/schemas/LinkURI'
           description: Always `null` if on the first page.
           example: null
+    CustomUserRoleAccessLevels:
+      allOf:
+        - $ref: '#/components/schemas/AccessLevels'
+        - type: object
+          properties:
+            custom_actions:
+              type: string
+              description: The access level for Custom Actions. Custom Actions are not available to Custom User Roles, so this must be `none`.
+              enum:
+                - none
+            extended_attributes:
+              type: string
+              description: Custom User Roles must have at least view access to Extended Attributes, so this must be `view` or `manage`.
+              enum:
+                - view
+                - manage
+            team:
+              type: string
+              description: The access level for Team. Team management is not available to Custom User Roles, so this must be `none`.
+              enum:
+                - none
+    InheritMeta:
+      allOf:
+        - $ref: '#/components/schemas/Meta'
+        - type: object
+          properties:
+            owner:
+              type: string
+              enum:
+                - organization
+                - store
+              description: Specifies whether the resource is managed in the organization or store.
+    CustomUserRole:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the Custom User Role.
+          format: uuid
+        type:
+          type: string
+          description: Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+          const: custom_user_role
+        name:
+          type: string
+          description: The name of the role.
+        description:
+          type: string
+          description: The description of the role.
+        access_levels:
+          $ref: '#/components/schemas/CustomUserRoleAccessLevels'
+        links:
+          type: object
+          properties:
+            self:
+              $ref: '#/components/schemas/LinkURI'
+              description: Specifies the URI of the Custom User Role.
+              example: /v2/permissions/custom-user-roles/3fa85f64-5717-4562-b3fc-2c963f66afa6
+        meta:
+          $ref: '#/components/schemas/InheritMeta'
   responses:
     ListOfStandardUserRoles:
       description: List of Standard User Roles
@@ -797,6 +979,30 @@ components:
                     }
                   ]
                 }
+    ListOfCustomUserRoles:
+      description: List of Custom User Roles
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomUserRole'
+              meta:
+                $ref: '#/components/schemas/PaginationMeta'
+              links:
+                $ref: '#/components/schemas/PaginationLinks'
+    CustomUserRole:
+      description: A Custom User Role
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/CustomUserRole'
   parameters:
     StandardUserRoleID:
       name: standard-user-role-id
@@ -866,6 +1072,40 @@ components:
     CustomAPIRolePolicyId:
       name: custom-api-role-policy-id
       description: The ID of the Custom API Role Policy.
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    CustomUserRoleSort:
+      name: sort
+      description: Specifies the order in which Custom User Roles will be returned.
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - id
+          - '-id'
+          - name
+          - '-name'
+          - created_at
+          - '-created_at'
+          - updated_at
+          - '-updated_at'
+        example: id
+        x-enumDescriptions:
+          id: Sort in increasing order of ID
+          '-id': Sort in decreasing order of ID
+          name: Sort in increasing order of name
+          '-name': Sort in decreasing order of name
+          created_at: Sort in increasing order of creation
+          '-created_at': Sort in decreasing order of creation
+          updated_at: Sort in increasing order of last update
+          '-updated_at': Sort in decreasing order of last update
+    CustomUserRoleID:
+      name: custom-user-role-id
+      description: The ID of the Custom User Role.
       in: path
       required: true
       schema:
@@ -975,3 +1215,163 @@ components:
                   read: false
                   update: false
                   delete: false
+    CreateCustomUserRole:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: object
+                required:
+                  - type
+                  - name
+                  - description
+                  - access_levels
+                properties:
+                  type:
+                    type: string
+                    description: Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+                    const: custom_user_role
+                  name:
+                    type: string
+                    description: The name of the role.
+                  description:
+                    type: string
+                    description: The description of the role.
+                  access_levels:
+                    allOf:
+                      - $ref: '#/components/schemas/CustomUserRoleAccessLevels'
+                    required:
+                      - accounts
+                      - application_keys
+                      - authentication
+                      - catalog_releases
+                      - catalog_search
+                      - catalogs
+                      - composer
+                      - content_and_pages
+                      - currencies
+                      - custom_actions
+                      - custom_apis
+                      - extended_attributes
+                      - flows
+                      - inventories
+                      - legacy_catalogs
+                      - metrics
+                      - orders
+                      - payment_gateways
+                      - personal_data
+                      - price_books
+                      - products
+                      - promotions
+                      - settings
+                      - subscription_billing
+                      - subscription_jobs
+                      - subscription_offerings
+                      - subscription_subscribers
+                      - team
+                      - webhooks
+          examples:
+            Create Example:
+              summary: Create a Custom User Role
+              value:
+                data:
+                  type: custom_user_role
+                  name: Custom Role
+                  description: A custom role for users
+                  access_levels:
+                    accounts: view
+                    application_keys: none
+                    authentication: none
+                    catalog_releases: view
+                    catalog_search: view
+                    catalogs: manage
+                    composer: none
+                    content_and_pages: view
+                    currencies: view
+                    custom_actions: none
+                    custom_apis: none
+                    extended_attributes: view
+                    flows: none
+                    inventories: manage
+                    legacy_catalogs: none
+                    metrics: view
+                    orders: manage
+                    payment_gateways: none
+                    personal_data: none
+                    price_books: view
+                    products: manage
+                    promotions: view
+                    settings: none
+                    subscription_billing: none
+                    subscription_jobs: none
+                    subscription_offerings: none
+                    subscription_subscribers: none
+                    team: none
+                    webhooks: none
+    UpdateCustomUserRole:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    type: string
+                    description: Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+                    const: custom_user_role
+                  name:
+                    type: string
+                    description: The name of the role.
+                  description:
+                    type: string
+                    description: The description of the role.
+                  access_levels:
+                    $ref: '#/components/schemas/CustomUserRoleAccessLevels'
+          examples:
+            Update Example:
+              summary: Update a Custom User Role
+              value:
+                data:
+                  type: custom_user_role
+                  name: Updated Role Name
+                  description: Updated role description
+                  access_levels:
+                    accounts: view
+                    application_keys: none
+                    authentication: none
+                    catalog_releases: view
+                    catalog_search: view
+                    catalogs: manage
+                    composer: none
+                    content_and_pages: content
+                    currencies: view
+                    custom_actions: none
+                    custom_apis: none
+                    extended_attributes: view
+                    flows: none
+                    inventories: manage
+                    legacy_catalogs: none
+                    metrics: view
+                    orders: manage
+                    payment_gateways: none
+                    personal_data: none
+                    price_books: view
+                    products: manage
+                    promotions: view
+                    settings: none
+                    subscription_billing: none
+                    subscription_jobs: none
+                    subscription_offerings: none
+                    subscription_subscribers: none
+                    team: none
+                    webhooks: none
