@@ -18026,6 +18026,37 @@ components:
         examples:
           - - main_image
             - component_products
+    search-override-list-filter:
+      in: query
+      name: filter
+      description: >
+        Limits which overrides are returned. Omit it to return every override on
+        the page.
+
+
+        | Operator | Attribute | Description |
+
+        | --- | --- | --- |
+
+        | `eq` | `id` | The override of this product. |
+
+        | `in` | `id` | The overrides of any of the listed products. |
+
+        | `eq` | `fields.<name>.value` | Overrides that set field `<name>` to
+        this value. |
+
+        | `is_null` | `fields.<name>.value` | Overrides that do not set field
+        `<name>`. |
+
+
+        A colon combines expressions that must all match. A pipe combines
+        expressions where any one may match. Any other operator, attribute, or
+        name is an invalid filter.
+      schema:
+        type: string
+        examples:
+          - eq(fields.name.value,Zorblax Beacon)
+      required: false
     search-profile:
       in: query
       name: search_profile
@@ -35911,6 +35942,18 @@ components:
           $ref: '#/components/schemas/SearchOverride'
       required:
         - data
+    ListSearchOverridesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchOverride'
+        meta:
+          $ref: '#/components/schemas/ListResponseMeta'
+      required:
+        - data
+        - meta
     SearchOverride:
       type: object
       properties:
@@ -35953,16 +35996,22 @@ components:
             $ref: '#/components/schemas/SearchOverrideField'
         expires_at:
           description: >-
-            Reserved. Ignored until a search override can expire. Omitted means
-            no expiry.
+            The instant the override stops being applied. When this instant is
+            before the current time, the override is not written onto the index
+            and is not copied onto a later index. A value already in the index
+            stays. Omitted means the override does not expire until it is
+            cleared or superseded.
           type: string
           format: date-time
           examples:
             - '2026-12-01T00:00:00Z'
         persist_across_releases:
           description: >-
-            Reserved. Ignored until a search override can stop at the next
-            release. Omitted means the override persists.
+            When false, the override is written only onto releases that already
+            have a search index. A reindex or a migration rebuild of one of
+            those releases keeps it. A release created later does not. True, and
+            omitted, write the override onto later releases as well. Omitted
+            reads back as true.
           type: boolean
           examples:
             - true
@@ -36067,16 +36116,22 @@ components:
           x-go-type-skip-optional-pointer: true
         expires_at:
           description: >-
-            Reserved. Ignored until a search override can expire. Omit means no
-            expiry.
+            The instant the override stops being applied. When this instant is
+            before the current time, the override is not written onto the index
+            and is not copied onto a later index. A value already in the index
+            stays. Omit means the override does not expire until it is cleared
+            or superseded.
           type: string
           format: date-time
           examples:
             - '2026-12-01T00:00:00Z'
         persist_across_releases:
           description: >-
-            Reserved. Ignored until a search override can stop at the next
-            release. Omit means the override persists.
+            When false, the override is written only onto releases that already
+            have a search index. A reindex or a migration rebuild of one of
+            those releases keeps it. A release created later does not. True, and
+            omitted, write the override onto later releases as well. An omitted
+            value reads back as true.
           type: boolean
           examples:
             - true

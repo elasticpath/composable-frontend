@@ -81,6 +81,9 @@ import type {
   ListSearchIndexesData,
   ListSearchIndexesErrors,
   ListSearchIndexesResponses,
+  ListSearchOverridesData,
+  ListSearchOverridesErrors,
+  ListSearchOverridesResponses,
   ListSearchProfilesData,
   ListSearchProfilesErrors,
   ListSearchProfilesResponses,
@@ -990,6 +993,37 @@ export const updateSynonymSet = <ThrowOnError extends boolean = false>(
   })
 
 /**
+ * List search overrides
+ *
+ * List the search overrides of the current store or organization, newest updated first, with offset/limit pagination.
+ *
+ * Filter with the `filter` query, for example `filter=eq(fields.name.value,Zorblax Beacon)`. `eq` and `in` match `id`. `eq` matches `fields.<name>.value`. `is_null` matches an override that does not set that field. `<name>` is a field a search override can set. A colon means both expressions match. A pipe means either expression matches. Any other operator, attribute, or name is an invalid filter. See [Filtering](/guides/Getting-Started/filtering).
+ *
+ */
+export const listSearchOverrides = <ThrowOnError extends boolean = false>(
+  options?: Options<ListSearchOverridesData, ThrowOnError>,
+): RequestResult<
+  ListSearchOverridesResponses,
+  ListSearchOverridesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ListSearchOverridesResponses,
+    ListSearchOverridesErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "BearerToken",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/pcm/catalogs/search/overrides",
+    ...options,
+  })
+
+/**
  * Delete search override
  *
  * Remove the search override for a product. The search override no longer shows on search hits. Search keeps matching the last search values until the product is next indexed.
@@ -1050,7 +1084,7 @@ export const getSearchOverride = <ThrowOnError extends boolean = false>(
  *
  * Create or update the search override for one product. Send `fields` to set values, `cleared` to remove fields, or both. Fields you leave out stay unchanged. The first request creates the override.
  *
- * A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. `expires_at` and `persist_across_releases` are ignored.
+ * A name is a core product field, or a field configured for the tenant. A pattern such as `price.*.amount` is not a name. The value must match the field type. `admin_attributes` fields must be private. An invalid name or value is a validation error, `meta.field` names it, and nothing is stored. An `expires_at` in the past is stored and is not applied. `persist_across_releases` false keeps the override on releases that already have a search index, including a reindex or migration rebuild of those releases, and leaves it off a release created later. Omit it, or send true, and the override is written onto later releases as well. An omitted value reads back as true.
  *
  */
 export const updateSearchOverride = <ThrowOnError extends boolean = false>(
