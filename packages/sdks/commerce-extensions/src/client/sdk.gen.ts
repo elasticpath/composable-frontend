@@ -140,13 +140,13 @@ export const listCustomApis = <ThrowOnError extends boolean = false>(
  * Create a Custom API
  */
 export const createACustomApi = <ThrowOnError extends boolean = false>(
-  options?: Options<CreateACustomApiData, ThrowOnError>,
+  options: Options<CreateACustomApiData, ThrowOnError>,
 ): RequestResult<
   CreateACustomApiResponses,
   CreateACustomApiErrors,
   ThrowOnError
 > =>
-  (options?.client ?? client).post<
+  (options.client ?? client).post<
     CreateACustomApiResponses,
     CreateACustomApiErrors,
     ThrowOnError
@@ -156,7 +156,7 @@ export const createACustomApi = <ThrowOnError extends boolean = false>(
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...options?.headers,
+      ...options.headers,
     },
   })
 
