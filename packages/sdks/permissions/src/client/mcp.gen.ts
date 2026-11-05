@@ -12,24 +12,35 @@ import {
 } from "./mcp-support.gen"
 import {
   createACustomApiRolePolicy,
+  createACustomUserRole,
   deleteACustomApiRolePolicy,
+  deleteACustomUserRole,
   getACustomApiRolePolicy,
+  getACustomUserRole,
   getAStandardShopperRole,
   getAStandardUserRole,
   listCustomApiRolePolicies,
+  listCustomUserRoles,
   listStandardShopperRoles,
   listStandardUserRoles,
   updateACustomApiRolePolicy,
+  updateACustomUserRole,
 } from "./sdk.gen"
 import {
   zCreateACustomApiRolePolicyBody,
+  zCreateACustomUserRoleBody,
   zDeleteACustomApiRolePolicyPath,
+  zDeleteACustomUserRolePath,
   zGetACustomApiRolePolicyPath,
+  zGetACustomUserRolePath,
   zGetAStandardShopperRolePath,
   zGetAStandardUserRolePath,
   zListCustomApiRolePoliciesQuery,
+  zListCustomUserRolesQuery,
   zUpdateACustomApiRolePolicyBody,
   zUpdateACustomApiRolePolicyPath,
+  zUpdateACustomUserRoleBody,
+  zUpdateACustomUserRolePath,
 } from "./zod.gen"
 
 type ToolOptions = {
@@ -502,6 +513,271 @@ export const updateACustomApiRolePolicyTool = (options?: ToolOptions) => {
   }
 }
 
+const listCustomUserRolesInput = z
+  .object({
+    query: zListCustomUserRolesQuery.strict().optional(),
+  })
+  .strict()
+
+/**
+ * List Custom User Roles
+ *
+ * Retrieves a list of Custom User Roles
+ *
+ * ## Filtering
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom User Roles:
+ *
+ * | Attribute        | Operators                      | Example                                                  |
+ * |------------------|--------------------------------|----------------------------------------------------------|
+ * | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in`  | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`            |
+ * | `name`           | `eq`                           | `eq(name,"Custom Role")`                                 |
+ * | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `ge(created_at,2024-04-29T00:00:00.000Z)`                |
+ * | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `le(updated_at,2024-04-29T00:00:00.000Z)`                |
+ *
+ * ## Sorting
+ * The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
+ * - `id`
+ * - `name`
+ * - `created_at`
+ * - `updated_at`
+ *
+ */
+export const listCustomUserRolesTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof listCustomUserRolesInput> = (args, ctx) =>
+    toToolResult(
+      listCustomUserRoles({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "permissions_list_custom_user_roles" as const,
+    config: {
+      title: "List Custom User Roles",
+      description:
+        "List Custom User Roles. Retrieves a list of Custom User Roles",
+      inputSchema: listCustomUserRolesInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "permissions.listCustomUserRoles",
+          method: "GET",
+          path: "/v2/permissions/custom-user-roles",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const createACustomUserRoleInput = withSharedSchemaIds(
+  "permissions",
+  z
+    .object({
+      body: loose(zCreateACustomUserRoleBody).optional(),
+    })
+    .strict(),
+)
+
+/**
+ * Create A Custom User Role
+ *
+ * Create A Custom User Role
+ */
+export const createACustomUserRoleTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof createACustomUserRoleInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      createACustomUserRole({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "permissions_create_a_custom_user_role" as const,
+    config: {
+      title: "Create A Custom User Role",
+      description: "Create A Custom User Role",
+      inputSchema: createACustomUserRoleInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "permissions.createACustomUserRole",
+          method: "POST",
+          path: "/v2/permissions/custom-user-roles",
+          risk: "create" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const deleteACustomUserRoleInput = z
+  .object({
+    path: zDeleteACustomUserRolePath.strict(),
+  })
+  .strict()
+
+/**
+ * Delete a Custom User Role
+ *
+ * Delete A Custom User Role
+ */
+export const deleteACustomUserRoleTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof deleteACustomUserRoleInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      deleteACustomUserRole({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "permissions_delete_a_custom_user_role" as const,
+    config: {
+      title: "Delete a Custom User Role",
+      description: "Delete A Custom User Role",
+      inputSchema: deleteACustomUserRoleInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "permissions.deleteACustomUserRole",
+          method: "DELETE",
+          path: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
+          risk: "delete" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const getACustomUserRoleInput = z
+  .object({
+    path: zGetACustomUserRolePath.strict(),
+  })
+  .strict()
+
+/**
+ * Get a Custom User Role
+ *
+ * Get A Custom User Role
+ */
+export const getACustomUserRoleTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getACustomUserRoleInput> = (args, ctx) =>
+    toToolResult(
+      getACustomUserRole({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "permissions_get_a_custom_user_role" as const,
+    config: {
+      title: "Get a Custom User Role",
+      description: "Get A Custom User Role",
+      inputSchema: getACustomUserRoleInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "permissions.getACustomUserRole",
+          method: "GET",
+          path: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const updateACustomUserRoleInput = withSharedSchemaIds(
+  "permissions",
+  z
+    .object({
+      path: zUpdateACustomUserRolePath.strict(),
+      body: loose(zUpdateACustomUserRoleBody).optional(),
+    })
+    .strict(),
+)
+
+/**
+ * Update a Custom User Role
+ *
+ * Update A Custom User Role
+ */
+export const updateACustomUserRoleTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof updateACustomUserRoleInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      updateACustomUserRole({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "permissions_update_a_custom_user_role" as const,
+    config: {
+      title: "Update a Custom User Role",
+      description: "Update A Custom User Role",
+      inputSchema: updateACustomUserRoleInput,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "permissions.updateACustomUserRole",
+          method: "PUT",
+          path: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
+          risk: "update" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
 export const tools = (options?: ToolOptions): Array<Tool> => [
   listStandardUserRolesTool(options),
   getAStandardUserRoleTool(options),
@@ -512,4 +788,9 @@ export const tools = (options?: ToolOptions): Array<Tool> => [
   deleteACustomApiRolePolicyTool(options),
   getACustomApiRolePolicyTool(options),
   updateACustomApiRolePolicyTool(options),
+  listCustomUserRolesTool(options),
+  createACustomUserRoleTool(options),
+  deleteACustomUserRoleTool(options),
+  getACustomUserRoleTool(options),
+  updateACustomUserRoleTool(options),
 ]

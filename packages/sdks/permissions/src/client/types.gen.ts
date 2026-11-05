@@ -40,9 +40,9 @@ export type AccessLevels = {
    */
   composer?: "none" | "manage"
   /**
-   * The access level for Content and Pages.
+   * The access level for Content and Pages. `content` (content creator) and `design` (designer) grant the same API access as `view` and set the Visual Builder access level. Only Custom User Roles can hold `content` or `design`.
    */
-  content_and_pages?: "none" | "view" | "manage"
+  content_and_pages?: "none" | "view" | "content" | "design" | "manage"
   /**
    * The access level for Currencies.
    */
@@ -55,6 +55,10 @@ export type AccessLevels = {
    * The access level for Custom APIs.
    */
   custom_apis?: "none" | "view" | "manage"
+  /**
+   * The access level for Extended Attributes.
+   */
+  extended_attributes?: "none" | "view" | "manage"
   /**
    * The access level for Flows.
    */
@@ -318,6 +322,55 @@ export type PaginationLinks = {
   prev?: LinkUri
 }
 
+export type CustomUserRoleAccessLevels = AccessLevels & {
+  /**
+   * The access level for Custom Actions. Custom Actions are not available to Custom User Roles, so this must be `none`.
+   */
+  custom_actions?: "none"
+  /**
+   * Custom User Roles must have at least view access to Extended Attributes, so this must be `view` or `manage`.
+   */
+  extended_attributes?: "view" | "manage"
+  /**
+   * The access level for Team. Team management is not available to Custom User Roles, so this must be `none`.
+   */
+  team?: "none"
+}
+
+export type InheritMeta = Meta & {
+  /**
+   * Specifies whether the resource is managed in the organization or store.
+   */
+  owner?: "organization" | "store"
+}
+
+export type CustomUserRole = {
+  /**
+   * The unique identifier for the Custom User Role.
+   */
+  id?: string
+  /**
+   * Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+   */
+  type?: "custom_user_role"
+  /**
+   * The name of the role.
+   */
+  name?: string
+  /**
+   * The description of the role.
+   */
+  description?: string
+  access_levels?: CustomUserRoleAccessLevels
+  links?: {
+    /**
+     * Specifies the URI of the Custom User Role.
+     */
+    self?: LinkUri
+  }
+  meta?: InheritMeta
+}
+
 /**
  * The ID of the Standard User Role.
  */
@@ -358,6 +411,24 @@ export type CustomApiRolePolicySort =
  * The ID of the Custom API Role Policy.
  */
 export type CustomApiRolePolicyId = string
+
+/**
+ * Specifies the order in which Custom User Roles will be returned.
+ */
+export type CustomUserRoleSort =
+  | "id"
+  | "-id"
+  | "name"
+  | "-name"
+  | "created_at"
+  | "-created_at"
+  | "updated_at"
+  | "-updated_at"
+
+/**
+ * The ID of the Custom User Role.
+ */
+export type CustomUserRoleId = string
 
 export type CreateCustomApiRolePolicy = {
   data: {
@@ -415,6 +486,42 @@ export type UpdateCustomApiRolePolicy = {
      * Specifies if the Role can delete a Custom API Entry.
      */
     delete?: boolean
+  }
+}
+
+export type CreateCustomUserRole = {
+  data: {
+    /**
+     * Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+     */
+    type: "custom_user_role"
+    /**
+     * The name of the role.
+     */
+    name: string
+    /**
+     * The description of the role.
+     */
+    description: string
+    access_levels: CustomUserRoleAccessLevels
+  }
+}
+
+export type UpdateCustomUserRole = {
+  data: {
+    /**
+     * Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.
+     */
+    type: "custom_user_role"
+    /**
+     * The name of the role.
+     */
+    name?: string
+    /**
+     * The description of the role.
+     */
+    description?: string
+    access_levels?: CustomUserRoleAccessLevels
   }
 }
 
@@ -782,3 +889,228 @@ export type UpdateACustomApiRolePolicyResponses = {
 
 export type UpdateACustomApiRolePolicyResponse =
   UpdateACustomApiRolePolicyResponses[keyof UpdateACustomApiRolePolicyResponses]
+
+export type ListCustomUserRolesData = {
+  body?: never
+  path?: never
+  query?: {
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[offset]"?: number
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * Filter attributes. For more information, see the [Filtering](/guides/Getting-Started/filtering) section.
+     */
+    filter?: string
+    /**
+     * Specifies the order in which Custom User Roles will be returned.
+     */
+    sort?:
+      | "id"
+      | "-id"
+      | "name"
+      | "-name"
+      | "created_at"
+      | "-created_at"
+      | "updated_at"
+      | "-updated_at"
+  }
+  url: "/v2/permissions/custom-user-roles"
+}
+
+export type ListCustomUserRolesErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: Errors
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Errors
+}
+
+export type ListCustomUserRolesError =
+  ListCustomUserRolesErrors[keyof ListCustomUserRolesErrors]
+
+export type ListCustomUserRolesResponses = {
+  /**
+   * List of Custom User Roles
+   */
+  200: {
+    data?: Array<CustomUserRole>
+    meta?: PaginationMeta
+    links?: PaginationLinks
+  }
+}
+
+export type ListCustomUserRolesResponse =
+  ListCustomUserRolesResponses[keyof ListCustomUserRolesResponses]
+
+export type CreateACustomUserRoleData = {
+  body?: CreateCustomUserRole
+  path?: never
+  query?: never
+  url: "/v2/permissions/custom-user-roles"
+}
+
+export type CreateACustomUserRoleErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: Errors
+  /**
+   * Unable to perform the operation at this time.
+   */
+  409: Errors
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Errors
+}
+
+export type CreateACustomUserRoleError =
+  CreateACustomUserRoleErrors[keyof CreateACustomUserRoleErrors]
+
+export type CreateACustomUserRoleResponses = {
+  /**
+   * A Custom User Role
+   */
+  201: {
+    data?: CustomUserRole
+  }
+}
+
+export type CreateACustomUserRoleResponse =
+  CreateACustomUserRoleResponses[keyof CreateACustomUserRoleResponses]
+
+export type DeleteACustomUserRoleData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the Custom User Role.
+     */
+    "custom-user-role-id": string
+  }
+  query?: never
+  url: "/v2/permissions/custom-user-roles/{custom-user-role-id}"
+}
+
+export type DeleteACustomUserRoleErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: Errors
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: Errors
+  /**
+   * Unable to perform the operation at this time.
+   */
+  409: Errors
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Errors
+}
+
+export type DeleteACustomUserRoleError =
+  DeleteACustomUserRoleErrors[keyof DeleteACustomUserRoleErrors]
+
+export type DeleteACustomUserRoleResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type DeleteACustomUserRoleResponse =
+  DeleteACustomUserRoleResponses[keyof DeleteACustomUserRoleResponses]
+
+export type GetACustomUserRoleData = {
+  body?: never
+  path: {
+    /**
+     * The ID of the Custom User Role.
+     */
+    "custom-user-role-id": string
+  }
+  query?: never
+  url: "/v2/permissions/custom-user-roles/{custom-user-role-id}"
+}
+
+export type GetACustomUserRoleErrors = {
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: Errors
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Errors
+}
+
+export type GetACustomUserRoleError =
+  GetACustomUserRoleErrors[keyof GetACustomUserRoleErrors]
+
+export type GetACustomUserRoleResponses = {
+  /**
+   * A Custom User Role
+   */
+  200: {
+    data?: CustomUserRole
+  }
+}
+
+export type GetACustomUserRoleResponse =
+  GetACustomUserRoleResponses[keyof GetACustomUserRoleResponses]
+
+export type UpdateACustomUserRoleData = {
+  body?: UpdateCustomUserRole
+  path: {
+    /**
+     * The ID of the Custom User Role.
+     */
+    "custom-user-role-id": string
+  }
+  query?: never
+  url: "/v2/permissions/custom-user-roles/{custom-user-role-id}"
+}
+
+export type UpdateACustomUserRoleErrors = {
+  /**
+   * Bad request. The request failed validation.
+   */
+  400: Errors
+  /**
+   * Not found. The requested entity does not exist.
+   */
+  404: Errors
+  /**
+   * Unable to perform the operation at this time.
+   */
+  409: Errors
+  /**
+   * Internal server error. There was a system failure in the platform.
+   */
+  500: Errors
+}
+
+export type UpdateACustomUserRoleError =
+  UpdateACustomUserRoleErrors[keyof UpdateACustomUserRoleErrors]
+
+export type UpdateACustomUserRoleResponses = {
+  /**
+   * A Custom User Role
+   */
+  200: {
+    data?: CustomUserRole
+  }
+}
+
+export type UpdateACustomUserRoleResponse =
+  UpdateACustomUserRoleResponses[keyof UpdateACustomUserRoleResponses]
