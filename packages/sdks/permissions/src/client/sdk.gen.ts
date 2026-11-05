@@ -12,12 +12,21 @@ import type {
   CreateACustomApiRolePolicyData,
   CreateACustomApiRolePolicyErrors,
   CreateACustomApiRolePolicyResponses,
+  CreateACustomUserRoleData,
+  CreateACustomUserRoleErrors,
+  CreateACustomUserRoleResponses,
   DeleteACustomApiRolePolicyData,
   DeleteACustomApiRolePolicyErrors,
   DeleteACustomApiRolePolicyResponses,
+  DeleteACustomUserRoleData,
+  DeleteACustomUserRoleErrors,
+  DeleteACustomUserRoleResponses,
   GetACustomApiRolePolicyData,
   GetACustomApiRolePolicyErrors,
   GetACustomApiRolePolicyResponses,
+  GetACustomUserRoleData,
+  GetACustomUserRoleErrors,
+  GetACustomUserRoleResponses,
   GetAStandardShopperRoleData,
   GetAStandardShopperRoleErrors,
   GetAStandardShopperRoleResponses,
@@ -27,6 +36,9 @@ import type {
   ListCustomApiRolePoliciesData,
   ListCustomApiRolePoliciesErrors,
   ListCustomApiRolePoliciesResponses,
+  ListCustomUserRolesData,
+  ListCustomUserRolesErrors,
+  ListCustomUserRolesResponses,
   ListStandardShopperRolesData,
   ListStandardShopperRolesErrors,
   ListStandardShopperRolesResponses,
@@ -36,6 +48,9 @@ import type {
   UpdateACustomApiRolePolicyData,
   UpdateACustomApiRolePolicyErrors,
   UpdateACustomApiRolePolicyResponses,
+  UpdateACustomUserRoleData,
+  UpdateACustomUserRoleErrors,
+  UpdateACustomUserRoleResponses,
 } from "./types.gen"
 
 export type Options<
@@ -281,6 +296,142 @@ export const updateACustomApiRolePolicy = <
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/v2/permissions/custom-api-role-policies/{custom-api-role-policy-id}",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+
+/**
+ * List Custom User Roles
+ *
+ * Retrieves a list of Custom User Roles
+ *
+ * ## Filtering
+ * The following operators and attributes are available for [filtering](/guides/Getting-Started/filtering) Custom User Roles:
+ *
+ * | Attribute        | Operators                      | Example                                                  |
+ * |------------------|--------------------------------|----------------------------------------------------------|
+ * | `id`             | `lt`,`le`,`eq`,`gt`,`ge`,`in`  | `eq(id,3fa85f64-5717-4562-b3fc-2c963f66afa6)`            |
+ * | `name`           | `eq`                           | `eq(name,"Custom Role")`                                 |
+ * | `created_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `ge(created_at,2024-04-29T00:00:00.000Z)`                |
+ * | `updated_at`     | `lt`,`le`,`eq`,`gt`,`ge`       | `le(updated_at,2024-04-29T00:00:00.000Z)`                |
+ *
+ * ## Sorting
+ * The following attributes are available for sorting. When specified, the results are sorted in ascending order based on the value of the field. To sort in descending order, prefix the attribute with `-`, for example, `-updated_at`. The default sort order is `created_at` in descending order.
+ * - `id`
+ * - `name`
+ * - `created_at`
+ * - `updated_at`
+ *
+ */
+export const listCustomUserRoles = <ThrowOnError extends boolean = false>(
+  options?: Options<ListCustomUserRolesData, ThrowOnError>,
+): RequestResult<
+  ListCustomUserRolesResponses,
+  ListCustomUserRolesErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).get<
+    ListCustomUserRolesResponses,
+    ListCustomUserRolesErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/permissions/custom-user-roles",
+    ...options,
+  })
+
+/**
+ * Create A Custom User Role
+ *
+ * Create A Custom User Role
+ */
+export const createACustomUserRole = <ThrowOnError extends boolean = false>(
+  options?: Options<CreateACustomUserRoleData, ThrowOnError>,
+): RequestResult<
+  CreateACustomUserRoleResponses,
+  CreateACustomUserRoleErrors,
+  ThrowOnError
+> =>
+  (options?.client ?? client).post<
+    CreateACustomUserRoleResponses,
+    CreateACustomUserRoleErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/permissions/custom-user-roles",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  })
+
+/**
+ * Delete a Custom User Role
+ *
+ * Delete A Custom User Role
+ */
+export const deleteACustomUserRole = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteACustomUserRoleData, ThrowOnError>,
+): RequestResult<
+  DeleteACustomUserRoleResponses,
+  DeleteACustomUserRoleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).delete<
+    DeleteACustomUserRoleResponses,
+    DeleteACustomUserRoleErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
+    ...options,
+  })
+
+/**
+ * Get a Custom User Role
+ *
+ * Get A Custom User Role
+ */
+export const getACustomUserRole = <ThrowOnError extends boolean = false>(
+  options: Options<GetACustomUserRoleData, ThrowOnError>,
+): RequestResult<
+  GetACustomUserRoleResponses,
+  GetACustomUserRoleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetACustomUserRoleResponses,
+    GetACustomUserRoleErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
+    ...options,
+  })
+
+/**
+ * Update a Custom User Role
+ *
+ * Update A Custom User Role
+ */
+export const updateACustomUserRole = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateACustomUserRoleData, ThrowOnError>,
+): RequestResult<
+  UpdateACustomUserRoleResponses,
+  UpdateACustomUserRoleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).put<
+    UpdateACustomUserRoleResponses,
+    UpdateACustomUserRoleErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/v2/permissions/custom-user-roles/{custom-user-role-id}",
     ...options,
     headers: {
       "Content-Type": "application/json",
