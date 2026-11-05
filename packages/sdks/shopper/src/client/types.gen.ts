@@ -154,6 +154,14 @@ export type Catalog = {
      * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
      */
     include_draft_products?: boolean
+    /**
+     * The maximum number of published releases kept for this catalog. Omitted when the catalog has never stored a maximum.
+     */
+    max_published_releases?: number | null
+    /**
+     * When `true`, search overrides are allowed for this catalog. Defaults to `false`.
+     */
+    allow_search_overrides?: boolean
   }
   /**
    * CatalogRelationships
@@ -225,6 +233,14 @@ export type CatalogCreateData = {
        * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
        */
       include_draft_products?: boolean
+      /**
+       * The maximum number of published releases to keep for this catalog. Must be 1, 2, or 3; any other value returns 400 Bad Request. When omitted, the catalog stores 2.
+       */
+      max_published_releases?: number | null
+      /**
+       * When `true`, search overrides are allowed for this catalog. When omitted or null, the catalog stores `false`.
+       */
+      allow_search_overrides?: boolean | null
     }
     /**
      * Represents the type of object being returned. Always `Catalog`.
@@ -295,6 +311,14 @@ export type CatalogUpdateData = {
        * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
        */
       include_draft_products?: boolean
+      /**
+       * The maximum number of published releases to keep for this catalog. Must be 1, 2, or 3; any other value returns 400 Bad Request. When omitted or null, the stored maximum is unchanged.
+       */
+      max_published_releases?: number | null
+      /**
+       * When `true`, search overrides are allowed for this catalog. When omitted or null, the stored value is unchanged.
+       */
+      allow_search_overrides?: boolean | null
     }
     /**
      * The unique identifier of the catalog to be updated.
@@ -464,16 +488,6 @@ export type ShopperAttributes = {
 }
 
 /**
- * DiffListData
- *
- * A list of differences between two releases.
- */
-export type DiffListData = {
-  data?: Array<ProductDiff>
-  links?: Links
-}
-
-/**
  * A price formatted for display.
  */
 export type DisplayPrice = {
@@ -549,6 +563,14 @@ export type FilesRelationship = {
  */
 export type ComponentProductsRelationship = {
   data?: ProductReferences
+  links?: SelfLink
+}
+
+/**
+ * Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.
+ */
+export type BundlesRelationship = {
+  data?: Array<ProductReference>
   links?: SelfLink
 }
 
@@ -921,64 +943,6 @@ export type NodeAttributes = {
 }
 
 /**
- * ReleaseIndexingCompleteData
- *
- * The response body for a successful release indexing complete request.
- */
-export type ReleaseIndexingCompleteData = {
-  data?: {
-    /**
-     * The final status of the search indexing process.
-     */
-    status: "succeeded" | "failed"
-    /**
-     * The elapsed time in milliseconds spent indexing the release.
-     */
-    duration_ms?: number | null
-  }
-}
-
-/**
- * NodeCreateData
- *
- * Container for nodes.
- */
-export type NodeCreateData = {
-  /**
-   * NodeCreateArgs
-   *
-   * A node in a catalog (e.g. a category node). Nodes can have child nodes, as well as a list of attached products
-   */
-  data: {
-    /**
-     * NodeCreateAttributes
-     *
-     * Resource attributes of a catalog node.
-     */
-    attributes: {
-      description?: string
-      /**
-       * hierarchy id of the node
-       */
-      hierarchy_id?: string
-      label?: string
-      name: string
-      slug?: string
-      status?: string
-      locales?: {
-        [key: string]: {
-          [key: string]: string
-        }
-      }
-    }
-    relationships?: NodeRelationships
-    id?: string
-    type: string
-  }
-  links?: Links
-}
-
-/**
  * NodeData
  *
  * Container for nodes.
@@ -1100,16 +1064,6 @@ export type NodeRelationships = {
 }
 
 /**
- * NodeRelationshipsData
- *
- * Container for node relationships.
- */
-export type NodeRelationshipsData = {
-  data?: NodeRelationships
-  links?: Links
-}
-
-/**
  * PageMeta
  *
  * Contains the results for the entire collection.
@@ -1142,106 +1096,6 @@ export type PageMeta = {
      */
     total?: number
   }
-}
-
-/**
- * Pricebook
- *
- * Top level entity in the pricebooks domain model. It contains a list of product prices.
- */
-export type Pricebook = {
-  /**
-   * The unique identifier of a price book.
-   */
-  id?: string
-  /**
-   * This represents the type of object being returned. Always `pricebook`.
-   */
-  type: "pricebook"
-  attributes: {
-    created_at?: string
-    description?: string | null
-    name: string | null
-    updated_at?: string
-  }
-}
-
-/**
- * PricebookData
- *
- * Container for pricebooks.
- */
-export type PricebookCreateData = {
-  /**
-   * PricebookCreateArgs
-   *
-   * New top level pricebook.
-   */
-  data: {
-    type: "pricebook"
-    attributes: {
-      description?: string | null
-      name: string | null
-    }
-  }
-  links?: Links
-}
-
-/**
- * PricebookData
- *
- * Container for pricebooks.
- */
-export type PricebookData = {
-  data: Pricebook
-  links?: Links
-}
-
-/**
- * PricebookPrice
- *
- * ProductPrice associates a collection of locale specific prices with a product ID.
- */
-export type PricebookPrice = {
-  type: "product-price"
-  attributes: {
-    currencies: TieredCurrencies
-    sales?: Sales
-    sku: string
-  }
-  id: string
-}
-
-/**
- * PricebookPriceCreateData
- *
- * Container for pricebook prices.
- */
-export type PricebookPriceCreateData = {
-  /**
-   * PricebookPriceCreateArgs
-   *
-   * ProductPrice associates a collection of locale specific prices with a product ID.
-   */
-  data: {
-    type: "product-price"
-    attributes: {
-      currencies: TieredCurrencies
-      sales?: Sales
-      sku: string
-    }
-  }
-  links?: Links
-}
-
-/**
- * PricebookPriceData
- *
- * Container for pricebook prices.
- */
-export type PricebookPriceData = {
-  data: PricebookPrice
-  links?: Links
 }
 
 /**
@@ -1350,64 +1204,10 @@ export type ProductAttributes = {
  *
  * Container for products.
  */
-export type ProductCreateData = {
-  /**
-   * ProductCreateArgs
-   *
-   * A new product in a catalog.
-   */
-  data?: {
-    /**
-     * ProductCreateAttributes
-     *
-     * A product's attributes.
-     */
-    attributes: {
-      description?: string
-      name: string
-      sku?: string
-      slug?: string
-      status: string
-      locales?: {
-        [key: string]: {
-          [key: string]: string
-        }
-      }
-    }
-    id?: string
-    type: string
-  }
-  links?: Links
-}
-
-/**
- * ProductData
- *
- * Container for products.
- */
 export type ProductData = {
   data?: Product
   included?: IncludedResponse
   links?: Links
-}
-
-export type ProductDiff = {
-  id?: string
-  type?: string
-  attributes?: {
-    sku?: string
-    this_release_id?: string
-    other_release_id?: string
-    diff_created_at?: string
-    exists?: {
-      this: boolean
-      other: boolean
-    }
-    updated_at?: {
-      this?: string | null
-      other?: string | null
-    }
-  }
 }
 
 /**
@@ -1698,42 +1498,8 @@ export type ProductRelationships = {
   files?: FilesRelationship
   main_image?: MainImageRelationship
   component_products?: ComponentProductsRelationship
+  bundles?: BundlesRelationship
   custom_relationships?: CustomRelationship
-}
-
-/**
- * ProductRelationshipsData
- *
- * Container for product relationships.
- */
-export type ProductRelationshipsData = {
-  data?: ProductRelationships
-  links?: Links
-}
-
-/**
- * ProductsForCart
- *
- * A list of products to be added to cart. Can be type product-data or error-response.
- */
-export type ProductsForCart = {
-  data: Array<unknown>
-  included?: {
-    component_products?: Array<Product>
-  } | null
-}
-
-/**
- * ProductsForCartConfiguration
- *
- * A list of product id or sku and bundle configuration for cart.
- */
-export type ProductsForCartConfiguration = {
-  data: Array<{
-    id?: string | null
-    sku?: string | null
-    bundle_configuration?: BundleConfiguration
-  }>
 }
 
 /**
@@ -1887,6 +1653,10 @@ export type ReleaseMeta = {
    * When `true`, this catalog release includes `draft` products in its published data. This reflects the catalog `include_draft_products` attribute at the time of publish.
    */
   includes_draft_products?: boolean
+  /**
+   * When `true`, search overrides are allowed for this catalog release. This is the catalog `allow_search_overrides` attribute at the time the release was created. Defaults to `false`.
+   */
+  allow_search_overrides?: boolean | null
 }
 
 /**
@@ -2286,15 +2056,6 @@ export type CatalogRuleValidatorRequest = {
 export type Sale = {
   schedule?: Schedule
   currencies?: TieredCurrencies
-}
-
-/**
- * Sales
- *
- * A set of sale specifications
- */
-export type Sales = {
-  [key: string]: Sale
 }
 
 /**
@@ -13847,11 +13608,6 @@ export type SimulatedShopperDate = string
  */
 export type BundleConfigurationData2 = BundleConfigurationData
 
-/**
- * A list of product id or sku and bundle configuration for cart.
- */
-export type ProductsForCartConfiguration2 = ProductsForCartConfiguration
-
 export type GetByContextReleaseData = {
   body?: never
   headers?: {
@@ -14510,6 +14266,57 @@ export type GetByContextComponentProductIdsResponses = {
 
 export type GetByContextComponentProductIdsResponse =
   GetByContextComponentProductIdsResponses[keyof GetByContextComponentProductIdsResponses]
+
+export type GetByContextBundleProductIdsData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products/{product_id}/relationships/bundles"
+}
+
+export type GetByContextBundleProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextBundleProductIdsError =
+  GetByContextBundleProductIdsErrors[keyof GetByContextBundleProductIdsErrors]
+
+export type GetByContextBundleProductIdsResponses = {
+  /**
+   * The list of IDs of the bundles that contain the product as a component option.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetByContextBundleProductIdsResponse =
+  GetByContextBundleProductIdsResponses[keyof GetByContextBundleProductIdsResponses]
 
 export type GetByContextChildProductsData = {
   body?: never
@@ -15979,6 +15786,55 @@ export type GetComponentProductIdsResponses = {
 
 export type GetComponentProductIdsResponse =
   GetComponentProductIdsResponses[keyof GetComponentProductIdsResponses]
+
+export type GetBundleProductIdsData = {
+  body?: never
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+    /**
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
+     */
+    release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/bundles"
+}
+
+export type GetBundleProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetBundleProductIdsError =
+  GetBundleProductIdsErrors[keyof GetBundleProductIdsErrors]
+
+export type GetBundleProductIdsResponses = {
+  /**
+   * The list of IDs of the bundles that contain the product as a component option.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetBundleProductIdsResponse =
+  GetBundleProductIdsResponses[keyof GetBundleProductIdsResponses]
 
 export type GetChildProductsData = {
   body?: never

@@ -33,8 +33,8 @@ info:
     displays. Contexts can be a customer ID, a channel, or any other
     user-defined tag that can be passed to the APIs from the front-end shopper
     experiences.
-  version: 26.0806.8000552
-  x-version-timestamp: '2026-08-06T08:10:44Z'
+  version: 26.1028.8400859
+  x-version-timestamp: '2026-10-28T10:33:13Z'
 servers:
   - url: https://euwest.api.elasticpath.com
     description: EU West Production Server
@@ -293,15 +293,6 @@ tags:
       criteria under which to display the catalog.
 
 
-      :::caution
-
-
-      You cannot create catalog rules for organization catalogs.
-
-
-      :::
-
-
       You can use catalog rules to schedule a catalog to appear during a
       particular period, such as on a specific date or during summer. The
       catalog might offer different pricing during this period. The pricing
@@ -419,8 +410,9 @@ tags:
       search your store, for example.
 
 
-      Currently, published catalogs are limited to the current release and two
-      releases prior to the current release.
+      A new catalog keeps two published releases. Set `max_published_releases`
+      to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+      keeps the current release and two releases prior to the current release.
     x-displayName: Administrator Latest Releases Catalog API
   - name: Shopper Catalog API
     description: >
@@ -4580,6 +4572,50 @@ paths:
         - Shopper Catalog API
       security:
         - bearerAuth: []
+  /catalog/products/{product_id}/relationships/bundles:
+    get:
+      operationId: getByContextBundleProductIDs
+      summary: Get the Bundles That Contain a Product
+      description: >
+        Returns the IDs of the bundles in the shopper's catalog that offer the
+        specified product as an option in one of their components. Only direct
+        membership is listed: a bundle that contains another bundle does not
+        appear for that bundle's options.
+
+
+        Bundle IDs are returned in ascending order. A product that is in the
+        catalog but is not an option of any bundle returns an empty list. A
+        product that is not in the catalog returns `404`.
+      parameters:
+        - $ref: '#/components/parameters/channel'
+        - $ref: '#/components/parameters/tag'
+        - name: product_id
+          in: path
+          description: The product ID.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: >-
+            The list of IDs of the bundles that contain the product as a
+            component option.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-reference-list-data'
+        default:
+          description: The unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+      tags:
+        - Shopper Catalog API
+      security:
+        - bearerAuth: []
   /catalog/products/{product_id}/relationships/children:
     get:
       operationId: getByContextChildProducts
@@ -5132,11 +5168,12 @@ paths:
       operationId: getCatalogs
       summary: Gets all authorized catalogs
       description: >
-        Retrieves a list of all the catalogs that you are authorized to view.
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release. You can see the differences
-        between the last 2 consecutive catalog releases using the delta link
-        returned in the response of a [publish a
+        Retrieves a list of all the catalogs that you are authorized to view. A
+        new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
+        You can see the differences between the last 2 consecutive catalog
+        releases using the delta link returned in the response of a [publish a
         catalog](/docs/api/pxm/catalog/publish-release) endpoint.
 
 
@@ -5316,9 +5353,10 @@ paths:
 
 
         You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id)
-        to retrieve a published catalog. Currently, published catalogs are
-        limited to the current release and two releases prior to the current
-        release.
+        to retrieve a published catalog. A new catalog keeps two published
+        releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has
+        never stored `max_published_releases` keeps the current release and two
+        releases prior to the current release.
 
 
         You can see the differences between the last 2 consecutive catalog
@@ -5453,11 +5491,13 @@ paths:
       operationId: getReleases
       summary: Gets all authorized catalog releases
       description: >
-        Returns a list of all published releases of the specified catalog.
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release. You can see the differences
-        between the last 2 consecutive catalog releases using the `delta` link
-        returned in the response of a `publish a catalog` endpoint.
+        Returns a list of all published releases of the specified catalog. A new
+        catalog keeps two published releases. Set `max_published_releases` to 1,
+        2, or 3. A catalog that has never stored `max_published_releases` keeps
+        the current release and two releases prior to the current release. You
+        can see the differences between the last 2 consecutive catalog releases
+        using the `delta` link returned in the response of a `publish a catalog`
+        endpoint.
 
 
         You can use the `is_full_delta` attribute returned from the `get a
@@ -5618,8 +5658,6 @@ paths:
         - Due to the way catalogs are cached in Commerce, using catalog rules to
         display catalogs sometimes causes a 5-minute time delay before the
         catalogs are displayed.
-
-        - You cannot create catalog rules for organization catalogs.
 
 
         :::
@@ -5836,8 +5874,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -5933,8 +5972,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -5988,8 +6028,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -6102,8 +6143,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -6212,8 +6254,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -6352,8 +6395,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -6439,8 +6483,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -6580,8 +6625,10 @@ paths:
       summary: Get all Products
       description: >
         Returns the products from a published catalog. Only the products in a
-        `live` status are retrieved. Currently, published catalogs are limited
-        to the current release and two releases prior to the current release.
+        `live` status are retrieved. A new catalog keeps two published releases.
+        Set `max_published_releases` to 1, 2, or 3. A catalog that has never
+        stored `max_published_releases` keeps the current release and two
+        releases prior to the current release.
 
 
         You can see the parent nodes a product is associated with in the
@@ -6734,8 +6781,10 @@ paths:
       summary: Get a Product
       description: >
         Returns a product from a published catalog. The product must be in
-        `live` status. Currently, published catalogs are limited to the current
-        release and two releases prior to the current release.
+        `live` status. A new catalog keeps two published releases. Set
+        `max_published_releases` to 1, 2, or 3. A catalog that has never stored
+        `max_published_releases` keeps the current release and two releases
+        prior to the current release.
 
 
         ### Product and Node Associations in Breadcrumb Metadata
@@ -6969,6 +7018,62 @@ paths:
           description: >-
             The list of component product IDs of a specific bundle product from
             a catalog.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product-reference-list-data'
+        default:
+          description: The unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error-response'
+      tags:
+        - Administrator Latest Releases Catalog API
+      security:
+        - bearerAuth: []
+  /catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/bundles:
+    get:
+      operationId: getBundleProductIDs
+      summary: Get the Bundles That Contain a Product
+      description: >
+        Returns the IDs of the bundles in the catalog release that offer the
+        specified product as an option in one of their components. Only direct
+        membership is listed: a bundle that contains another bundle does not
+        appear for that bundle's options.
+
+
+        Bundle IDs are returned in ascending order. A product that is in the
+        release but is not an option of any bundle returns an empty list. A
+        product that is not in the release returns `404`.
+      parameters:
+        - name: catalog_id
+          in: path
+          description: The catalog ID.
+          required: true
+          schema:
+            type: string
+        - name: release_id
+          in: path
+          description: >-
+            The unique identifier of a published release of the catalog or
+            `latestPublished` for the most recently published version.
+          required: true
+          schema:
+            type: string
+        - name: product_id
+          in: path
+          description: The product ID.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: >-
+            The list of IDs of the bundles that contain the product as a
+            component option.
           content:
             application/json:
               schema:
@@ -7316,8 +7421,9 @@ paths:
         :::note
 
 
-        Currently, published catalogs are limited to the current release and two
-        releases prior to the current release.
+        A new catalog keeps two published releases. Set `max_published_releases`
+        to 1, 2, or 3. A catalog that has never stored `max_published_releases`
+        keeps the current release and two releases prior to the current release.
 
 
         :::
@@ -18401,6 +18507,25 @@ components:
                 - false
               default: false
               x-go-name: IncludeDraftProducts
+            max_published_releases:
+              description: >-
+                The maximum number of published releases kept for this catalog.
+                Omitted when the catalog has never stored a maximum.
+              type:
+                - integer
+                - 'null'
+              examples:
+                - 2
+              x-go-name: MaxPublishedReleases
+            allow_search_overrides:
+              description: >-
+                When `true`, search overrides are allowed for this catalog.
+                Defaults to `false`.
+              type: boolean
+              examples:
+                - false
+              x-go-name: AllowSearchOverrides
+              x-omitempty: false
           required:
             - name
             - hierarchy_ids
@@ -18524,6 +18649,27 @@ components:
                     - false
                   default: false
                   x-go-name: IncludeDraftProducts
+                max_published_releases:
+                  description: >-
+                    The maximum number of published releases to keep for this
+                    catalog. Must be 1, 2, or 3; any other value returns 400 Bad
+                    Request. When omitted, the catalog stores 2.
+                  type:
+                    - integer
+                    - 'null'
+                  examples:
+                    - 2
+                  x-go-name: MaxPublishedReleases
+                allow_search_overrides:
+                  description: >-
+                    When `true`, search overrides are allowed for this catalog.
+                    When omitted or null, the catalog stores `false`.
+                  type:
+                    - boolean
+                    - 'null'
+                  examples:
+                    - false
+                  x-go-name: AllowSearchOverrides
               required:
                 - name
                 - hierarchy_ids
@@ -18649,6 +18795,28 @@ components:
                     - false
                   default: false
                   x-go-name: IncludeDraftProducts
+                max_published_releases:
+                  description: >-
+                    The maximum number of published releases to keep for this
+                    catalog. Must be 1, 2, or 3; any other value returns 400 Bad
+                    Request. When omitted or null, the stored maximum is
+                    unchanged.
+                  type:
+                    - integer
+                    - 'null'
+                  examples:
+                    - 2
+                  x-go-name: MaxPublishedReleases
+                allow_search_overrides:
+                  description: >-
+                    When `true`, search overrides are allowed for this catalog.
+                    When omitted or null, the stored value is unchanged.
+                  type:
+                    - boolean
+                    - 'null'
+                  examples:
+                    - false
+                  x-go-name: AllowSearchOverrides
             id:
               description: The unique identifier of the catalog to be updated.
               type: string
@@ -18905,17 +19073,6 @@ components:
       additionalProperties:
         type: string
       title: ShopperAttributes
-    diff-list-data:
-      description: A list of differences between two releases.
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/product-diff'
-        links:
-          $ref: '#/components/schemas/links'
-      title: DiffListData
     display-price:
       description: A price formatted for display.
       type: object
@@ -18962,7 +19119,6 @@ components:
       type: object
       additionalProperties:
         description: The product attributes available for this template.
-        type: object
       title: Extension
     extensions:
       description: >-
@@ -19022,6 +19178,21 @@ components:
       properties:
         data:
           $ref: '#/components/schemas/product-references'
+        links:
+          $ref: '#/components/schemas/self-link'
+      x-omitempty: true
+    bundles-relationship:
+      description: >-
+        Present only when the product is an option in at least one bundle
+        component in the release. `data` is always empty; follow `links.self` to
+        list the bundles that contain the product.
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/product-reference'
+          x-omitempty: false
         links:
           $ref: '#/components/schemas/self-link'
       x-omitempty: true
@@ -19260,31 +19431,31 @@ components:
           type:
             - string
             - 'null'
-          format: uri
+          format: uri-reference
         first:
           description: Always the first page.
           type:
             - string
             - 'null'
-          format: uri
+          format: uri-reference
         last:
           description: This is `null` if there is only one page.
           type:
             - string
             - 'null'
-          format: uri
+          format: uri-reference
         prev:
           description: This is `null` if there is only one page.
           type:
             - string
             - 'null'
-          format: uri
+          format: uri-reference
         next:
           description: This is `null` if there is only one page.
           type:
             - string
             - 'null'
-          format: uri
+          format: uri-reference
     included-response:
       description: Included is an array of resources that are included in the response.
       type: object
@@ -19527,104 +19698,6 @@ components:
           x-go-name: UpdatedAt
       title: NodeAttributes
       x-go-name: NodeAttributes
-    release-indexing-complete-data:
-      description: The response body for a successful release indexing complete request.
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            status:
-              description: The final status of the search indexing process.
-              type: string
-              enum:
-                - succeeded
-                - failed
-            duration_ms:
-              description: The elapsed time in milliseconds spent indexing the release.
-              type:
-                - integer
-                - 'null'
-              format: int64
-              minimum: 0
-              x-go-name: DurationMS
-          required:
-            - status
-      title: ReleaseIndexingCompleteData
-    node-create-data:
-      description: Container for nodes.
-      type: object
-      properties:
-        data:
-          description: >-
-            A node in a catalog (e.g. a category node). Nodes can have child
-            nodes, as well as a list of attached products
-          type: object
-          properties:
-            attributes:
-              description: Resource attributes of a catalog node.
-              type: object
-              properties:
-                description:
-                  type: string
-                  examples:
-                    - Formal dresswear
-                  x-go-name: Description
-                hierarchy_id:
-                  description: hierarchy id of the node
-                  type: string
-                  examples:
-                    - ddd401ac-db06-4d9e-af60-cf5206abb9bc
-                label:
-                  type: string
-                  examples:
-                    - category
-                  x-go-name: Label
-                name:
-                  type: string
-                  examples:
-                    - Formal dresswear
-                  x-go-name: Name
-                slug:
-                  type: string
-                  examples:
-                    - formal
-                  x-go-name: Slug
-                status:
-                  type: string
-                  examples:
-                    - Live
-                  x-go-name: Status
-                locales:
-                  type: object
-                  additionalProperties:
-                    type: object
-                    additionalProperties:
-                      type: string
-              required:
-                - name
-              title: NodeCreateAttributes
-            relationships:
-              $ref: '#/components/schemas/node-relationships'
-            id:
-              type: string
-              examples:
-                - 8fccaa19-dba9-4621-8d11-31a222a68c7c
-              x-go-name: ID
-            type:
-              type: string
-              examples:
-                - node
-              x-go-name: Type
-          required:
-            - type
-            - attributes
-          title: NodeCreateArgs
-        links:
-          $ref: '#/components/schemas/links'
-      required:
-        - data
-      title: NodeCreateData
     node-data:
       description: Container for nodes.
       type: object
@@ -19806,15 +19879,6 @@ components:
             - data
       title: NodeRelationships
       x-go-name: NodeRelationships
-    node-relationships-data:
-      description: Container for node relationships.
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/node-relationships'
-        links:
-          $ref: '#/components/schemas/links'
-      title: NodeRelationshipsData
     page-meta:
       description: Contains the results for the entire collection.
       type: object
@@ -19847,207 +19911,6 @@ components:
               type: integer
               format: int64
       title: PageMeta
-    pricebook:
-      description: >-
-        Top level entity in the pricebooks domain model. It contains a list of
-        product prices.
-      type: object
-      properties:
-        id:
-          description: The unique identifier of a price book.
-          type: string
-          examples:
-            - 4c45e4ec-26e0-4043-86e4-c15b9cf985a7
-          x-go-name: ID
-        type:
-          description: >-
-            This represents the type of object being returned. Always
-            `pricebook`.
-          type: string
-          examples:
-            - pricebook
-          default: pricebook
-          const: pricebook
-          x-go-name: Type
-        attributes:
-          type: object
-          properties:
-            created_at:
-              type: string
-              format: date-time
-              examples:
-                - '2020-09-22T09:00:00'
-              x-go-name: CreatedAt
-            description:
-              type:
-                - string
-                - 'null'
-              examples:
-                - This is a pricebook
-              x-go-name: Description
-            name:
-              type:
-                - string
-                - 'null'
-              examples:
-                - pricebook-store-abc
-              x-go-name: Name
-            updated_at:
-              type: string
-              format: date-time
-              examples:
-                - '2020-09-22T09:00:00'
-              x-go-name: UpdatedAt
-          required:
-            - name
-      additionalProperties: false
-      required:
-        - type
-        - attributes
-      title: Pricebook
-      x-go-name: Pricebook
-    pricebook-create-data:
-      description: Container for pricebooks.
-      type: object
-      properties:
-        data:
-          description: New top level pricebook.
-          type: object
-          additionalProperties: false
-          properties:
-            type:
-              type: string
-              examples:
-                - pricebook
-              default: pricebook
-              const: pricebook
-              x-go-name: Type
-            attributes:
-              type: object
-              properties:
-                description:
-                  type:
-                    - string
-                    - 'null'
-                  examples:
-                    - This is a pricebook
-                  x-go-name: Description
-                name:
-                  type:
-                    - string
-                    - 'null'
-                  examples:
-                    - pricebook-store-abc
-                  x-go-name: Name
-              required:
-                - name
-          required:
-            - type
-            - attributes
-          title: PricebookCreateArgs
-        links:
-          $ref: '#/components/schemas/links'
-      required:
-        - data
-      title: PricebookData
-    pricebook-data:
-      description: Container for pricebooks.
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/pricebook'
-        links:
-          $ref: '#/components/schemas/links'
-      required:
-        - data
-      title: PricebookData
-    pricebook-price:
-      description: >-
-        ProductPrice associates a collection of locale specific prices with a
-        product ID.
-      type: object
-      properties:
-        type:
-          type: string
-          examples:
-            - product-price
-          default: product-price
-          const: product-price
-        attributes:
-          type: object
-          properties:
-            currencies:
-              $ref: '#/components/schemas/tiered-currencies'
-            sales:
-              $ref: '#/components/schemas/sales'
-            sku:
-              type: string
-              examples:
-                - 4c45e4ec-sku
-          required:
-            - currencies
-            - sku
-        id:
-          type: string
-          examples:
-            - 4c45e4ec-26e0-4043-86e4-c15b9cf985a7
-          x-go-name: ID
-      additionalProperties: false
-      required:
-        - type
-        - id
-        - attributes
-      title: PricebookPrice
-    pricebook-price-create-data:
-      description: Container for pricebook prices.
-      type: object
-      properties:
-        data:
-          description: >-
-            ProductPrice associates a collection of locale specific prices with
-            a product ID.
-          type: object
-          properties:
-            type:
-              type: string
-              examples:
-                - product-price
-              default: product-price
-              const: product-price
-            attributes:
-              type: object
-              properties:
-                currencies:
-                  $ref: '#/components/schemas/tiered-currencies'
-                sales:
-                  $ref: '#/components/schemas/sales'
-                sku:
-                  type: string
-                  examples:
-                    - 4c45e4ec-sku
-              required:
-                - currencies
-                - sku
-          required:
-            - type
-            - attributes
-          title: PricebookPriceCreateArgs
-        links:
-          $ref: '#/components/schemas/links'
-      required:
-        - data
-      title: PricebookPriceCreateData
-    pricebook-price-data:
-      description: Container for pricebook prices.
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/pricebook-price'
-        links:
-          $ref: '#/components/schemas/links'
-      required:
-        - data
-      title: PricebookPriceData
     product:
       description: A product in a catalog with the following attributes.
       type: object
@@ -20223,65 +20086,6 @@ components:
           $ref: '#/components/schemas/extensions'
       title: ProductAttributes
       x-go-name: ProductAttributes
-    product-create-data:
-      description: Container for products.
-      type: object
-      properties:
-        data:
-          description: A new product in a catalog.
-          type: object
-          properties:
-            attributes:
-              description: A product's attributes.
-              type: object
-              properties:
-                description:
-                  type: string
-                  examples:
-                    - This is a product
-                name:
-                  type: string
-                  examples:
-                    - Blue shirt
-                sku:
-                  type: string
-                  examples:
-                    - blue-shirt
-                slug:
-                  type: string
-                  examples:
-                    - blue-shirt
-                status:
-                  type: string
-                  examples:
-                    - live
-                locales:
-                  type: object
-                  additionalProperties:
-                    type: object
-                    additionalProperties:
-                      type: string
-              required:
-                - name
-                - status
-              title: ProductCreateAttributes
-            id:
-              type: string
-              examples:
-                - 8fccaa19-dba9-4621-8d11-31a222a68c7c
-              x-go-name: ID
-            type:
-              type: string
-              examples:
-                - product
-              x-go-name: Type
-          required:
-            - attributes
-            - type
-          title: ProductCreateArgs
-        links:
-          $ref: '#/components/schemas/links'
-      title: ProductData
     product-data:
       description: Container for products.
       type: object
@@ -20293,65 +20097,6 @@ components:
         links:
           $ref: '#/components/schemas/links'
       title: ProductData
-    product-diff:
-      type: object
-      properties:
-        id:
-          type: string
-          examples:
-            - e871df93-c769-49a9-9394-a6fd555b8e8a
-          x-go-name: ID
-        type:
-          type: string
-          examples:
-            - product_diff
-          x-go-name: Type
-        attributes:
-          type: object
-          properties:
-            sku:
-              type: string
-            this_release_id:
-              type: string
-            other_release_id:
-              type: string
-            diff_created_at:
-              type: string
-              format: date-time
-              examples:
-                - '1970-01-01T00:00:00.000'
-            exists:
-              type: object
-              properties:
-                this:
-                  type: boolean
-                other:
-                  type: boolean
-              required:
-                - this
-                - other
-              x-go-name: ProductDiffExists
-            updated_at:
-              type: object
-              properties:
-                this:
-                  type:
-                    - string
-                    - 'null'
-                  format: date-time
-                  examples:
-                    - '1970-01-01T00:00:00.000'
-                  x-omitempty: true
-                other:
-                  type:
-                    - string
-                    - 'null'
-                  format: date-time
-                  examples:
-                    - '1970-01-01T00:00:00.000'
-                  x-omitempty: true
-              x-go-name: ProductDiffUpdatedAt
-      x-go-name: ProductDiff
     product-list-data:
       description: Container for a list of products.
       type: object
@@ -20838,73 +20583,13 @@ components:
           $ref: '#/components/schemas/main-image-relationship'
         component_products:
           $ref: '#/components/schemas/component-products-relationship'
+        bundles:
+          $ref: '#/components/schemas/bundles-relationship'
         custom_relationships:
           $ref: '#/components/schemas/custom-relationship'
       title: ProductRelationships
       x-go-name: ProductRelationships
       x-omitempty: true
-    product-relationships-data:
-      description: Container for product relationships.
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/product-relationships'
-        links:
-          $ref: '#/components/schemas/links'
-      title: ProductRelationshipsData
-    products-for-cart:
-      description: >-
-        A list of products to be added to cart. Can be type product-data or
-        error-response.
-      type: object
-      properties:
-        data:
-          type: array
-          items: {}
-          x-go-name: Data
-        included:
-          type:
-            - object
-            - 'null'
-          properties:
-            component_products:
-              type: array
-              items:
-                $ref: '#/components/schemas/product'
-              x-go-name: ComponentProducts
-          x-go-name: Included
-      required:
-        - data
-      title: ProductsForCart
-      x-go-name: ProductsForCart
-    products-for-cart-configuration:
-      description: A list of product id or sku and bundle configuration for cart.
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type:
-                  - string
-                  - 'null'
-                format: uuid
-                x-go-name: ID
-              sku:
-                type:
-                  - string
-                  - 'null'
-                x-go-name: SKU
-              bundle_configuration:
-                $ref: '#/components/schemas/bundle-configuration'
-          minItems: 1
-          x-go-name: Data
-      required:
-        - data
-      title: ProductsForCartConfiguration
-      x-go-name: ProductsForCartConfiguration
     related-link:
       description: >-
         A URL to a related object, for example, catalog rules, hierarchies,
@@ -21140,6 +20825,17 @@ components:
             - false
           default: false
           x-go-name: IncludesDraftProducts
+        allow_search_overrides:
+          description: >-
+            When `true`, search overrides are allowed for this catalog release.
+            This is the catalog `allow_search_overrides` attribute at the time
+            the release was created. Defaults to `false`.
+          type:
+            - boolean
+            - 'null'
+          examples:
+            - false
+          x-go-name: AllowSearchOverrides
       title: ReleaseMeta
       x-go-name: ReleaseMeta
       x-omitempty: true
@@ -21904,12 +21600,6 @@ components:
           $ref: '#/components/schemas/schedule'
         currencies:
           $ref: '#/components/schemas/tiered-currencies'
-    sales:
-      description: A set of sale specifications
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/sale'
-      title: Sales
     schedule:
       description: A definition of the times at which a sale is valid
       type: object
@@ -37730,13 +37420,6 @@ components:
           schema:
             $ref: '#/components/schemas/bundle-configuration-data'
       description: The bundle configuration.
-      required: true
-    products-for-cart-configuration:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/products-for-cart-configuration'
-      description: A list of product id or sku and bundle configuration for cart.
       required: true
   securitySchemes:
     bearerAuth:

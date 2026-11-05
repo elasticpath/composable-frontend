@@ -115,6 +115,8 @@ export const zCatalogCreateData = z
           })
           .optional()
           .default(false),
+        max_published_releases: z.int().nullish(),
+        allow_search_overrides: z.boolean().nullish(),
       }),
       type: z.literal("catalog").register(z.globalRegistry, {
         description:
@@ -177,6 +179,8 @@ export const zCatalogUpdateData = z
           })
           .optional()
           .default(false),
+        max_published_releases: z.int().nullish(),
+        allow_search_overrides: z.boolean().nullish(),
       }),
       id: z.string().register(z.globalRegistry, {
         description: "The unique identifier of the catalog to be updated.",
@@ -904,32 +908,6 @@ export const zNodeAttributes = z
   })
 
 /**
- * ReleaseIndexingCompleteData
- *
- * The response body for a successful release indexing complete request.
- */
-export const zReleaseIndexingCompleteData = z
-  .object({
-    data: z
-      .object({
-        status: z.enum(["succeeded", "failed"]).register(z.globalRegistry, {
-          description: "The final status of the search indexing process.",
-        }),
-        duration_ms: z
-          .preprocess(
-            (v) => (typeof v === "string" ? Number(v) : v),
-            z.number().int().gte(0),
-          )
-          .nullish(),
-      })
-      .optional(),
-  })
-  .register(z.globalRegistry, {
-    description:
-      "The response body for a successful release indexing complete request.",
-  })
-
-/**
  * NodeMeta
  *
  * A node's metadata.
@@ -1079,151 +1057,6 @@ export const zPageMeta = z
   })
   .register(z.globalRegistry, {
     description: "Contains the results for the entire collection.",
-  })
-
-/**
- * Pricebook
- *
- * Top level entity in the pricebooks domain model. It contains a list of product prices.
- */
-export const zPricebook = z
-  .object({
-    id: z
-      .string()
-      .register(z.globalRegistry, {
-        description: "The unique identifier of a price book.",
-      })
-      .optional(),
-    type: z
-      .literal("pricebook")
-      .register(z.globalRegistry, {
-        description:
-          "This represents the type of object being returned. Always `pricebook`.",
-      })
-      .default("pricebook"),
-    attributes: z.object({
-      created_at: z.iso.datetime().optional(),
-      description: z.string().nullish(),
-      name: z.string().nullable(),
-      updated_at: z.iso.datetime().optional(),
-    }),
-  })
-  .register(z.globalRegistry, {
-    description:
-      "Top level entity in the pricebooks domain model. It contains a list of product prices.",
-  })
-
-/**
- * PricebookData
- *
- * Container for pricebooks.
- */
-export const zPricebookCreateData = z
-  .object({
-    data: z
-      .object({
-        type: z.literal("pricebook").default("pricebook"),
-        attributes: z.object({
-          description: z.string().nullish(),
-          name: z.string().nullable(),
-        }),
-      })
-      .register(z.globalRegistry, {
-        description: "New top level pricebook.",
-      }),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for pricebooks.",
-  })
-
-/**
- * PricebookData
- *
- * Container for pricebooks.
- */
-export const zPricebookData = z
-  .object({
-    data: zPricebook,
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for pricebooks.",
-  })
-
-/**
- * ProductData
- *
- * Container for products.
- */
-export const zProductCreateData = z
-  .object({
-    data: z
-      .object({
-        attributes: z
-          .object({
-            description: z.string().optional(),
-            name: z.string(),
-            sku: z.string().optional(),
-            slug: z.string().optional(),
-            status: z.string(),
-            locales: z
-              .record(z.string(), z.record(z.string(), z.string()))
-              .optional(),
-          })
-          .register(z.globalRegistry, {
-            description: "A product's attributes.",
-          }),
-        id: z.string().optional(),
-        type: z.string(),
-      })
-      .register(z.globalRegistry, {
-        description: "A new product in a catalog.",
-      })
-      .optional(),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for products.",
-  })
-
-export const zProductDiff = z.object({
-  id: z.string().optional(),
-  type: z.string().optional(),
-  attributes: z
-    .object({
-      sku: z.string().optional(),
-      this_release_id: z.string().optional(),
-      other_release_id: z.string().optional(),
-      diff_created_at: z.iso.datetime().optional(),
-      exists: z
-        .object({
-          this: z.boolean(),
-          other: z.boolean(),
-        })
-        .optional(),
-      updated_at: z
-        .object({
-          this: z.iso.datetime().nullish(),
-          other: z.iso.datetime().nullish(),
-        })
-        .optional(),
-    })
-    .optional(),
-})
-
-/**
- * DiffListData
- *
- * A list of differences between two releases.
- */
-export const zDiffListData = z
-  .object({
-    data: z.array(zProductDiff).optional(),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "A list of differences between two releases.",
   })
 
 /**
@@ -1381,28 +1214,6 @@ export const zProductReferenceListData = z
   })
 
 /**
- * ProductsForCartConfiguration
- *
- * A list of product id or sku and bundle configuration for cart.
- */
-export const zProductsForCartConfiguration = z
-  .object({
-    data: z
-      .array(
-        z.object({
-          id: z.uuid().nullish(),
-          sku: z.string().nullish(),
-          bundle_configuration: zBundleConfiguration.optional(),
-        }),
-      )
-      .min(1),
-  })
-  .register(z.globalRegistry, {
-    description:
-      "A list of product id or sku and bundle configuration for cart.",
-  })
-
-/**
  * A URL to a related object, for example, catalog rules, hierarchies, price books, products and deltas.
  */
 export const zRelatedLink = z
@@ -1502,6 +1313,14 @@ export const zCatalog = z
         })
         .optional()
         .default(false),
+      max_published_releases: z.int().nullish(),
+      allow_search_overrides: z
+        .boolean()
+        .register(z.globalRegistry, {
+          description:
+            "When `true`, search overrides are allowed for this catalog. Defaults to `false`.",
+        })
+        .optional(),
     }),
     relationships: z
       .object({
@@ -1751,49 +1570,6 @@ export const zNode = z
   })
 
 /**
- * NodeCreateData
- *
- * Container for nodes.
- */
-export const zNodeCreateData = z
-  .object({
-    data: z
-      .object({
-        attributes: z
-          .object({
-            description: z.string().optional(),
-            hierarchy_id: z
-              .string()
-              .register(z.globalRegistry, {
-                description: "hierarchy id of the node",
-              })
-              .optional(),
-            label: z.string().optional(),
-            name: z.string(),
-            slug: z.string().optional(),
-            status: z.string().optional(),
-            locales: z
-              .record(z.string(), z.record(z.string(), z.string()))
-              .optional(),
-          })
-          .register(z.globalRegistry, {
-            description: "Resource attributes of a catalog node.",
-          }),
-        relationships: zNodeRelationships.optional(),
-        id: z.string().optional(),
-        type: z.string(),
-      })
-      .register(z.globalRegistry, {
-        description:
-          "A node in a catalog (e.g. a category node). Nodes can have child nodes, as well as a list of attached products",
-      }),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for nodes.",
-  })
-
-/**
  * NodeData
  *
  * Container for nodes.
@@ -1820,20 +1596,6 @@ export const zNodeListData = z
   })
   .register(z.globalRegistry, {
     description: "Container for a list of nodes.",
-  })
-
-/**
- * NodeRelationshipsData
- *
- * Container for node relationships.
- */
-export const zNodeRelationshipsData = z
-  .object({
-    data: zNodeRelationships.optional(),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for node relationships.",
   })
 
 /**
@@ -1887,6 +1649,19 @@ export const zComponentProductsRelationship = z
   })
 
 /**
+ * Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.
+ */
+export const zBundlesRelationship = z
+  .object({
+    data: z.array(zProductReference).optional(),
+    links: zSelfLink.optional(),
+  })
+  .register(z.globalRegistry, {
+    description:
+      "Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.",
+  })
+
+/**
  * ProductRelationships
  *
  * Relationships allow you to move between requests. Includes links to the parent and child products, bundle component products, files, and main images associated with a product.
@@ -1915,25 +1690,12 @@ export const zProductRelationships = z
     files: zFilesRelationship.optional(),
     main_image: zMainImageRelationship.optional(),
     component_products: zComponentProductsRelationship.optional(),
+    bundles: zBundlesRelationship.optional(),
     custom_relationships: zCustomRelationship.optional(),
   })
   .register(z.globalRegistry, {
     description:
       "Relationships allow you to move between requests. Includes links to the parent and child products, bundle component products, files, and main images associated with a product.",
-  })
-
-/**
- * ProductRelationshipsData
- *
- * Container for product relationships.
- */
-export const zProductRelationshipsData = z
-  .object({
-    data: zProductRelationships.optional(),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for product relationships.",
   })
 
 /**
@@ -2028,6 +1790,7 @@ export const zReleaseMeta = z
       })
       .optional()
       .default(false),
+    allow_search_overrides: z.boolean().nullish(),
   })
   .register(z.globalRegistry, {
     description: "A release's metadata.",
@@ -2538,75 +2301,6 @@ export const zSale = z
   })
   .register(z.globalRegistry, {
     description: "A set of sale prices and a validity period.",
-  })
-
-/**
- * Sales
- *
- * A set of sale specifications
- */
-export const zSales = z.record(z.string(), zSale).register(z.globalRegistry, {
-  description: "A set of sale specifications",
-})
-
-/**
- * PricebookPrice
- *
- * ProductPrice associates a collection of locale specific prices with a product ID.
- */
-export const zPricebookPrice = z
-  .object({
-    type: z.literal("product-price").default("product-price"),
-    attributes: z.object({
-      currencies: zTieredCurrencies,
-      sales: zSales.optional(),
-      sku: z.string(),
-    }),
-    id: z.string(),
-  })
-  .register(z.globalRegistry, {
-    description:
-      "ProductPrice associates a collection of locale specific prices with a product ID.",
-  })
-
-/**
- * PricebookPriceCreateData
- *
- * Container for pricebook prices.
- */
-export const zPricebookPriceCreateData = z
-  .object({
-    data: z
-      .object({
-        type: z.literal("product-price").default("product-price"),
-        attributes: z.object({
-          currencies: zTieredCurrencies,
-          sales: zSales.optional(),
-          sku: z.string(),
-        }),
-      })
-      .register(z.globalRegistry, {
-        description:
-          "ProductPrice associates a collection of locale specific prices with a product ID.",
-      }),
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for pricebook prices.",
-  })
-
-/**
- * PricebookPriceData
- *
- * Container for pricebook prices.
- */
-export const zPricebookPriceData = z
-  .object({
-    data: zPricebookPrice,
-    links: zLinks.optional(),
-  })
-  .register(z.globalRegistry, {
-    description: "Container for pricebook prices.",
   })
 
 /**
@@ -16943,25 +16637,6 @@ export const zProductMeta = z
   })
 
 /**
- * ProductsForCart
- *
- * A list of products to be added to cart. Can be type product-data or error-response.
- */
-export const zProductsForCart = z
-  .object({
-    data: z.array(z.unknown()),
-    included: z
-      .object({
-        component_products: z.array(zProduct).optional(),
-      })
-      .nullish(),
-  })
-  .register(z.globalRegistry, {
-    description:
-      "A list of products to be added to cart. Can be type product-data or error-response.",
-  })
-
-/**
  * The language and locale your storefront prefers. See [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language).
  */
 export const zAcceptLanguage = z.string().register(z.globalRegistry, {
@@ -17516,11 +17191,6 @@ export const zSimulatedShopperDate = z.string()
  */
 export const zBundleConfigurationData2 = zBundleConfigurationData
 
-/**
- * A list of product id or sku and bundle configuration for cart.
- */
-export const zProductsForCartConfiguration2 = zProductsForCartConfiguration
-
 export const zGetByContextReleaseHeaders = z.object({
   "accept-language": z
     .string()
@@ -17984,6 +17654,57 @@ export const zGetByContextComponentProductIdsQuery = z.object({
  */
 export const zGetByContextComponentProductIdsResponse =
   zProductReferenceListData
+
+export const zGetByContextBundleProductIdsHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextBundleProductIdsPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetByContextBundleProductIdsQuery = z.object({
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of IDs of the bundles that contain the product as a component option.
+ */
+export const zGetByContextBundleProductIdsResponse = zProductReferenceListData
 
 export const zGetCatalogsQuery = z.object({
   filter: z
@@ -18683,6 +18404,47 @@ export const zGetComponentProductIdsQuery = z.object({
  * The list of component product IDs of a specific bundle product from a catalog.
  */
 export const zGetComponentProductIdsResponse = zProductReferenceListData
+
+export const zGetBundleProductIdsPath = z.object({
+  catalog_id: z.string().register(z.globalRegistry, {
+    description: "The catalog ID.",
+  }),
+  release_id: z.string().register(z.globalRegistry, {
+    description:
+      "The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.",
+  }),
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetBundleProductIdsQuery = z.object({
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of IDs of the bundles that contain the product as a component option.
+ */
+export const zGetBundleProductIdsResponse = zProductReferenceListData
 
 export const zGetCartsHeaders = z.object({
   "EP-Account-Management-Authentication-Token": z
