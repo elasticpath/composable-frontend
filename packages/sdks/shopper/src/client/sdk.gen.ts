@@ -167,6 +167,9 @@ import type {
   GetAnOrderResponses,
   GetATransactionData,
   GetATransactionResponses,
+  GetBundleProductIdsData,
+  GetBundleProductIdsErrors,
+  GetBundleProductIdsResponses,
   GetByContextAllHierarchiesData,
   GetByContextAllHierarchiesErrors,
   GetByContextAllHierarchiesResponses,
@@ -179,6 +182,9 @@ import type {
   GetByContextAllRelatedProductsData,
   GetByContextAllRelatedProductsErrors,
   GetByContextAllRelatedProductsResponses,
+  GetByContextBundleProductIdsData,
+  GetByContextBundleProductIdsErrors,
+  GetByContextBundleProductIdsResponses,
   GetByContextChildNodesData,
   GetByContextChildNodesErrors,
   GetByContextChildNodesResponses,
@@ -1056,6 +1062,39 @@ export const getByContextComponentProductIds = <
   })
 
 /**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the shopper's catalog that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the catalog but is not an option of any bundle returns an empty list. A product that is not in the catalog returns `404`.
+ *
+ */
+export const getByContextBundleProductIds = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetByContextBundleProductIdsData, ThrowOnError>,
+): RequestResult<
+  GetByContextBundleProductIdsResponses,
+  GetByContextBundleProductIdsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetByContextBundleProductIdsResponses,
+    GetByContextBundleProductIdsErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/catalog/products/{product_id}/relationships/bundles",
+    ...options,
+  })
+
+/**
  * Get a Parent Product's Child Products
  *
  * For a specified product and catalog release, retrieves a list of child products from a parent product. Any product other than a base product results in a `422 Unprocessable Entity` response. Only the products in a `live` status are retrieved.
@@ -1316,7 +1355,7 @@ export const configureByContextProduct = <ThrowOnError extends boolean = false>(
 /**
  * Gets all authorized catalogs
  *
- * Retrieves a list of all the catalogs that you are authorized to view. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
+ * Retrieves a list of all the catalogs that you are authorized to view. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
  *
@@ -1492,7 +1531,7 @@ export const deleteReleases = <ThrowOnError extends boolean = false>(
 /**
  * Gets all authorized catalog releases
  *
- * Returns a list of all published releases of the specified catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
+ * Returns a list of all published releases of the specified catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
  *
@@ -1524,7 +1563,7 @@ export const getReleases = <ThrowOnError extends boolean = false>(
  *
  * Publishes a catalog. You must publish a catalog before you can retrieve that catalog in an organization or store. The hierarchies, live products, and prices associated with a published catalog are in read-only mode. If you make a change to these resources, for example, a change to your price book or hierarchies, you need to republish the catalog.
  *
- * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the differences between the last 2 consecutive catalog releases. This is useful if want to understand how your products have changed in your catalog, ensuring your site search integration is kept up-to-date.
  *
@@ -1686,7 +1725,6 @@ export const getRules = <ThrowOnError extends boolean = false>(
  *
  * - If you have one catalog for all customers and channels, you can omit creating this resource.
  * - Due to the way catalogs are cached in Commerce, using catalog rules to display catalogs sometimes causes a 5-minute time delay before the catalogs are displayed.
- * - You cannot create catalog rules for organization catalogs.
  *
  * :::
  *
@@ -1828,7 +1866,7 @@ export const validateCatalogRules = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -1884,7 +1922,7 @@ export const getAllHierarchies = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -1915,7 +1953,7 @@ export const getHierarchy = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -1975,7 +2013,7 @@ export const getHierarchyNodes = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2033,7 +2071,7 @@ export const getHierarchyChildNodes = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2098,7 +2136,7 @@ export const getAllNodes = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2137,7 +2175,7 @@ export const getNode = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2198,7 +2236,7 @@ export const getChildNodes = <ThrowOnError extends boolean = false>(
 /**
  * Get all Products
  *
- * Returns the products from a published catalog. Only the products in a `live` status are retrieved. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns the products from a published catalog. Only the products in a `live` status are retrieved. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
@@ -2261,7 +2299,7 @@ export const getAllProducts = <ThrowOnError extends boolean = false>(
 /**
  * Get a Product
  *
- * Returns a product from a published catalog. The product must be in `live` status. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns a product from a published catalog. The product must be in `live` status. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * ### Product and Node Associations in Breadcrumb Metadata
  *
@@ -2376,6 +2414,37 @@ export const getComponentProductIds = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products",
+    ...options,
+  })
+
+/**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the catalog release that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the release but is not an option of any bundle returns an empty list. A product that is not in the release returns `404`.
+ *
+ */
+export const getBundleProductIds = <ThrowOnError extends boolean = false>(
+  options: Options<GetBundleProductIdsData, ThrowOnError>,
+): RequestResult<
+  GetBundleProductIdsResponses,
+  GetBundleProductIdsErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetBundleProductIdsResponses,
+    GetBundleProductIdsErrors,
+    ThrowOnError
+  >({
+    security: [
+      {
+        key: "bearerAuth",
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/bundles",
     ...options,
   })
 
@@ -2522,7 +2591,7 @@ export const getProductsForHierarchy = <ThrowOnError extends boolean = false>(
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *

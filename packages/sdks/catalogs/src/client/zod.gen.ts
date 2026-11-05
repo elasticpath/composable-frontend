@@ -115,6 +115,8 @@ export const zCatalogCreateData = z
           })
           .optional()
           .default(false),
+        max_published_releases: z.int().nullish(),
+        allow_search_overrides: z.boolean().nullish(),
       }),
       type: z.enum(["catalog"]).register(z.globalRegistry, {
         description:
@@ -177,6 +179,8 @@ export const zCatalogUpdateData = z
           })
           .optional()
           .default(false),
+        max_published_releases: z.int().nullish(),
+        allow_search_overrides: z.boolean().nullish(),
       }),
       id: z.string().register(z.globalRegistry, {
         description: "The unique identifier of the catalog to be updated.",
@@ -423,7 +427,7 @@ export const zErrorResponse = z
 export const zExtension = z
   .record(
     z.string(),
-    z.record(z.string(), z.unknown()).register(z.globalRegistry, {
+    z.unknown().register(z.globalRegistry, {
       description: "The product attributes available for this template.",
     }),
   )
@@ -688,11 +692,11 @@ export const zHierarchyAttributes = z
  */
 export const zLinks = z
   .object({
-    self: z.url().nullish(),
-    first: z.url().nullish(),
-    last: z.url().nullish(),
-    prev: z.url().nullish(),
-    next: z.url().nullish(),
+    self: z.string().nullish(),
+    first: z.string().nullish(),
+    last: z.string().nullish(),
+    prev: z.string().nullish(),
+    next: z.string().nullish(),
   })
   .register(z.globalRegistry, {
     description: "Links allow you to move between requests.",
@@ -1314,6 +1318,14 @@ export const zCatalog = z
         })
         .optional()
         .default(false),
+      max_published_releases: z.int().nullish(),
+      allow_search_overrides: z
+        .boolean()
+        .register(z.globalRegistry, {
+          description:
+            "When `true`, search overrides are allowed for this catalog. Defaults to `false`.",
+        })
+        .optional(),
     }),
     relationships: z
       .object({
@@ -1642,6 +1654,19 @@ export const zComponentProductsRelationship = z
   })
 
 /**
+ * Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.
+ */
+export const zBundlesRelationship = z
+  .object({
+    data: z.array(zProductReference).optional(),
+    links: zSelfLink.optional(),
+  })
+  .register(z.globalRegistry, {
+    description:
+      "Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.",
+  })
+
+/**
  * ProductRelationships
  *
  * Relationships allow you to move between requests. Includes links to the parent and child products, bundle component products, files, and main images associated with a product.
@@ -1670,6 +1695,7 @@ export const zProductRelationships = z
     files: zFilesRelationship.optional(),
     main_image: zMainImageRelationship.optional(),
     component_products: zComponentProductsRelationship.optional(),
+    bundles: zBundlesRelationship.optional(),
     custom_relationships: zCustomRelationship.optional(),
   })
   .register(z.globalRegistry, {
@@ -1769,6 +1795,7 @@ export const zReleaseMeta = z
       })
       .optional()
       .default(false),
+    allow_search_overrides: z.boolean().nullish(),
   })
   .register(z.globalRegistry, {
     description: "A release's metadata.",
@@ -3328,6 +3355,57 @@ export const zGetByContextComponentProductIdsQuery = z.object({
 export const zGetByContextComponentProductIdsResponse =
   zProductReferenceListData
 
+export const zGetByContextBundleProductIdsHeaders = z.object({
+  "EP-Channel": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.",
+    })
+    .optional(),
+  "EP-Context-Tag": z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.",
+    })
+    .optional(),
+})
+
+export const zGetByContextBundleProductIdsPath = z.object({
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetByContextBundleProductIdsQuery = z.object({
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of IDs of the bundles that contain the product as a component option.
+ */
+export const zGetByContextBundleProductIdsResponse = zProductReferenceListData
+
 export const zGetCatalogsQuery = z.object({
   filter: z
     .string()
@@ -4026,6 +4104,47 @@ export const zGetComponentProductIdsQuery = z.object({
  * The list of component product IDs of a specific bundle product from a catalog.
  */
 export const zGetComponentProductIdsResponse = zProductReferenceListData
+
+export const zGetBundleProductIdsPath = z.object({
+  catalog_id: z.string().register(z.globalRegistry, {
+    description: "The catalog ID.",
+  }),
+  release_id: z.string().register(z.globalRegistry, {
+    description:
+      "The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.",
+  }),
+  product_id: z.string().register(z.globalRegistry, {
+    description: "The product ID.",
+  }),
+})
+
+export const zGetBundleProductIdsQuery = z.object({
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(1),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.",
+    })
+    .optional(),
+})
+
+/**
+ * The list of IDs of the bundles that contain the product as a component option.
+ */
+export const zGetBundleProductIdsResponse = zProductReferenceListData
 
 export const zGetByContextAllProductsHeaders = z.object({
   "accept-language": z

@@ -152,6 +152,14 @@ export type Catalog = {
      * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
      */
     include_draft_products?: boolean
+    /**
+     * The maximum number of published releases kept for this catalog. Omitted when the catalog has never stored a maximum.
+     */
+    max_published_releases?: number | null
+    /**
+     * When `true`, search overrides are allowed for this catalog. Defaults to `false`.
+     */
+    allow_search_overrides?: boolean
   }
   /**
    * CatalogRelationships
@@ -223,6 +231,14 @@ export type CatalogCreateData = {
        * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
        */
       include_draft_products?: boolean
+      /**
+       * The maximum number of published releases to keep for this catalog. Must be 1, 2, or 3; any other value returns 400 Bad Request. When omitted, the catalog stores 2.
+       */
+      max_published_releases?: number | null
+      /**
+       * When `true`, search overrides are allowed for this catalog. When omitted or null, the catalog stores `false`.
+       */
+      allow_search_overrides?: boolean | null
     }
     /**
      * Represents the type of object being returned. Always `Catalog`.
@@ -293,6 +309,14 @@ export type CatalogUpdateData = {
        * When `true`, publishing this catalog includes products in `draft` status in the catalog release. When `false` or omitted, only `live` products are included in the release (default).
        */
       include_draft_products?: boolean
+      /**
+       * The maximum number of published releases to keep for this catalog. Must be 1, 2, or 3; any other value returns 400 Bad Request. When omitted or null, the stored maximum is unchanged.
+       */
+      max_published_releases?: number | null
+      /**
+       * When `true`, search overrides are allowed for this catalog. When omitted or null, the stored value is unchanged.
+       */
+      allow_search_overrides?: boolean | null
     }
     /**
      * The unique identifier of the catalog to be updated.
@@ -495,9 +519,7 @@ export type ErrorResponse = {
  * The name of the product template.
  */
 export type Extension = {
-  [key: string]: {
-    [key: string]: unknown
-  }
+  [key: string]: unknown
 }
 
 /**
@@ -539,6 +561,14 @@ export type FilesRelationship = {
  */
 export type ComponentProductsRelationship = {
   data?: ProductReferences
+  links?: SelfLink
+}
+
+/**
+ * Present only when the product is an option in at least one bundle component in the release. `data` is always empty; follow `links.self` to list the bundles that contain the product.
+ */
+export type BundlesRelationship = {
+  data?: Array<ProductReference>
   links?: SelfLink
 }
 
@@ -1466,6 +1496,7 @@ export type ProductRelationships = {
   files?: FilesRelationship
   main_image?: MainImageRelationship
   component_products?: ComponentProductsRelationship
+  bundles?: BundlesRelationship
   custom_relationships?: CustomRelationship
 }
 
@@ -1620,6 +1651,10 @@ export type ReleaseMeta = {
    * When `true`, this catalog release includes `draft` products in its published data. This reflects the catalog `include_draft_products` attribute at the time of publish.
    */
   includes_draft_products?: boolean
+  /**
+   * When `true`, search overrides are allowed for this catalog release. This is the catalog `allow_search_overrides` attribute at the time the release was created. Defaults to `false`.
+   */
+  allow_search_overrides?: boolean | null
 }
 
 /**
@@ -2846,6 +2881,57 @@ export type GetByContextComponentProductIdsResponses = {
 
 export type GetByContextComponentProductIdsResponse =
   GetByContextComponentProductIdsResponses[keyof GetByContextComponentProductIdsResponses]
+
+export type GetByContextBundleProductIdsData = {
+  body?: never
+  headers?: {
+    /**
+     * The list of channels in which this catalog can be displayed. A channel is the shopping experience, such as a mobile app or web storefront. If empty, the catalog rule matches all channels. The channel will eventually be included in the bearer token that is used for authorization, but currently, you must set the `EP-Channel` header in your requests.
+     */
+    "EP-Channel"?: string
+    /**
+     * Tags are used to refine the eligibility criteria for a rule. Requests populate the catalog rule tag using the `EP-Context-Tag` header.
+     */
+    "EP-Context-Tag"?: string
+  }
+  path: {
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalog/products/{product_id}/relationships/bundles"
+}
+
+export type GetByContextBundleProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetByContextBundleProductIdsError =
+  GetByContextBundleProductIdsErrors[keyof GetByContextBundleProductIdsErrors]
+
+export type GetByContextBundleProductIdsResponses = {
+  /**
+   * The list of IDs of the bundles that contain the product as a component option.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetByContextBundleProductIdsResponse =
+  GetByContextBundleProductIdsResponses[keyof GetByContextBundleProductIdsResponses]
 
 export type GetByContextChildProductsData = {
   body?: never
@@ -4315,6 +4401,55 @@ export type GetComponentProductIdsResponses = {
 
 export type GetComponentProductIdsResponse =
   GetComponentProductIdsResponses[keyof GetComponentProductIdsResponses]
+
+export type GetBundleProductIdsData = {
+  body?: never
+  path: {
+    /**
+     * The catalog ID.
+     */
+    catalog_id: string
+    /**
+     * The unique identifier of a published release of the catalog or `latestPublished` for the most recently published version.
+     */
+    release_id: string
+    /**
+     * The product ID.
+     */
+    product_id: string
+  }
+  query?: {
+    /**
+     * The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.
+     */
+    "page[limit]"?: number
+    /**
+     * The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. You would normally increment the page offset by multiples of the page limit to paginate through the results.
+     */
+    "page[offset]"?: number
+  }
+  url: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/bundles"
+}
+
+export type GetBundleProductIdsErrors = {
+  /**
+   * The unexpected error.
+   */
+  default: ErrorResponse
+}
+
+export type GetBundleProductIdsError =
+  GetBundleProductIdsErrors[keyof GetBundleProductIdsErrors]
+
+export type GetBundleProductIdsResponses = {
+  /**
+   * The list of IDs of the bundles that contain the product as a component option.
+   */
+  200: ProductReferenceListData
+}
+
+export type GetBundleProductIdsResponse =
+  GetBundleProductIdsResponses[keyof GetBundleProductIdsResponses]
 
 export type GetChildProductsData = {
   body?: never
