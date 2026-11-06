@@ -9,8 +9,8 @@ info:
     name: Elastic Path
     url: https://www.elasticpath.com
     email: support@elasticpath.com
-  version: 26.0608.7722088
-  x-version-timestamp: 2026-06-08T19:43:09Z
+  version: 26.1015.8330282
+  x-version-timestamp: 2026-10-15T21:16:34Z
   license:
     name: MIT
     url: https://raw.githubusercontent.com/elasticpath/elasticpath-dev/main/LICENSE
@@ -237,7 +237,6 @@ tags:
 
       The following values cannot be used as a `slug` in a Custom Field.
 
-      - slug
       - type
       - id
       - meta
@@ -249,6 +248,7 @@ tags:
       - attribute
       - dimension
       - dimensions
+      - null
       - weight
       - weights
   - name: Custom API Entries
@@ -674,8 +674,6 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/CustomAPIEntry'
-        '201':
-          $ref: '#/components/responses/CustomAPIEntry'
         '400':
           $ref: '#/components/responses/ValidationError'
         '403':
@@ -921,7 +919,7 @@ components:
       description: |
         When If-Match is set, the value must be W/"{etag_id}". If the value of the header matches, the request completes. If not, HTTP 412 Precondition Failed is returned.
       in: header
-      required: true
+      required: false
       schema:
         type: string
         format: string
@@ -949,9 +947,13 @@ components:
           $ref: '#/components/schemas/Timestamps'
     CustomAPIRelationships:
       type: object
+      required:
+        - parent_apis
       properties:
         parent_apis:
           type: object
+          required:
+            - data
           properties:
             data:
               type: array
@@ -1346,6 +1348,9 @@ components:
         - 'null'
       description: |
         An optional JSON Schema used to validate entry values for this field.
+      required:
+        - version
+        - schema
       properties:
         version:
           type: string
@@ -1518,6 +1523,12 @@ components:
           list: '#/components/schemas/ListCustomField'
     BaseCreateCustomField:
       type: object
+      required:
+        - type
+        - name
+        - description
+        - slug
+        - field_type
       properties:
         type:
           type: string
@@ -1530,7 +1541,7 @@ components:
           maxLength: 255
         description:
           type: string
-          description: Specifies the description for this Custom Field.
+          description: Specifies the description for this Custom Field. Must be present and not `null`. An empty string is allowed.
           minLength: 0
           maxLength: 255
         slug:
@@ -1805,6 +1816,8 @@ components:
                       $ref: '#/components/schemas/JSONSchemaValidation'
     BaseUpdateCustomField:
       type: object
+      required:
+        - type
       properties:
         type:
           type: string
@@ -2528,6 +2541,7 @@ components:
                 }
   requestBodies:
     CreateCustomAPI:
+      required: true
       content:
         application/json:
           schema:
@@ -2540,6 +2554,7 @@ components:
                 required:
                   - type
                   - name
+                  - description
                   - slug
                   - api_type
                 properties:
@@ -2554,7 +2569,7 @@ components:
                     maxLength: 255
                   description:
                     type: string
-                    description: Specifies the description for this Custom API.
+                    description: Specifies the description for this Custom API. Must be present and not `null`. An empty string is allowed.
                     minLength: 0
                     maxLength: 255
                   slug:
@@ -2605,6 +2620,7 @@ components:
                         - id: 652e39d8-d613-493e-8c20-fef99ad6327a
                           type: custom_api
     UpdateCustomAPI:
+      required: true
       content:
         application/json:
           schema:
@@ -2658,6 +2674,7 @@ components:
                         maxLength: 64
                   relationships:
                     $ref: '#/components/schemas/CustomAPIRelationships'
+                    description: Omit `relationships` to keep the existing parent APIs.
           examples:
             Update Example:
               summary: Update a Custom API
@@ -2673,6 +2690,7 @@ components:
                         - id: 652e39d8-d613-493e-8c20-fef99ad6327a
                           type: custom_api
     CreateCustomField:
+      required: true
       content:
         application/json:
           schema:
@@ -2681,11 +2699,6 @@ components:
               - data
             properties:
               data:
-                required:
-                  - type
-                  - name
-                  - slug
-                  - field_type
                 oneOf:
                   - $ref: '#/components/schemas/BooleanCreateCustomField'
                   - $ref: '#/components/schemas/FloatCreateCustomField'
@@ -2794,6 +2807,7 @@ components:
                       max_length: 100
                       allowed_type: string
     UpdateCustomField:
+      required: true
       content:
         application/json:
           schema:
@@ -2802,8 +2816,6 @@ components:
               - data
             properties:
               data:
-                required:
-                  - type
                 oneOf:
                   - $ref: '#/components/schemas/BooleanUpdateCustomField'
                   - $ref: '#/components/schemas/FloatUpdateCustomField'
@@ -2892,6 +2904,7 @@ components:
                       min_length: 0
                       max_length: 100
     CreateCustomAPIEntry:
+      required: true
       content:
         application/json:
           schema:
@@ -2924,6 +2937,7 @@ components:
                     - birthday
                     - gifts
     UpdateCustomAPIEntry:
+      required: true
       content:
         application/json:
           schema:

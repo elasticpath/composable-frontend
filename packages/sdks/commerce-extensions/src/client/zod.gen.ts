@@ -24,30 +24,26 @@ export const zMeta = z.object({
 })
 
 export const zCustomApiRelationships = z.object({
-  parent_apis: z
-    .object({
-      data: z
-        .array(
-          z.object({
-            id: z
-              .string()
-              .register(z.globalRegistry, {
-                description:
-                  "The unique identifier for the related Custom API. When the `type` of an object is set to `api_location` then `id` must be `/v2/extensions`.\nWhen the `type` of an object is set to `custom_api`, then `id` must be that of a Custom API that results in a relationship that does not have a depth exceeding 2 and does not result in a cycle.\n",
-              })
-              .optional(),
-            type: z
-              .enum(["custom_api", "api_location"])
-              .register(z.globalRegistry, {
-                description:
-                  "Specifies the type of parent relationship, can be `custom_api` or `api_location`.",
-              })
-              .optional(),
-          }),
-        )
-        .optional(),
-    })
-    .optional(),
+  parent_apis: z.object({
+    data: z.array(
+      z.object({
+        id: z
+          .string()
+          .register(z.globalRegistry, {
+            description:
+              "The unique identifier for the related Custom API. When the `type` of an object is set to `api_location` then `id` must be `/v2/extensions`.\nWhen the `type` of an object is set to `custom_api`, then `id` must be that of a Custom API that results in a relationship that does not have a depth exceeding 2 and does not result in a cycle.\n",
+          })
+          .optional(),
+        type: z
+          .enum(["custom_api", "api_location"])
+          .register(z.globalRegistry, {
+            description:
+              "Specifies the type of parent relationship, can be `custom_api` or `api_location`.",
+          })
+          .optional(),
+      }),
+    ),
+  }),
 })
 
 export const zCustomApi = z.object({
@@ -374,20 +370,13 @@ export const zStringCustomField = zBaseCustomField.and(
  */
 export const zJsonSchemaValidation = z
   .object({
-    version: z
-      .literal("2020-12")
-      .register(z.globalRegistry, {
-        description: 'The JSON Schema draft version. Must be "2020-12".',
-      })
-      .optional(),
-    schema: z
-      .string()
-      .max(8192)
-      .register(z.globalRegistry, {
-        description:
-          "A JSON-encoded string containing a valid JSON Schema Draft 2020-12 object.\nThe schema must not exceed 8 KiB in size.\nExternal `$ref` references (e.g., HTTP URLs, file paths) are not supported and will be rejected.\n",
-      })
-      .optional(),
+    version: z.literal("2020-12").register(z.globalRegistry, {
+      description: 'The JSON Schema draft version. Must be "2020-12".',
+    }),
+    schema: z.string().max(8192).register(z.globalRegistry, {
+      description:
+        "A JSON-encoded string containing a valid JSON Schema Draft 2020-12 object.\nThe schema must not exceed 8 KiB in size.\nExternal `$ref` references (e.g., HTTP URLs, file paths) are not supported and will be rejected.\n",
+    }),
   })
   .nullable()
 
@@ -537,7 +526,8 @@ export const zBaseCreateCustomField = z.object({
     description: "Specifies the name of this Custom Field.",
   }),
   description: z.string().min(0).max(255).register(z.globalRegistry, {
-    description: "Specifies the description for this Custom Field.",
+    description:
+      "Specifies the description for this Custom Field. Must be present and not `null`. An empty string is allowed.",
   }),
   slug: z.string().min(1).max(63).register(z.globalRegistry, {
     description:
@@ -1095,7 +1085,8 @@ export const zCreateCustomApi = z.object({
       description: "Specifies the name of this Custom API.",
     }),
     description: z.string().min(0).max(255).register(z.globalRegistry, {
-      description: "Specifies the description for this Custom API.",
+      description:
+        "Specifies the description for this Custom API. Must be present and not `null`. An empty string is allowed.",
     }),
     slug: z
       .string()
@@ -1688,22 +1679,16 @@ export const zUpdateACustomEntryPath = z.object({
   }),
 })
 
-export const zUpdateACustomEntryResponse = z.union([
-  z
-    .object({
-      data: zCustomApiEntry.optional(),
-    })
-    .register(z.globalRegistry, {
-      description: "A Custom API Entry",
-    }),
-  z
-    .object({
-      data: zCustomApiEntry.optional(),
-    })
-    .register(z.globalRegistry, {
-      description: "A Custom API Entry",
-    }),
-])
+/**
+ * A Custom API Entry
+ */
+export const zUpdateACustomEntryResponse = z
+  .object({
+    data: zCustomApiEntry.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A Custom API Entry",
+  })
 
 /**
  * The OpenAPI specification in JSON format.
