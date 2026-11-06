@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Changes a custom user role's name, description or access levels by its ID.
+  Send type with the attributes to set. The same limits apply as on create:
+  custom_actions and team must be none, and extended_attributes must be view or
+  manage. Returns 404 when there is no such role.

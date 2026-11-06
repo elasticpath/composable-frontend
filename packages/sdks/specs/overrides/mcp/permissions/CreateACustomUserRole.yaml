@@ -1,0 +1,8 @@
+x-mcp-title: Create a Custom User Role
+x-mcp-description: >-
+  Creates a custom user role for Commerce Manager users, with a name, a
+  description and access_levels giving an access level (none, view or manage)
+  per permission group, such as catalogs, orders and promotions. type, name,
+  description and access_levels are required. custom_actions and team must be
+  none, extended_attributes must be view or manage, and content_and_pages may
+  also be content or design. To see the groups, get a standard user role.
