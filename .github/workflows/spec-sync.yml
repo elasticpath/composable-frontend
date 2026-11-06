@@ -167,6 +167,22 @@ jobs:
           echo "Typechecking:$filters"
           pnpm $filters run type:check
 
+      # Every regenerated package has tests, and mcp.test.ts fails for a tool without a written
+      # description. The outcome goes in the pull request body; the sync still opens it.
+      - name: Test the regenerated packages
+        id: test
+        if: steps.sync.outcome == 'success' && steps.sync.outputs.code == '0'
+        continue-on-error: true
+        run: |
+          summary="${RUNNER_TEMP}/spec-sync-summary.json"
+          filters=""
+          for p in $(jq -r '.packages[]?' "$summary"); do filters="$filters --filter $p"; done
+          if [ -z "$filters" ]; then
+            echo "No package regenerated; nothing to test."
+            exit 0
+          fi
+          pnpm $filters run test
+
       # build:packages regenerates every package README, exactly as it does in release.yml.
       # Revert them so the pull request carries only the spec, the client and the changeset.
       - name: Revert README churn
@@ -207,8 +223,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           summary="${RUNNER_TEMP}/spec-sync-summary.json"
-          breaking=$(jq -r '.breaking' "$summary")
-          body=$(jq -r '
+          held=$(jq -r '.held' "$summary")
+          case "${{ steps.test.outcome }}" in
+            success) tests=pass ;;
+            failure) tests=fail ;;
+            *) tests="not run" ;;
+          esac
+          body=$(jq -r --arg tests "$tests" '
             "Regenerated `packages/sdks/specs/" + .specFile + "` from the spec published at developer.elasticpath.com"
             + (if .upstreamTimestamp then " on " + .upstreamTimestamp else "" end) + ".\n\n"
             + "| | |\n|---|---|\n"
@@ -218,9 +239,20 @@ jobs:
               + " |\n"
             + "| Exports added | " + (.exportsAdded | length | tostring) + " |\n"
             + "| Exports removed | " + (.exportsRemoved | length | tostring) + " |\n"
+            + "| Tools without a written description | " + (.toolsWithoutDescription | length | tostring) + " |\n"
+            + "| Package tests | " + $tests + " |\n"
             + (if .breaking then
                 "\n> [!WARNING]\n> This regeneration removes exported symbols from a published package. Held as a draft.\n\n"
                 + (.exportsRemoved | map("- `" + . + "`") | join("\n")) + "\n"
+              else "" end)
+            + (if (.toolsWithoutDescription | length) > 0 then
+                "\n> [!WARNING]\n> " + (.toolsWithoutDescription | length | tostring)
+                + " new tool(s) have no written description, so the package test that checks tool descriptions fails. "
+                + "For each one, add `packages/sdks/specs/overrides/mcp/<package>/<operationId>.yaml`, list it under that package in `packages/sdks/specs/config/redocly.yaml`, and regenerate. Held as a draft.\n\n"
+                + (.toolsWithoutDescription | map("- `" + .package + ": " + .operationId + "`") | join("\n")) + "\n"
+              else "" end)
+            + (if $tests == "fail" then
+                "\n> [!WARNING]\n> The regenerated packages\u0027 tests fail. See the sync job\u0027s test step. Held as a draft.\n"
               else "" end)
             + "\nMerging this pull request publishes to npm."
           ' "$summary")
@@ -237,9 +269,9 @@ jobs:
             echo "Opened PR #$existing"
           fi
 
-          if [ "$breaking" = "true" ]; then
+          if [ "$held" = "true" ] || [ "$tests" = "fail" ]; then
             gh pr ready --undo "$existing" || true
-            echo "::warning::Exports removed; pull request held as a draft."
+            echo "::warning::Exports removed, tools undescribed or tests failing; pull request held as a draft."
           fi
 
   # A spec the docs site would not serve must not pass unnoticed, but it must not stop the
