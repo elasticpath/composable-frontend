@@ -557,7 +557,7 @@ export const listCustomUserRolesTool = (options?: ToolOptions) => {
     config: {
       title: "List Custom User Roles",
       description:
-        "List Custom User Roles. Retrieves a list of Custom User Roles",
+        "Lists the custom user roles of the store or organization, each with its name, description and access level for each permission group. Filter by id, name, created_at or updated_at, and sort by those attributes, prefixed with - for descending; the default is newest first. Supports offset and limit pagination.",
       inputSchema: listCustomUserRolesInput,
       annotations: {
         readOnlyHint: true,
@@ -608,8 +608,9 @@ export const createACustomUserRoleTool = (options?: ToolOptions) => {
   return {
     name: "permissions_create_a_custom_user_role" as const,
     config: {
-      title: "Create A Custom User Role",
-      description: "Create A Custom User Role",
+      title: "Create a Custom User Role",
+      description:
+        "Creates a custom user role for Commerce Manager users, with a name, a description and access_levels giving an access level (none, view or manage) per permission group, such as catalogs, orders and promotions. type, name, description and access_levels are required. custom_actions and team must be none, extended_attributes must be view or manage, and content_and_pages may also be content or design. To see the groups, get a standard user role.",
       inputSchema: createACustomUserRoleInput,
       annotations: {
         readOnlyHint: false,
@@ -658,7 +659,8 @@ export const deleteACustomUserRoleTool = (options?: ToolOptions) => {
     name: "permissions_delete_a_custom_user_role" as const,
     config: {
       title: "Delete a Custom User Role",
-      description: "Delete A Custom User Role",
+      description:
+        "Deletes one custom user role by its ID. Returns 404 when there is no such role and 409 when the role cannot be deleted, for example while it is still assigned.",
       inputSchema: deleteACustomUserRoleInput,
       annotations: {
         readOnlyHint: false,
@@ -704,7 +706,8 @@ export const getACustomUserRoleTool = (options?: ToolOptions) => {
     name: "permissions_get_a_custom_user_role" as const,
     config: {
       title: "Get a Custom User Role",
-      description: "Get A Custom User Role",
+      description:
+        "Gets one custom user role by its ID, with its name, description, access level for each permission group, and whether the organization or the store manages it. Use it when you already know the role ID; to find one, list the custom user roles with a filter.",
       inputSchema: getACustomUserRoleInput,
       annotations: {
         readOnlyHint: true,
@@ -757,7 +760,8 @@ export const updateACustomUserRoleTool = (options?: ToolOptions) => {
     name: "permissions_update_a_custom_user_role" as const,
     config: {
       title: "Update a Custom User Role",
-      description: "Update A Custom User Role",
+      description:
+        "Changes a custom user role's name, description or access levels by its ID. Send type with the attributes to set. The same limits apply as on create: custom_actions and team must be none, and extended_attributes must be view or manage. Returns 404 when there is no such role.",
       inputSchema: updateACustomUserRoleInput,
       annotations: {
         readOnlyHint: false,

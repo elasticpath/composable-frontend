@@ -1,0 +1,4 @@
+x-mcp-description: >-
+  Deletes one custom user role by its ID. Returns 404 when there is no such role
+  and 409 when the role cannot be deleted, for example while it is still
+  assigned.
