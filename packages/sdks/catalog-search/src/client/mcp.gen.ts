@@ -1509,7 +1509,7 @@ export const listSearchOverridesTool = (options?: ToolOptions) => {
     config: {
       title: "List search overrides",
       description:
-        "List search overrides. List the search overrides of the current store or organization, newest updated first, with offset/limit pagination.",
+        "Lists the search overrides of the store or organization, newest updated first, with offset and limit pagination. Each override holds the field values search uses in place of one product's own. Filter with eq or in on id, eq on fields.<name>.value, or is_null on a field the override does not set; a colon joins conditions that must both match, a pipe conditions where either may. Any other operator, attribute or field name returns 400.",
       inputSchema: listSearchOverridesInput,
       annotations: {
         readOnlyHint: true,

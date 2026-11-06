@@ -629,6 +629,7 @@ apis:
           updateSearchRuleGroup: ../overrides/mcp/catalog-search/updateSearchRuleGroup.yaml
           updateStopwordSet: ../overrides/mcp/catalog-search/updateStopwordSet.yaml
           updateSynonymSet: ../overrides/mcp/catalog-search/updateSynonymSet.yaml
+          listSearchOverrides: ../overrides/mcp/catalog-search/listSearchOverrides.yaml
     preprocessors:
       ops-extras/remove-v2-server: true
       ops-extras/remove-invalid-enum-defaults: true
