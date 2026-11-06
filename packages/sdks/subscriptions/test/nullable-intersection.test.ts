@@ -43,35 +43,40 @@ afterAll(() => {
   fs.rmSync(generated, { force: true, recursive: true })
 })
 
-describe("a nullable oneOf that also lists shared properties, typed with nullableIntersection", () => {
-  it("accepts null, as its zod schema does", () => {
-    expect(
-      typeErrorsIn(`import type { Holder } from "./types.gen"
+describe(
+  "a nullable oneOf that also lists shared properties, typed with nullableIntersection",
+  // Each case starts tsc, which takes longer than the 5 s default on a loaded CI runner.
+  { timeout: 60_000 },
+  () => {
+    it("accepts null, as its zod schema does", () => {
+      expect(
+        typeErrorsIn(`import type { Holder } from "./types.gen"
 const cleared: Holder = { payment: null, payments: { first: null } }
 export { cleared }
 `),
-    ).toBe("")
-  })
+      ).toBe("")
+    })
 
-  it("still accepts each member and rejects a value that is neither", () => {
-    expect(
-      typeErrorsIn(`import type { NullablePayment } from "./types.gen"
+    it("still accepts each member and rejects a value that is neither", () => {
+      expect(
+        typeErrorsIn(`import type { NullablePayment } from "./types.gen"
 const card: NullablePayment = { type: "card", last4: "4242" }
 const bank: NullablePayment = { type: "bank", iban: "GB00" }
 // @ts-expect-error
 const other: NullablePayment = { type: "cash" }
 export { bank, card, other }
 `),
-    ).toBe("")
-  })
+      ).toBe("")
+    })
 
-  it("leaves a oneOf that is not nullable without null", () => {
-    expect(
-      typeErrorsIn(`import type { Holder } from "./types.gen"
+    it("leaves a oneOf that is not nullable without null", () => {
+      expect(
+        typeErrorsIn(`import type { Holder } from "./types.gen"
 // @ts-expect-error
 const missing: Holder = { required_payment: null }
 export { missing }
 `),
-    ).toBe("")
-  })
-})
+      ).toBe("")
+    })
+  },
+)

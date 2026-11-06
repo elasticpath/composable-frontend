@@ -2,13 +2,14 @@
 /**
  * Takes a spec downloaded into packages/sdks/specs/upstream/ by fetch-upstream.mjs, refreshes the
  * working spec from it, regenerates the affected clients, writes a changeset whose
- * bump type is derived from the export diff, and reports any export that disappeared.
+ * bump type is derived from the export diff, and reports any export that disappeared and any
+ * MCP tool that would ship without a written description.
  *
  * Usage:
  *   node scripts/spec-sync/sync-spec.mjs --spec pricebooks
  *   node scripts/spec-sync/sync-spec.mjs --spec pricebooks --dry-run
  *
- * Exit codes: 0 = synced (check summary.exportsRemoved), 2 = nothing to do,
+ * Exit codes: 0 = synced (check summary.held), 2 = nothing to do,
  * 3 = refused (divergence needs a rule that does not exist yet), 4 = would not build.
  */
 import { execFileSync } from "node:child_process"
@@ -17,6 +18,7 @@ import { resolve, dirname } from "node:path"
 import { tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 import { BASELINE, assertBaselineResolves, specOnBaseline } from "./baseline.mjs"
+import { toolsWithoutDescription } from "./tool-descriptions.mjs"
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..")
 const specsDir = resolve(repoRoot, "packages/sdks/specs")
@@ -122,6 +124,10 @@ if (filters.length) {
 // glob: a wider pathspec also matches hand-written docs and deletes uncommitted edits to them.
 sh("git", ["restore", "--staged", "--worktree", ":(icase,glob)packages/*/readme.md", ":(icase,glob)packages/sdks/*/readme.md"], { stdio: "inherit" })
 
+// Read from the bundles this regeneration just wrote. A tool with no written description
+// fails its package's mcp.test.ts, and the sync must not open a pull request that hides that.
+const undescribed = toolsWithoutDescription(packages, repoRoot)
+
 const after = Object.fromEntries(packages.map((p) => [p, exportsOf(p, null)]))
 const removed = []
 const added = []
@@ -201,6 +207,8 @@ const summary = {
   exportsAdded: added,
   exportsRemoved: removed,
   breaking: removed.length > 0,
+  toolsWithoutDescription: undescribed,
+  held: removed.length > 0 || undescribed.length > 0,
 }
 const summaryPath = process.env.SPEC_SYNC_SUMMARY ?? resolve(process.env.RUNNER_TEMP ?? tmpdir(), "spec-sync-summary.json")
 writeFileSync(summaryPath, JSON.stringify(summary, null, 2))
@@ -214,10 +222,16 @@ if (removed.length) {
   console.log("spec-sync: exports removed —")
   for (const name of removed) console.log(`  - ${name}`)
 }
+if (undescribed.length) {
+  console.log("spec-sync: tools without a written description —")
+  for (const { package: pkg, operationId } of undescribed) {
+    console.log(`  - ${pkg}: ${operationId} (write specs/overrides/mcp/${pkg}/${operationId}.yaml and list it in specs/config/redocly.yaml)`)
+  }
+}
 if (process.env.GITHUB_OUTPUT) {
   writeFileSync(
     process.env.GITHUB_OUTPUT,
-    `breaking=${summary.breaking}\nbump=${bump}\nadded=${added.length}\nremoved=${removed.length}\n`,
+    `breaking=${summary.breaking}\nheld=${summary.held}\nbump=${bump}\nadded=${added.length}\nremoved=${removed.length}\nundescribed=${undescribed.length}\n`,
     { flag: "a" },
   )
 }
