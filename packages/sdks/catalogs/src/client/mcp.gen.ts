@@ -1041,9 +1041,9 @@ export const getByContextBundleProductIdsTool = (options?: ToolOptions) => {
   return {
     name: "catalogs_get_by_context_bundle_product_ids" as const,
     config: {
-      title: "Get the Bundles That Contain a Product",
+      title: "Get the Bundles That Contain a Shopper Product",
       description:
-        "Get the Bundles That Contain a Product. Returns the IDs of the bundles in the shopper's catalog that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.",
+        "Lists the IDs of the bundles that offer one product as an option in one of their components, from the catalog that the shopper's context selects. Only direct membership counts: a bundle that contains another bundle is not listed for that inner bundle's options. IDs come back in ascending order with offset and limit pagination. A product in no bundle returns an empty list; a product not in the catalog returns 404. To read a specific catalog and release by ID, use the catalog reads.",
       inputSchema: getByContextBundleProductIdsInput,
       annotations: {
         readOnlyHint: true,
@@ -3122,7 +3122,7 @@ export const getBundleProductIdsTool = (options?: ToolOptions) => {
     config: {
       title: "Get the Bundles That Contain a Product",
       description:
-        "Get the Bundles That Contain a Product. Returns the IDs of the bundles in the catalog release that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.",
+        "Lists the IDs of the bundles that offer one product as an option in one of their components, from a published catalog release; pass a release ID, or latestPublished for the newest release. Only direct membership counts: a bundle that contains another bundle is not listed for that inner bundle's options. IDs come back in ascending order with offset and limit pagination. A product in no bundle returns an empty list; a product not in the release returns 404.",
       inputSchema: getBundleProductIdsInput,
       annotations: {
         readOnlyHint: true,
