@@ -63,10 +63,12 @@ import {
   getAllRelatedProducts,
   getAnOrder,
   getATransaction,
+  getBundleProductIds,
   getByContextAllHierarchies,
   getByContextAllNodes,
   getByContextAllProducts,
   getByContextAllRelatedProducts,
+  getByContextBundleProductIds,
   getByContextChildNodes,
   getByContextChildProducts,
   getByContextComponentProductIds,
@@ -323,6 +325,9 @@ import type {
   GetAnOrderResponse,
   GetATransactionData,
   GetATransactionResponse,
+  GetBundleProductIdsData,
+  GetBundleProductIdsError,
+  GetBundleProductIdsResponse,
   GetByContextAllHierarchiesData,
   GetByContextAllHierarchiesError,
   GetByContextAllHierarchiesResponse,
@@ -335,6 +340,9 @@ import type {
   GetByContextAllRelatedProductsData,
   GetByContextAllRelatedProductsError,
   GetByContextAllRelatedProductsResponse,
+  GetByContextBundleProductIdsData,
+  GetByContextBundleProductIdsError,
+  GetByContextBundleProductIdsResponse,
   GetByContextChildNodesData,
   GetByContextChildNodesError,
   GetByContextChildNodesResponse,
@@ -1245,6 +1253,39 @@ export const getByContextComponentProductIdsOptions = (
     queryKey: getByContextComponentProductIdsQueryKey(options),
   })
 
+export const getByContextBundleProductIdsQueryKey = (
+  options: Options<GetByContextBundleProductIdsData>,
+) => createQueryKey("getByContextBundleProductIds", options)
+
+/**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the shopper's catalog that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the catalog but is not an option of any bundle returns an empty list. A product that is not in the catalog returns `404`.
+ *
+ */
+export const getByContextBundleProductIdsOptions = (
+  options: Options<GetByContextBundleProductIdsData>,
+) =>
+  queryOptions<
+    GetByContextBundleProductIdsResponse,
+    GetByContextBundleProductIdsError,
+    GetByContextBundleProductIdsResponse,
+    ReturnType<typeof getByContextBundleProductIdsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getByContextBundleProductIds({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getByContextBundleProductIdsQueryKey(options),
+  })
+
 export const getByContextChildProductsQueryKey = (
   options: Options<GetByContextChildProductsData>,
 ) => createQueryKey("getByContextChildProducts", options)
@@ -1504,7 +1545,7 @@ export const getCatalogsQueryKey = (options?: Options<GetCatalogsData>) =>
 /**
  * Gets all authorized catalogs
  *
- * Retrieves a list of all the catalogs that you are authorized to view. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
+ * Retrieves a list of all the catalogs that you are authorized to view. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
  *
@@ -1694,7 +1735,7 @@ export const getReleasesQueryKey = (options: Options<GetReleasesData>) =>
 /**
  * Gets all authorized catalog releases
  *
- * Returns a list of all published releases of the specified catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
+ * Returns a list of all published releases of the specified catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
  *
@@ -1726,7 +1767,7 @@ export const getReleasesOptions = (options: Options<GetReleasesData>) =>
  *
  * Publishes a catalog. You must publish a catalog before you can retrieve that catalog in an organization or store. The hierarchies, live products, and prices associated with a published catalog are in read-only mode. If you make a change to these resources, for example, a change to your price book or hierarchies, you need to republish the catalog.
  *
- * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the differences between the last 2 consecutive catalog releases. This is useful if want to understand how your products have changed in your catalog, ensuring your site search integration is kept up-to-date.
  *
@@ -1896,7 +1937,6 @@ export const getRulesOptions = (options?: Options<GetRulesData>) =>
  *
  * - If you have one catalog for all customers and channels, you can omit creating this resource.
  * - Due to the way catalogs are cached in Commerce, using catalog rules to display catalogs sometimes causes a 5-minute time delay before the catalogs are displayed.
- * - You cannot create catalog rules for organization catalogs.
  *
  * :::
  *
@@ -2049,7 +2089,7 @@ export const getAllHierarchiesQueryKey = (
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2106,7 +2146,7 @@ export const getHierarchyQueryKey = (options: Options<GetHierarchyData>) =>
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2141,7 +2181,7 @@ export const getHierarchyNodesQueryKey = (
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2203,7 +2243,7 @@ export const getHierarchyChildNodesQueryKey = (
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2262,7 +2302,7 @@ export const getAllNodesQueryKey = (options: Options<GetAllNodesData>) =>
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2330,7 +2370,7 @@ export const getNodeQueryKey = (options: Options<GetNodeData>) =>
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2374,7 +2414,7 @@ export const getChildNodesQueryKey = (options: Options<GetChildNodesData>) =>
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2438,7 +2478,7 @@ export const getAllProductsQueryKey = (options: Options<GetAllProductsData>) =>
 /**
  * Get all Products
  *
- * Returns the products from a published catalog. Only the products in a `live` status are retrieved. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns the products from a published catalog. Only the products in a `live` status are retrieved. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
@@ -2503,7 +2543,7 @@ export const getProductQueryKey = (options: Options<GetProductData>) =>
 /**
  * Get a Product
  *
- * Returns a product from a published catalog. The product must be in `live` status. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns a product from a published catalog. The product must be in `live` status. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * ### Product and Node Associations in Breadcrumb Metadata
  *
@@ -2621,6 +2661,39 @@ export const getComponentProductIdsOptions = (
       return data
     },
     queryKey: getComponentProductIdsQueryKey(options),
+  })
+
+export const getBundleProductIdsQueryKey = (
+  options: Options<GetBundleProductIdsData>,
+) => createQueryKey("getBundleProductIds", options)
+
+/**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the catalog release that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the release but is not an option of any bundle returns an empty list. A product that is not in the release returns `404`.
+ *
+ */
+export const getBundleProductIdsOptions = (
+  options: Options<GetBundleProductIdsData>,
+) =>
+  queryOptions<
+    GetBundleProductIdsResponse,
+    GetBundleProductIdsError,
+    GetBundleProductIdsResponse,
+    ReturnType<typeof getBundleProductIdsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getBundleProductIds({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: getBundleProductIdsQueryKey(options),
   })
 
 export const getChildProductsQueryKey = (
@@ -2772,7 +2845,7 @@ export const getProductsForNodeQueryKey = (
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *

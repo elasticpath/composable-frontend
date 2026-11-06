@@ -22,10 +22,12 @@ import {
   getAllNodes,
   getAllProducts,
   getAllRelatedProducts,
+  getBundleProductIds,
   getByContextAllHierarchies,
   getByContextAllNodes,
   getByContextAllProducts,
   getByContextAllRelatedProducts,
+  getByContextBundleProductIds,
   getByContextChildNodes,
   getByContextChildProducts,
   getByContextComponentProductIds,
@@ -81,6 +83,8 @@ import {
   zGetAllRelatedProductsHeaders,
   zGetAllRelatedProductsPath,
   zGetAllRelatedProductsQuery,
+  zGetBundleProductIdsPath,
+  zGetBundleProductIdsQuery,
   zGetByContextAllHierarchiesHeaders,
   zGetByContextAllHierarchiesQuery,
   zGetByContextAllNodesHeaders,
@@ -90,6 +94,9 @@ import {
   zGetByContextAllRelatedProductsHeaders,
   zGetByContextAllRelatedProductsPath,
   zGetByContextAllRelatedProductsQuery,
+  zGetByContextBundleProductIdsHeaders,
+  zGetByContextBundleProductIdsPath,
+  zGetByContextBundleProductIdsQuery,
   zGetByContextChildNodesHeaders,
   zGetByContextChildNodesPath,
   zGetByContextChildNodesQuery,
@@ -1002,6 +1009,61 @@ export const getByContextComponentProductIdsTool = (options?: ToolOptions) => {
   }
 }
 
+const getByContextBundleProductIdsInput = z
+  .object({
+    path: zGetByContextBundleProductIdsPath.strict(),
+    query: zGetByContextBundleProductIdsQuery.strict().optional(),
+    headers: zGetByContextBundleProductIdsHeaders.strict().optional(),
+  })
+  .strict()
+
+/**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the shopper's catalog that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the catalog but is not an option of any bundle returns an empty list. A product that is not in the catalog returns `404`.
+ *
+ */
+export const getByContextBundleProductIdsTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getByContextBundleProductIdsInput> = (
+    args,
+    ctx,
+  ) =>
+    toToolResult(
+      getByContextBundleProductIds({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "catalogs_get_by_context_bundle_product_ids" as const,
+    config: {
+      title: "Get the Bundles That Contain a Shopper Product",
+      description:
+        "Lists the IDs of the bundles that offer one product as an option in one of their components, from the catalog that the shopper's context selects. Only direct membership counts: a bundle that contains another bundle is not listed for that inner bundle's options. IDs come back in ascending order with offset and limit pagination. A product in no bundle returns an empty list; a product not in the catalog returns 404. To read a specific catalog and release by ID, use the catalog reads.",
+      inputSchema: getByContextBundleProductIdsInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "catalogs.getByContextBundleProductIds",
+          method: "GET",
+          path: "/catalog/products/{product_id}/relationships/bundles",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
 const getByContextChildProductsInput = z
   .object({
     path: zGetByContextChildProductsPath.strict(),
@@ -1357,7 +1419,7 @@ const getCatalogsInput = z
 /**
  * Gets all authorized catalogs
  *
- * Retrieves a list of all the catalogs that you are authorized to view. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
+ * Retrieves a list of all the catalogs that you are authorized to view. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the delta link returned in the response of a [publish a catalog](/docs/api/pxm/catalog/publish-release) endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file. See [Publish a catalog](/docs/api/pxm/catalog/publish-release).
  *
@@ -1667,7 +1729,7 @@ const getReleasesInput = z
 /**
  * Gets all authorized catalog releases
  *
- * Returns a list of all published releases of the specified catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
+ * Returns a list of all published releases of the specified catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release. You can see the differences between the last 2 consecutive catalog releases using the `delta` link returned in the response of a `publish a catalog` endpoint.
  *
  * You can use the `is_full_delta` attribute returned from the `get a release of a catalog` endpoint to determine if you need to refresh the data in your company system before publishing a catalog release and injecting fresh data in a delta link. The `is_full_delta` attribute tells you if this is a full publish of a catalog release. Using a search service as an example, if the `is_full_delta` attribute is `true`, you should remove all data about that catalog from the search service before publishing a catalog release and injecting fresh data from the delta file.
  *
@@ -1726,7 +1788,7 @@ const publishReleaseInput = withSharedSchemaIds(
  *
  * Publishes a catalog. You must publish a catalog before you can retrieve that catalog in an organization or store. The hierarchies, live products, and prices associated with a published catalog are in read-only mode. If you make a change to these resources, for example, a change to your price book or hierarchies, you need to republish the catalog.
  *
- * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * You can get [a catalog release](/docs/api/pxm/catalog/get-release-by-id) to retrieve a published catalog. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the differences between the last 2 consecutive catalog releases. This is useful if want to understand how your products have changed in your catalog, ensuring your site search integration is kept up-to-date.
  *
@@ -1976,7 +2038,6 @@ const createRuleInput = withSharedSchemaIds(
  *
  * - If you have one catalog for all customers and channels, you can omit creating this resource.
  * - Due to the way catalogs are cached in Commerce, using catalog rules to display catalogs sometimes causes a 5-minute time delay before the catalogs are displayed.
- * - You cannot create catalog rules for organization catalogs.
  *
  * :::
  *
@@ -2227,7 +2288,7 @@ const getAllHierarchiesInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2303,7 +2364,7 @@ const getHierarchyInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2359,7 +2420,7 @@ const getHierarchyNodesInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2440,7 +2501,7 @@ const getHierarchyChildNodesInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2522,7 +2583,7 @@ const getAllNodesInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2611,7 +2672,7 @@ const getNodeInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2677,7 +2738,7 @@ const getChildNodesInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -2763,7 +2824,7 @@ const getAllProductsInput = z
 /**
  * Get all Products
  *
- * Returns the products from a published catalog. Only the products in a `live` status are retrieved. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns the products from a published catalog. Only the products in a `live` status are retrieved. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * You can see the parent nodes a product is associated with in the `bread_crumbs` and `bread_crumb_nodes` metadata for each product. This is useful if you want to improve how your shoppers search your store, for example. See [Product and Node Associations in Breadcrumb Metadata](/guides/How-To/Catalogs/breadcrumbs).
  *
@@ -2850,7 +2911,7 @@ const getProductInput = z
 /**
  * Get a Product
  *
- * Returns a product from a published catalog. The product must be in `live` status. Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * Returns a product from a published catalog. The product must be in `live` status. A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * ### Product and Node Associations in Breadcrumb Metadata
  *
@@ -3023,6 +3084,57 @@ export const getComponentProductIdsTool = (options?: ToolOptions) => {
           id: "catalogs.getComponentProductIds",
           method: "GET",
           path: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/component_products",
+          risk: "read" as const,
+        },
+      },
+    },
+    handler,
+  }
+}
+
+const getBundleProductIdsInput = z
+  .object({
+    path: zGetBundleProductIdsPath.strict(),
+    query: zGetBundleProductIdsQuery.strict().optional(),
+  })
+  .strict()
+
+/**
+ * Get the Bundles That Contain a Product
+ *
+ * Returns the IDs of the bundles in the catalog release that offer the specified product as an option in one of their components. Only direct membership is listed: a bundle that contains another bundle does not appear for that bundle's options.
+ *
+ * Bundle IDs are returned in ascending order. A product that is in the release but is not an option of any bundle returns an empty list. A product that is not in the release returns `404`.
+ *
+ */
+export const getBundleProductIdsTool = (options?: ToolOptions) => {
+  const handler: ToolCallback<typeof getBundleProductIdsInput> = (args, ctx) =>
+    toToolResult(
+      getBundleProductIds({
+        ...args,
+        client: options?.client,
+        signal: ctx.mcpReq.signal,
+        throwOnError: false,
+      }),
+    )
+  return {
+    name: "catalogs_get_bundle_product_ids" as const,
+    config: {
+      title: "Get the Bundles That Contain a Product",
+      description:
+        "Lists the IDs of the bundles that offer one product as an option in one of their components, from a published catalog release; pass a release ID, or latestPublished for the newest release. Only direct membership counts: a bundle that contains another bundle is not listed for that inner bundle's options. IDs come back in ascending order with offset and limit pagination. A product in no bundle returns an empty list; a product not in the release returns 404.",
+      inputSchema: getBundleProductIdsInput,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+      _meta: {
+        "com.elasticpath/operation": {
+          id: "catalogs.getBundleProductIds",
+          method: "GET",
+          path: "/catalogs/{catalog_id}/releases/{release_id}/products/{product_id}/relationships/bundles",
           risk: "read" as const,
         },
       },
@@ -3225,7 +3337,7 @@ const getProductsForNodeInput = z
  *
  * :::note
  *
- * Currently, published catalogs are limited to the current release and two releases prior to the current release.
+ * A new catalog keeps two published releases. Set `max_published_releases` to 1, 2, or 3. A catalog that has never stored `max_published_releases` keeps the current release and two releases prior to the current release.
  *
  * :::
  *
@@ -3318,6 +3430,7 @@ export const tools = (options?: ToolOptions): Array<Tool> => [
   getByContextProductTool(options),
   getByContextAllRelatedProductsTool(options),
   getByContextComponentProductIdsTool(options),
+  getByContextBundleProductIdsTool(options),
   getByContextChildProductsTool(options),
   getByContextProductsForHierarchyTool(options),
   getByContextProductsForNodeTool(options),
@@ -3349,6 +3462,7 @@ export const tools = (options?: ToolOptions): Array<Tool> => [
   getProductTool(options),
   getAllRelatedProductsTool(options),
   getComponentProductIdsTool(options),
+  getBundleProductIdsTool(options),
   getChildProductsTool(options),
   getProductsForHierarchyTool(options),
   getProductsForNodeTool(options),
