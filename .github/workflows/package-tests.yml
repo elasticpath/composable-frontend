@@ -42,8 +42,12 @@ jobs:
 
       # d2c-schematics is left out: its tests need `pnpm generate` first and one of them fails
       # on main regardless. The package is legacy and no example depends on it.
+      #
+      # One task per core: each package's tests run a full tsup build inside a 120 s hook, and
+      # turbo's default of ten tasks at once on a four-core runner pushes the largest package
+      # past that limit. --continue reports every failing package in one run.
       - name: Test every package
-        run: pnpm exec turbo run test --filter='./packages/*' --filter='./packages/sdks/*' --filter='!@elasticpath/d2c-schematics'
+        run: pnpm exec turbo run test --filter='./packages/*' --filter='./packages/sdks/*' --filter='!@elasticpath/d2c-schematics' --concurrency=100% --continue
 
       - name: Test the spec-sync scripts
         run: pnpm test:spec-sync
