@@ -1,0 +1,9 @@
+x-mcp-title: Get the Bundles That Contain a Shopper Product
+x-mcp-description: >-
+  Lists the IDs of the bundles that offer one product as an option in one of
+  their components, from the catalog that the shopper's context selects. Only
+  direct membership counts: a bundle that contains another bundle is not listed
+  for that inner bundle's options. IDs come back in ascending order with offset
+  and limit pagination. A product in no bundle returns an empty list; a product
+  not in the catalog returns 404. To read a specific catalog and release by ID,
+  use the catalog reads.
