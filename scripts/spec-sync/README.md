@@ -16,6 +16,8 @@ pnpm install --frozen-lockfile
 node scripts/spec-sync/fetch-upstream.mjs --list          # what has changed upstream
 node scripts/spec-sync/fetch-upstream.mjs --spec pim      # download one spec
 node scripts/spec-sync/sync-spec.mjs --spec pim           # refresh, regenerate, changeset
+node scripts/spec-sync/tool-descriptions.mjs pim          # tools with no written description
+pnpm test:spec-sync                                       # the tests of these scripts
 ```
 
 `--dry-run` stops `sync-spec` before it touches the working spec. `SPEC_SYNC_BASELINE`
@@ -47,7 +49,13 @@ its spec as current forever. A spec absent from the baseline counts as fully cha
 6. Diffs the exports again. A removed symbol means breaking, a new symbol means minor,
    neither means patch. That bump goes into the changeset. A breaking regeneration holds the
    pull request as a draft and lists every symbol that disappeared.
-7. Writes a summary JSON the workflow turns into the pull request body.
+7. Lists every operation in the regenerated bundles with no `x-mcp-description`. Each one is
+   an MCP tool with no file under `packages/sdks/specs/overrides/mcp/<package>/`, and the
+   package's `mcp.test.ts` fails on it. The pull request names each one and is held as a draft
+   until a human writes the description, lists it in `specs/config/redocly.yaml` and regenerates.
+8. Writes a summary JSON the workflow turns into the pull request body. `held` is true when
+   step 6 removed an export or step 7 found a tool. The workflow also runs the regenerated
+   packages' tests and holds the pull request as a draft when they fail.
 
 ## Exit codes
 
@@ -57,7 +65,7 @@ its spec as current forever. A spec absent from the baseline counts as fully cha
 
 | Code | Meaning |
 |---|---|
-| 0 | Synced. Check `exportsRemoved` in the summary. |
+| 0 | Synced. Check `held` in the summary. |
 | 2 | Working spec already matches the published one. |
 | 3 | Spec carries a divergence no rule covers. Left untouched. |
 | 4 | Published spec does not generate. Almost always a malformed spec. |
