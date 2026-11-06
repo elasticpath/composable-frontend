@@ -166,6 +166,8 @@ apis:
           getByContextProductsForHierarchy: ../overrides/mcp/catalogs/getByContextProductsForHierarchy.yaml
           getByContextProductsForNode: ../overrides/mcp/catalogs/getByContextProductsForNode.yaml
           getByContextRelease: ../overrides/mcp/catalogs/getByContextRelease.yaml
+          getBundleProductIDs: ../overrides/mcp/catalogs/getBundleProductIDs.yaml
+          getByContextBundleProductIDs: ../overrides/mcp/catalogs/getByContextBundleProductIDs.yaml
   subscriptions@v1:
     output: ../bundled/subscriptions.yaml
     root: ../subscriptions.yaml

@@ -1,0 +1,8 @@
+x-mcp-description: >-
+  Lists the IDs of the bundles that offer one product as an option in one of
+  their components, from a published catalog release; pass a release ID, or
+  latestPublished for the newest release. Only direct membership counts: a
+  bundle that contains another bundle is not listed for that inner bundle's
+  options. IDs come back in ascending order with offset and limit pagination. A
+  product in no bundle returns an empty list; a product not in the release
+  returns 404.
