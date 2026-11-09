@@ -48,7 +48,9 @@ its spec as current forever. A spec absent from the baseline counts as fully cha
 5. Reverts the README churn every build produces, as `release.yml` already does.
 6. Diffs the exports again. A removed symbol means breaking, a new symbol means minor,
    neither means patch. That bump goes into the changeset. A breaking regeneration holds the
-   pull request as a draft and lists every symbol that disappeared.
+   pull request as a draft and lists every symbol that disappeared. A changeset already on
+   the branch with a higher bump than the run computed is left as it is: a person raised it,
+   and the export diff cannot see a type that only got stricter.
 7. Lists every operation in the regenerated bundles with no `x-mcp-description`. Each one is
    an MCP tool with no file under `packages/sdks/specs/overrides/mcp/<package>/`, and the
    package's `mcp.test.ts` fails on it. The pull request names each one and is held as a draft

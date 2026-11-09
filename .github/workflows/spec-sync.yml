@@ -236,6 +236,7 @@ jobs:
             + "| Packages | " + (.packages | join(", ")) + " |\n"
             + "| Changeset | " + .changesetBump
               + (if .breaking then " (breaking; these packages are pre-1.0, where `minor` is the breaking bump)" else "" end)
+              + (if .changesetKept then " (kept: the branch carries a higher bump than this run computed)" else "" end)
               + " |\n"
             + "| Exports added | " + (.exportsAdded | length | tostring) + " |\n"
             + "| Exports removed | " + (.exportsRemoved | length | tostring) + " |\n"
