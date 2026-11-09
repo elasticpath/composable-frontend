@@ -428,12 +428,13 @@ What the id does in each state:
 | `{ state: "objected" }`          | `objected` | none                                              | Clears `ep_vid` if present. Drops the id in memory. Writes no cookie. |
 
 - Without consent, the id lives in module memory only. It is the same for every call until the page loads again, and then a new id starts. This is the same as the Algolia anonymous token when cookies are off. The `none` result gives this id whether or not it has `sessionId: true`, because `ep_vsid` is a server cookie that the browser entry never writes.
-- The in-memory id is a `session` visitor in the types, because it has the same headers as the `ep_vsid` id. It is a different id: a lasting id is never linked to it.
+- The `session` visitor kind covers two ids that send the same headers: the `ep_vsid` id on a server, and the id in browser memory. The browser entry only makes the id in memory. A lasting id is never linked to it.
 - With consent, the entry writes `ep_vid` with JavaScript, with the same attributes as the server: `Path=/`, `Secure`, `SameSite=Lax`, 365 days from creation. It does not roll the lifetime, so it writes only when it makes an id. It reuses a valid `ep_vid`, including one that a server wrote. A value that is not 32 lowercase hex characters counts as absent and is replaced.
 - On an objection, the entry clears `ep_vid` and drops the id in memory. A later consent makes a new id. Any state that is not `granted` clears `ep_vid`, so a withdrawal back to `none` also starts a new in-memory id.
 - A `granted` result with no purposes behaves like `none`.
 - Safari limits a cookie that JavaScript writes to 7 days. A returning shopper whose last visit was more than 7 days ago gets a new `ep_vid` in Safari. A cookie that a server sets with `Set-Cookie` lasts the full 365 days, so a storefront that needs the long lifetime in Safari uses the server entry.
-- `Secure` cookies are stored over HTTPS, and on `localhost`. On plain HTTP elsewhere the browser drops the cookie, and the id then changes on every page load.
+- A browser stores a `Secure` cookie over HTTPS and on `localhost`. When the browser does not keep the `ep_vid` cookie (cookies blocked, or `Secure` on plain HTTP elsewhere), the entry reads the cookie back after it writes it. It then keeps the lasting id in memory, so the id stays the same until the page loads again. A full page load makes a new id. An objection, or any result that is not `granted`, drops this id.
+- Where `document` is not defined, for example when a client component renders on a server, the function returns `{ kind: "none" }` and touches no cookie. It does not call your consent function.
 - `hasBrowserGlobalPrivacyControl()` returns true when `navigator.globalPrivacyControl` is true. Put it first in your consent function, as in the example, so it wins over an accepted banner.
 
 A browser call with a custom header needs a CORS preflight. Elastic Path allows `EP-Visitor-Id`, `EP-Visitor-Consent` and `EP-Analytics` in `Access-Control-Allow-Headers`, so the preflight passes.

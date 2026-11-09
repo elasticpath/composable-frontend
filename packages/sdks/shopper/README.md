@@ -138,7 +138,7 @@ const { client } = createShopperClient(
 )
 ```
 
-Your consent function reads your consent management platform in the browser and runs on every request. Without consent, the id lives in memory only: it stays the same until the page loads again, sends `EP-Visitor-Consent: none`, and sets no cookie. With consent, the function writes the `ep_vid` cookie with JavaScript. An objection clears `ep_vid` and sends no visitor headers. Safari limits a cookie that JavaScript writes to 7 days, so a lasting id in Safari lasts 7 days at most. The `@epcc-sdk/visitor` README, section "Browser-only storefronts", has the details.
+Your consent function reads your consent management platform in the browser and runs on every request. Without consent, the id lives in memory only. It stays the same until the page loads again. It is sent with `EP-Visitor-Consent: none`, and the function sets no cookie. With consent, the function writes the `ep_vid` cookie with JavaScript. An objection clears `ep_vid` and sends no visitor headers. Safari limits a cookie that JavaScript writes to 7 days, so a lasting id in Safari lasts 7 days at most. The `@epcc-sdk/visitor` README, section "Browser-only storefronts", has the details.
 
 Elastic Path allows `EP-Visitor-Id`, `EP-Visitor-Consent` and `EP-Analytics` in its CORS preflight response, so a browser can send them.
 
