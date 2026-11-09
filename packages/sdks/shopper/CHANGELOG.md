@@ -1,5 +1,52 @@
 # @epcc-sdk/sdks-shopper
 
+## 0.15.0
+
+### Minor Changes
+
+- b179e110: Regenerate from the upstream `catalog_search` spec (spec version 26.1104.8438036, published 2026-11-04T10:00:48Z).
+
+  Adds 10 exported symbols.
+
+- a4f855f0: Regenerate from the upstream `catalog_view` spec (spec version 26.1028.8400859, published 2026-10-28T10:33:13Z).
+
+  Adds 26 exported symbols.
+
+  **Breaking.** Removes 17 exported symbols:
+
+  - `shopper: DiffListData`
+  - `shopper: ReleaseIndexingCompleteData`
+  - `shopper: NodeCreateData`
+  - `shopper: NodeRelationshipsData`
+  - `shopper: Pricebook`
+  - `shopper: PricebookCreateData`
+  - `shopper: PricebookData`
+  - `shopper: PricebookPrice`
+  - `shopper: PricebookPriceCreateData`
+  - `shopper: PricebookPriceData`
+  - `shopper: ProductCreateData`
+  - `shopper: ProductDiff`
+  - `shopper: ProductRelationshipsData`
+  - `shopper: ProductsForCart`
+  - `shopper: ProductsForCartConfiguration`
+  - `shopper: Sales`
+  - `shopper: ProductsForCartConfiguration2`
+
+- 65c6fcdf: Add a browser entry for storefronts with no server.
+
+  `createBrowserVisitor` from `@epcc-sdk/visitor/browser` takes a consent function that reads your consent management platform in the browser. It fits the `visitor` option of `createShopperClient`.
+
+  Without consent, it keeps an id in memory only. The id is sent with `EP-Visitor-Consent: none` and resets on a full page load. For a consented shopper, it writes `ep_vid` with JavaScript. On an objection, it clears `ep_vid`.
+
+  `hasBrowserGlobalPrivacyControl` reads `navigator.globalPrivacyControl`. `@epcc-sdk/sdks-shopper` re-exports both functions, and the types `BrowserConsentFunction` and `BrowserVisitorOptions`.
+
+  Safari limits a cookie that JavaScript writes to 7 days.
+
+### Patch Changes
+
+- Updated dependencies [65c6fcdf]
+  - @epcc-sdk/visitor@0.0.2
+
 ## 0.14.0
 
 ### Minor Changes
