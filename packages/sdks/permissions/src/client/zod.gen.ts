@@ -50,9 +50,10 @@ export const zAccessLevels = z
       })
       .optional(),
     content_and_pages: z
-      .enum(["none", "view", "manage"])
+      .enum(["none", "view", "content", "design", "manage"])
       .register(z.globalRegistry, {
-        description: "The access level for Content and Pages.",
+        description:
+          "The access level for Content and Pages. `content` (content creator) and `design` (designer) grant the same API access as `view` and set the Visual Builder access level. Only Custom User Roles can hold `content` or `design`.",
       })
       .optional(),
     currencies: z
@@ -71,6 +72,12 @@ export const zAccessLevels = z
       .enum(["none", "view", "manage"])
       .register(z.globalRegistry, {
         description: "The access level for Custom APIs.",
+      })
+      .optional(),
+    extended_attributes: z
+      .enum(["none", "view", "manage"])
+      .register(z.globalRegistry, {
+        description: "The access level for Extended Attributes.",
       })
       .optional(),
     flows: z
@@ -425,6 +432,79 @@ export const zPaginationLinks = z.object({
   prev: zLinkUri.optional(),
 })
 
+export const zCustomUserRoleAccessLevels = zAccessLevels.and(
+  z.object({
+    custom_actions: z
+      .enum(["none"])
+      .register(z.globalRegistry, {
+        description:
+          "The access level for Custom Actions. Custom Actions are not available to Custom User Roles, so this must be `none`.",
+      })
+      .optional(),
+    extended_attributes: z
+      .enum(["view", "manage"])
+      .register(z.globalRegistry, {
+        description:
+          "Custom User Roles must have at least view access to Extended Attributes, so this must be `view` or `manage`.",
+      })
+      .optional(),
+    team: z
+      .enum(["none"])
+      .register(z.globalRegistry, {
+        description:
+          "The access level for Team. Team management is not available to Custom User Roles, so this must be `none`.",
+      })
+      .optional(),
+  }),
+)
+
+export const zInheritMeta = zMeta.and(
+  z.object({
+    owner: z
+      .enum(["organization", "store"])
+      .register(z.globalRegistry, {
+        description:
+          "Specifies whether the resource is managed in the organization or store.",
+      })
+      .optional(),
+  }),
+)
+
+export const zCustomUserRole = z.object({
+  id: z
+    .uuid()
+    .register(z.globalRegistry, {
+      description: "The unique identifier for the Custom User Role.",
+    })
+    .optional(),
+  type: z
+    .literal("custom_user_role")
+    .register(z.globalRegistry, {
+      description:
+        "Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.",
+    })
+    .optional(),
+  name: z
+    .string()
+    .register(z.globalRegistry, {
+      description: "The name of the role.",
+    })
+    .optional(),
+  description: z
+    .string()
+    .register(z.globalRegistry, {
+      description: "The description of the role.",
+    })
+    .optional(),
+  access_levels: zCustomUserRoleAccessLevels.optional(),
+  links: z
+    .object({
+      self: zLinkUri.optional(),
+    })
+    .optional(),
+  meta: zInheritMeta.optional(),
+})
+
 /**
  * The ID of the Standard User Role.
  */
@@ -490,6 +570,32 @@ export const zCustomApiRolePolicyId = z.string().register(z.globalRegistry, {
   description: "The ID of the Custom API Role Policy.",
 })
 
+/**
+ * Specifies the order in which Custom User Roles will be returned.
+ */
+export const zCustomUserRoleSort = z
+  .enum([
+    "id",
+    "-id",
+    "name",
+    "-name",
+    "created_at",
+    "-created_at",
+    "updated_at",
+    "-updated_at",
+  ])
+  .register(z.globalRegistry, {
+    description:
+      "Specifies the order in which Custom User Roles will be returned.",
+  })
+
+/**
+ * The ID of the Custom User Role.
+ */
+export const zCustomUserRoleId = z.string().register(z.globalRegistry, {
+  description: "The ID of the Custom User Role.",
+})
+
 export const zCreateCustomApiRolePolicy = z.object({
   data: z.object({
     type: z.literal("custom_api_role_policy").register(z.globalRegistry, {
@@ -553,6 +659,44 @@ export const zUpdateCustomApiRolePolicy = z.object({
         description: "Specifies if the Role can delete a Custom API Entry.",
       })
       .optional(),
+  }),
+})
+
+export const zCreateCustomUserRole = z.object({
+  data: z.object({
+    type: z.literal("custom_user_role").register(z.globalRegistry, {
+      description:
+        "Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.",
+    }),
+    name: z.string().register(z.globalRegistry, {
+      description: "The name of the role.",
+    }),
+    description: z.string().register(z.globalRegistry, {
+      description: "The description of the role.",
+    }),
+    access_levels: zCustomUserRoleAccessLevels,
+  }),
+})
+
+export const zUpdateCustomUserRole = z.object({
+  data: z.object({
+    type: z.literal("custom_user_role").register(z.globalRegistry, {
+      description:
+        "Specifies the type of the resource object, use `custom_user_role` for Custom User Roles.",
+    }),
+    name: z
+      .string()
+      .register(z.globalRegistry, {
+        description: "The name of the role.",
+      })
+      .optional(),
+    description: z
+      .string()
+      .register(z.globalRegistry, {
+        description: "The description of the role.",
+      })
+      .optional(),
+    access_levels: zCustomUserRoleAccessLevels.optional(),
   }),
 })
 
@@ -731,4 +875,127 @@ export const zUpdateACustomApiRolePolicyResponse = z
   })
   .register(z.globalRegistry, {
     description: "A Custom API Role Policy",
+  })
+
+export const zListCustomUserRolesQuery = z.object({
+  "page[offset]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0).lte(10000),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The current offset by number of records, not pages. Offset is zero-based. The maximum records you can offset is 10,000. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  "page[limit]": z
+    .preprocess(
+      (v) => (typeof v === "string" ? Number(v) : v),
+      z.number().int().gte(0),
+    )
+    .register(z.globalRegistry, {
+      description:
+        "The maximum number of records per page for this response. You can set this value up to 100. If no page size is set, the [page length](/docs/api/settings/settings-introduction#page-length) store setting is used.",
+    })
+    .optional(),
+  filter: z
+    .string()
+    .register(z.globalRegistry, {
+      description:
+        "Filter attributes. For more information, see the [Filtering](/guides/Getting-Started/filtering) section.",
+    })
+    .optional(),
+  sort: z
+    .enum([
+      "id",
+      "-id",
+      "name",
+      "-name",
+      "created_at",
+      "-created_at",
+      "updated_at",
+      "-updated_at",
+    ])
+    .register(z.globalRegistry, {
+      description:
+        "Specifies the order in which Custom User Roles will be returned.",
+    })
+    .optional(),
+})
+
+/**
+ * List of Custom User Roles
+ */
+export const zListCustomUserRolesResponse = z
+  .object({
+    data: z.array(zCustomUserRole).optional(),
+    meta: zPaginationMeta.optional(),
+    links: zPaginationLinks.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "List of Custom User Roles",
+  })
+
+export const zCreateACustomUserRoleBody = zCreateCustomUserRole
+
+/**
+ * A Custom User Role
+ */
+export const zCreateACustomUserRoleResponse = z
+  .object({
+    data: zCustomUserRole.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A Custom User Role",
+  })
+
+export const zDeleteACustomUserRolePath = z.object({
+  "custom-user-role-id": z.string().register(z.globalRegistry, {
+    description: "The ID of the Custom User Role.",
+  }),
+})
+
+/**
+ * No Content
+ */
+export const zDeleteACustomUserRoleResponse = z
+  .void()
+  .register(z.globalRegistry, {
+    description: "No Content",
+  })
+
+export const zGetACustomUserRolePath = z.object({
+  "custom-user-role-id": z.string().register(z.globalRegistry, {
+    description: "The ID of the Custom User Role.",
+  }),
+})
+
+/**
+ * A Custom User Role
+ */
+export const zGetACustomUserRoleResponse = z
+  .object({
+    data: zCustomUserRole.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A Custom User Role",
+  })
+
+export const zUpdateACustomUserRoleBody = zUpdateCustomUserRole
+
+export const zUpdateACustomUserRolePath = z.object({
+  "custom-user-role-id": z.string().register(z.globalRegistry, {
+    description: "The ID of the Custom User Role.",
+  }),
+})
+
+/**
+ * A Custom User Role
+ */
+export const zUpdateACustomUserRoleResponse = z
+  .object({
+    data: zCustomUserRole.optional(),
+  })
+  .register(z.globalRegistry, {
+    description: "A Custom User Role",
   })

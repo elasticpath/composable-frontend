@@ -720,6 +720,11 @@ apis:
           ListStandardShopperRoles: ../overrides/mcp/permissions/ListStandardShopperRoles.yaml
           ListStandardUserRoles: ../overrides/mcp/permissions/ListStandardUserRoles.yaml
           UpdateACustomAPIRolePolicy: ../overrides/mcp/permissions/UpdateACustomAPIRolePolicy.yaml
+          ListCustomUserRoles: ../overrides/mcp/permissions/ListCustomUserRoles.yaml
+          CreateACustomUserRole: ../overrides/mcp/permissions/CreateACustomUserRole.yaml
+          GetACustomUserRole: ../overrides/mcp/permissions/GetACustomUserRole.yaml
+          UpdateACustomUserRole: ../overrides/mcp/permissions/UpdateACustomUserRole.yaml
+          DeleteACustomUserRole: ../overrides/mcp/permissions/DeleteACustomUserRole.yaml
   personal-data-standalone@v1:
     output: ../bundled/personal-data_standalone.yaml
     root: ../personal-data.yaml

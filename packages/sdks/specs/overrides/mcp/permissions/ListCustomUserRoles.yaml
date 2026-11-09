@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Lists the custom user roles of the store or organization, each with its name,
+  description and access level for each permission group. Filter by id, name,
+  created_at or updated_at, and sort by those attributes, prefixed with - for
+  descending; the default is newest first. Supports offset and limit pagination.

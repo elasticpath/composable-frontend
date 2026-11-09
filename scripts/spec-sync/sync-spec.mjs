@@ -19,6 +19,7 @@ import { tmpdir } from "node:os"
 import { fileURLToPath } from "node:url"
 import { BASELINE, assertBaselineResolves, specOnBaseline } from "./baseline.mjs"
 import { toolsWithoutDescription } from "./tool-descriptions.mjs"
+import { raisedBump } from "./changeset.mjs"
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..")
 const specsDir = resolve(repoRoot, "packages/sdks/specs")
@@ -144,7 +145,9 @@ const bump = removed.length > 0 ? "major" : added.length > 0 ? "minor" : "patch"
 // `minor` as the breaking bump (0.0.2 -> 0.1.0) and `major` would jump it to 1.0.0 and
 // claim a stability these packages do not have. So a breaking regeneration is written as
 // `minor` and says so in its body.
-const changesetBump = bump === "major" ? "minor" : bump
+const computedChangesetBump = bump === "major" ? "minor" : bump
+let changesetBump = computedChangesetBump
+let changesetKept = false
 
 const upstreamVersion = /^\s{2}version:\s*(.+)$/m.exec(upstream)?.[1]?.trim()
 const upstreamStamp = /^\s{2}x-version-timestamp:\s*(.+)$/m.exec(upstream)?.[1]?.trim()
@@ -154,18 +157,28 @@ const provenance = [upstreamVersion && `spec version ${upstreamVersion}`, upstre
 
 if (packageNames.length) {
   const changesetPath = resolve(repoRoot, `.changeset/spec-sync-${specKey.replace(/_/g, "-")}.md`)
-  const frontmatter = packageNames.map((n) => `"${n}": ${changesetBump}`).join("\n")
-  const body =
-    `Regenerate from the upstream \`${specKey}\` spec` +
-    (provenance ? ` (${provenance})` : "") +
-    "." +
-    (added.length ? `\n\nAdds ${added.length} exported symbol${added.length === 1 ? "" : "s"}.` : "") +
-    (removed.length
-      ? `\n\n**Breaking.** Removes ${removed.length} exported symbol${removed.length === 1 ? "" : "s"}:\n\n` +
-        removed.map((r) => `- \`${r}\``).join("\n")
-      : "")
-  writeFileSync(changesetPath, `---\n${frontmatter}\n---\n\n${body}\n`)
-  console.log(`spec-sync: wrote ${changesetPath.replace(repoRoot + "/", "")} (${changesetBump})`)
+  const raised = existsSync(changesetPath) ? raisedBump(readFileSync(changesetPath, "utf8"), computedChangesetBump) : null
+  if (raised) {
+    changesetBump = raised
+    changesetKept = true
+    console.log(
+      `spec-sync: kept ${changesetPath.replace(repoRoot + "/", "")} at ${raised}; ` +
+        `someone raised it above the computed ${computedChangesetBump}`,
+    )
+  } else {
+    const frontmatter = packageNames.map((n) => `"${n}": ${changesetBump}`).join("\n")
+    const body =
+      `Regenerate from the upstream \`${specKey}\` spec` +
+      (provenance ? ` (${provenance})` : "") +
+      "." +
+      (added.length ? `\n\nAdds ${added.length} exported symbol${added.length === 1 ? "" : "s"}.` : "") +
+      (removed.length
+        ? `\n\n**Breaking.** Removes ${removed.length} exported symbol${removed.length === 1 ? "" : "s"}:\n\n` +
+          removed.map((r) => `- \`${r}\``).join("\n")
+        : "")
+    writeFileSync(changesetPath, `---\n${frontmatter}\n---\n\n${body}\n`)
+    console.log(`spec-sync: wrote ${changesetPath.replace(repoRoot + "/", "")} (${changesetBump})`)
+  }
 }
 
 // Examples that import one of the regenerated packages. Only these can break, so only
@@ -204,6 +217,7 @@ const summary = {
   upstreamTimestamp: upstreamStamp ?? null,
   bump,
   changesetBump,
+  changesetKept,
   exportsAdded: added,
   exportsRemoved: removed,
   breaking: removed.length > 0,

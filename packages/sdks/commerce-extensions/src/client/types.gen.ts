@@ -25,8 +25,8 @@ export type Meta = {
 }
 
 export type CustomApiRelationships = {
-  parent_apis?: {
-    data?: Array<{
+  parent_apis: {
+    data: Array<{
       /**
        * The unique identifier for the related Custom API. When the `type` of an object is set to `api_location` then `id` must be `/v2/extensions`.
        * When the `type` of an object is set to `custom_api`, then `id` must be that of a Custom API that results in a relationship that does not have a depth exceeding 2 and does not result in a cycle.
@@ -330,14 +330,14 @@ export type JsonSchemaValidation = {
   /**
    * The JSON Schema draft version. Must be "2020-12".
    */
-  version?: "2020-12"
+  version: "2020-12"
   /**
    * A JSON-encoded string containing a valid JSON Schema Draft 2020-12 object.
    * The schema must not exceed 8 KiB in size.
    * External `$ref` references (e.g., HTTP URLs, file paths) are not supported and will be rejected.
    *
    */
-  schema?: string
+  schema: string
 } | null
 
 /**
@@ -482,7 +482,7 @@ export type BaseCreateCustomField = {
    */
   name: string
   /**
-   * Specifies the description for this Custom Field.
+   * Specifies the description for this Custom Field. Must be present and not `null`. An empty string is allowed.
    */
   description: string
   /**
@@ -977,7 +977,7 @@ export type CreateCustomApi = {
      */
     name: string
     /**
-     * Specifies the description for this Custom API.
+     * Specifies the description for this Custom API. Must be present and not `null`. An empty string is allowed.
      */
     description: string
     /**
@@ -1049,6 +1049,9 @@ export type UpdateCustomApi = {
        */
       section?: string | null
     }
+    /**
+     * Omit `relationships` to keep the existing parent APIs.
+     */
     relationships?: CustomApiRelationships
   }
 }
@@ -1173,7 +1176,7 @@ export type ListCustomApisResponse =
   ListCustomApisResponses[keyof ListCustomApisResponses]
 
 export type CreateACustomApiData = {
-  body?: CreateCustomApi
+  body: CreateCustomApi
   path?: never
   query?: never
   url: "/v2/settings/extensions/custom-apis"
@@ -1291,7 +1294,7 @@ export type GetACustomApiResponse =
   GetACustomApiResponses[keyof GetACustomApiResponses]
 
 export type UpdateACustomApiData = {
-  body?: UpdateCustomApi
+  body: UpdateCustomApi
   path: {
     /**
      * The unique identifier of the Custom API.
@@ -1411,7 +1414,7 @@ export type ListCustomFieldsResponse =
   ListCustomFieldsResponses[keyof ListCustomFieldsResponses]
 
 export type CreateACustomFieldData = {
-  body?: CreateCustomField
+  body: CreateCustomField
   path: {
     /**
      * The unique identifier of the Custom API.
@@ -1547,7 +1550,7 @@ export type GetACustomFieldResponse =
   GetACustomFieldResponses[keyof GetACustomFieldResponses]
 
 export type UpdateACustomFieldData = {
-  body?: UpdateCustomField
+  body: UpdateCustomField
   path: {
     /**
      * The unique identifier of the Custom API.
@@ -1681,7 +1684,7 @@ export type ListCustomApiEntriesResponse =
   ListCustomApiEntriesResponses[keyof ListCustomApiEntriesResponses]
 
 export type CreateACustomApiEntryData = {
-  body?: CreateCustomApiEntry
+  body: CreateCustomApiEntry
   path: {
     /**
      * The unique identifier of the Custom API.
@@ -1848,7 +1851,7 @@ export type GetACustomEntryResponse =
   GetACustomEntryResponses[keyof GetACustomEntryResponses]
 
 export type UpdateACustomEntryData = {
-  body?: UpdateCustomApiEntry
+  body: UpdateCustomApiEntry
   headers?: {
     /**
      * When If-Match is set, the value must be W/"{etag_id}". If the value of the header matches, the request completes. If not, HTTP 412 Precondition Failed is returned.
@@ -1913,12 +1916,6 @@ export type UpdateACustomEntryResponses = {
    * A Custom API Entry
    */
   200: {
-    data?: CustomApiEntry
-  }
-  /**
-   * A Custom API Entry
-   */
-  201: {
     data?: CustomApiEntry
   }
 }
@@ -2048,7 +2045,7 @@ export type GetCustomEntriesSettingsResponse =
   GetCustomEntriesSettingsResponses[keyof GetCustomEntriesSettingsResponses]
 
 export type CreateACustomEntrySettingsData = {
-  body?: CreateCustomApiEntry
+  body: CreateCustomApiEntry
   path: {
     /**
      * The slug of the Custom API.
@@ -2223,7 +2220,7 @@ export type GetACustomEntrySettingsResponse =
   GetACustomEntrySettingsResponses[keyof GetACustomEntrySettingsResponses]
 
 export type PutACustomEntrySettingsData = {
-  body?: UpdateCustomApiEntry
+  body: UpdateCustomApiEntry
   headers?: {
     /**
      * When If-Match is set, the value must be W/"{etag_id}". If the value of the header matches, the request completes. If not, HTTP 412 Precondition Failed is returned.

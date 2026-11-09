@@ -149,7 +149,7 @@ const createACustomApiInput = withSharedSchemaIds(
   "commerce_extensions",
   z
     .object({
-      body: loose(zCreateACustomApiBody).optional(),
+      body: loose(zCreateACustomApiBody),
     })
     .strict(),
 )
@@ -294,7 +294,7 @@ const updateACustomApiInput = withSharedSchemaIds(
   z
     .object({
       path: zUpdateACustomApiPath.strict(),
-      body: loose(zUpdateACustomApiBody).optional(),
+      body: loose(zUpdateACustomApiBody),
     })
     .strict(),
 )
@@ -416,7 +416,7 @@ const createACustomFieldInput = withSharedSchemaIds(
   z
     .object({
       path: zCreateACustomFieldPath.strict(),
-      body: loose(zCreateACustomFieldBody).optional(),
+      body: loose(zCreateACustomFieldBody),
     })
     .strict(),
 )
@@ -561,7 +561,7 @@ const updateACustomFieldInput = withSharedSchemaIds(
   z
     .object({
       path: zUpdateACustomFieldPath.strict(),
-      body: loose(zUpdateACustomFieldBody).optional(),
+      body: loose(zUpdateACustomFieldBody),
     })
     .strict(),
 )
@@ -720,7 +720,7 @@ const createACustomApiEntryInput = withSharedSchemaIds(
   z
     .object({
       path: zCreateACustomApiEntryPath.strict(),
-      body: loose(zCreateACustomApiEntryBody).optional(),
+      body: loose(zCreateACustomApiEntryBody),
     })
     .strict(),
 )
@@ -870,7 +870,7 @@ const updateACustomEntryInput = withSharedSchemaIds(
     .object({
       path: zUpdateACustomEntryPath.strict(),
       headers: zUpdateACustomEntryHeaders.strict().optional(),
-      body: loose(zUpdateACustomEntryBody).optional(),
+      body: loose(zUpdateACustomEntryBody),
     })
     .strict(),
 )
@@ -1022,7 +1022,7 @@ const createACustomEntrySettingsInput = withSharedSchemaIds(
   z
     .object({
       path: zCreateACustomEntrySettingsPath.strict(),
-      body: loose(zCreateACustomEntrySettingsBody).optional(),
+      body: loose(zCreateACustomEntrySettingsBody),
     })
     .strict(),
 )
@@ -1178,7 +1178,7 @@ const putACustomEntrySettingsInput = withSharedSchemaIds(
     .object({
       path: zPutACustomEntrySettingsPath.strict(),
       headers: zPutACustomEntrySettingsHeaders.strict().optional(),
-      body: loose(zPutACustomEntrySettingsBody).optional(),
+      body: loose(zPutACustomEntrySettingsBody),
     })
     .strict(),
 )

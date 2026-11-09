@@ -1,0 +1,5 @@
+x-mcp-description: >-
+  Gets one custom user role by its ID, with its name, description, access level
+  for each permission group, and whether the organization or the store manages
+  it. Use it when you already know the role ID; to find one, list the custom
+  user roles with a filter.
