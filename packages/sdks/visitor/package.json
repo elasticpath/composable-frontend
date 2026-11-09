@@ -24,7 +24,24 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./browser": {
+      "import": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.mjs"
+      },
+      "require": {
+        "types": "./dist/browser.d.cts",
+        "default": "./dist/browser.cjs"
+      }
+    },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "browser": [
+        "./dist/browser.d.ts"
+      ]
+    }
   },
   "files": [
     "dist/**"

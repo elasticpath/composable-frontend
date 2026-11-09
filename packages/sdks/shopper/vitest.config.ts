@@ -4,5 +4,8 @@ export default defineConfig({
   test: {
     include: ["src/**/*.{test,spec}.ts", "test/**/*.{test,spec}.ts"],
     setupFiles: ["./src/test/setup.ts"],
+    environmentOptions: {
+      jsdom: { url: "https://storefront.test/" },
+    },
   },
 })

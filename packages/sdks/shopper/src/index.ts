@@ -63,6 +63,14 @@ export {
   resolveVisitor,
   visitorHeaders,
 } from "@epcc-sdk/visitor"
+export {
+  createBrowserVisitor,
+  hasBrowserGlobalPrivacyControl,
+} from "@epcc-sdk/visitor/browser"
+export type {
+  BrowserConsentFunction,
+  BrowserVisitorOptions,
+} from "@epcc-sdk/visitor/browser"
 export type {
   ConsentFunction,
   ConsentResult,
