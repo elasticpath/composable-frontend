@@ -1,6 +1,5 @@
 import type { BaseItem } from "@algolia/autocomplete-core"
 import type { AutocompleteOptions } from "@algolia/autocomplete-js"
-import type { SearchClient } from "instantsearch.js"
 import { postMultiSearch, type Hit } from "@epcc-sdk/sdks-shopper"
 import { storefrontClient } from "./storefront-client.ts"
 
@@ -30,7 +29,6 @@ import { INSTANT_SEARCH_HIERARCHICAL_ATTRIBUTES } from "./constants.ts"
 import "@algolia/autocomplete-theme-classic"
 
 type AutocompleteProps = Partial<AutocompleteOptions<BaseItem>> & {
-  searchClient: SearchClient
   className?: string
 }
 
@@ -51,7 +49,6 @@ type SetInstantSearchUiStateOptions = {
 }
 
 export function Autocomplete({
-  searchClient,
   className,
   ...autocompleteProps
 }: AutocompleteProps) {
@@ -74,7 +71,9 @@ export function Autocomplete({
 
   useEffect(() => {
     setQuery(instantSearchUiState.query)
-    instantSearchUiState.category && setCategory(instantSearchUiState.category)
+    if (instantSearchUiState.category) {
+      setCategory(instantSearchUiState.category)
+    }
     setPage(0)
   }, [instantSearchUiState])
 
