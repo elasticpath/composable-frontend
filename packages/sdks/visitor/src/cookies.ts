@@ -1,5 +1,7 @@
-export function readCookie(request: Request, name: string): string | undefined {
-  const header = request.headers.get("cookie")
+export function findCookie(
+  header: string | null | undefined,
+  name: string,
+): string | undefined {
   if (!header) return undefined
 
   for (const pair of header.split(";")) {
@@ -10,6 +12,10 @@ export function readCookie(request: Request, name: string): string | undefined {
     }
   }
   return undefined
+}
+
+export function readCookie(request: Request, name: string): string | undefined {
+  return findCookie(request.headers.get("cookie"), name)
 }
 
 export function lastingCookie(

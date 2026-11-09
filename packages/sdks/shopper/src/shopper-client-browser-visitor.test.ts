@@ -317,6 +317,92 @@ describe("the browser visitor through createShopperClient", () => {
     })
   })
 
+  describe("where the cookie does not persist", () => {
+    beforeEach(() => {
+      vi.spyOn(document, "cookie", "set").mockImplementation(() => {})
+    })
+
+    it("keeps one lasting id until the page loads again", async () => {
+      const { requests, search } = storefront(() => grantedAll)
+
+      await search()
+      await search()
+
+      const id = requests[0].headers.get("EP-Visitor-Id")
+      expect(id).toMatch(idFormat)
+      expect(requests[1].headers.get("EP-Visitor-Id")).toBe(id)
+      expect(requests[0].headers.get("EP-Visitor-Consent")).toBe(
+        "analytics,personalization",
+      )
+    })
+
+    it("makes a new lasting id after an objection", async () => {
+      let consent: ConsentResult = grantedAll
+      const { requests, search } = storefront(() => consent)
+      await search()
+
+      consent = { state: "objected" }
+      await search()
+      consent = grantedAll
+      await search()
+
+      expect(requests[2].headers.get("EP-Visitor-Id")).not.toBe(
+        requests[0].headers.get("EP-Visitor-Id"),
+      )
+    })
+
+    it("makes a new lasting id after any state that is not granted", async () => {
+      let consent: ConsentResult = grantedAll
+      const { requests, search } = storefront(() => consent)
+      await search()
+
+      consent = { state: "none" }
+      await search()
+      consent = grantedAll
+      await search()
+
+      expect(requests[2].headers.get("EP-Visitor-Id")).not.toBe(
+        requests[0].headers.get("EP-Visitor-Id"),
+      )
+      expect(requests[1].headers.get("EP-Visitor-Id")).not.toBe(
+        requests[0].headers.get("EP-Visitor-Id"),
+      )
+    })
+
+    it("keeps the lasting id apart from the in-memory id", async () => {
+      let consent: ConsentResult = { state: "none" }
+      const { requests, search } = storefront(() => consent)
+      await search()
+
+      consent = grantedAll
+      await search()
+
+      expect(requests[1].headers.get("EP-Visitor-Id")).not.toBe(
+        requests[0].headers.get("EP-Visitor-Id"),
+      )
+    })
+  })
+
+  describe("where there is no document", () => {
+    it.each<[string, ConsentResult]>([
+      ["granted", grantedAll],
+      ["none", { state: "none" }],
+      ["objected", { state: "objected" }],
+    ])(
+      "sends no visitor headers and does not throw for %s",
+      async (_, result) => {
+        const { requests, search } = storefront(() => result)
+        vi.stubGlobal("document", undefined)
+
+        await search()
+
+        expect(requests).toHaveLength(1)
+        expect(requests[0].headers.has("EP-Visitor-Id")).toBe(false)
+        expect(requests[0].headers.has("EP-Visitor-Consent")).toBe(false)
+      },
+    )
+  })
+
   describe("creating a visitor source", () => {
     it("reads no DOM global until a visitor is asked for", () => {
       vi.stubGlobal("document", undefined)

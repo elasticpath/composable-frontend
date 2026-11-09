@@ -1,5 +1,5 @@
 import { VISITOR_COOKIE, VISITOR_COOKIE_LIFETIME_SECONDS } from "./constants"
-import { clearedCookie, lastingCookie } from "./cookies"
+import { clearedCookie, findCookie, lastingCookie } from "./cookies"
 import { isVisitorId, newVisitorId } from "./visitor-id"
 import type { ConsentResult, Visitor } from "./types"
 
@@ -22,14 +22,7 @@ export function hasBrowserGlobalPrivacyControl(): boolean {
 }
 
 function readDocumentCookie(name: string): string | undefined {
-  for (const pair of document.cookie.split(";")) {
-    const separator = pair.indexOf("=")
-    if (separator === -1) continue
-    if (pair.slice(0, separator).trim() === name) {
-      return pair.slice(separator + 1).trim()
-    }
-  }
-  return undefined
+  return findCookie(document.cookie, name)
 }
 
 export function createBrowserVisitor(
@@ -39,6 +32,7 @@ export function createBrowserVisitor(
   const lifetimeSeconds =
     options.lifetimeSeconds ?? VISITOR_COOKIE_LIFETIME_SECONDS
   let inMemoryId: string | undefined
+  let unpersistedLastingId: string | undefined
 
   function clearLastingCookie() {
     if (readDocumentCookie(cookieName) !== undefined) {
@@ -49,12 +43,17 @@ export function createBrowserVisitor(
   function lastingId(): string {
     const existing = readDocumentCookie(cookieName)
     if (isVisitorId(existing)) return existing
+    if (unpersistedLastingId !== undefined) return unpersistedLastingId
+
     const id = newVisitorId()
     document.cookie = lastingCookie(cookieName, id, lifetimeSeconds)
+    if (readDocumentCookie(cookieName) !== id) unpersistedLastingId = id
     return id
   }
 
   return async function browserVisitor(): Promise<Visitor> {
+    if (typeof document === "undefined") return { kind: "none" }
+
     const result = await options.consent()
 
     if (result.state === "granted" && result.purposes.length > 0) {
@@ -66,6 +65,7 @@ export function createBrowserVisitor(
       }
     }
 
+    unpersistedLastingId = undefined
     clearLastingCookie()
 
     if (result.state === "objected") {
