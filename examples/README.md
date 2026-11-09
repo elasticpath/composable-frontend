@@ -34,7 +34,7 @@ An example assumes a **declared minimal baseline** of the store behind it, writt
 | [spa-guest-checkout](spa-guest-checkout) | Guest checkout: converting a cart to an order with billing and shipping addresses and no customer account. | React single-page app (Vite) |
 | [spa-manual-payments](spa-manual-payments) | Recording payment against an order with the manual payment gateway. | React single-page app (Vite) |
 | [spa-search](spa-search) | Catalog Search from a plain search box, through the shopper SDK's multi-search call. | React single-page app (Vite) |
-| [spa-search-instantsearch](spa-search-instantsearch) | Catalog Search through the Elastic Path InstantSearch adapter, with facets, autocomplete and pagination, and a visitor id sent from the browser under a stand-in consent banner. | React single-page app (Vite) |
+| [spa-search-instantsearch](spa-search-instantsearch) | Catalog Search through the Elastic Path InstantSearch adapter, with facets, autocomplete, pagination and a browser visitor id. | React single-page app (Vite) |
 | [subscriptions](subscriptions) | Subscriptions: offerings with plans and pricing options added to the cart, paid through Stripe, and cancelled or updated from the account. | Next.js |
 
 A pull request that adds, removes, renames or retitles an example updates this list.
