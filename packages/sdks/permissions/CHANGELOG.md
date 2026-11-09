@@ -1,5 +1,13 @@
 # @epcc-sdk/permissions
 
+## 0.8.0
+
+### Minor Changes
+
+- ae7f1a91: Regenerate from the upstream `permissions` spec (spec version 26.1104.8439853, published 2026-11-04T17:58:37Z).
+
+  Adds 37 exported symbols.
+
 ## 0.7.1
 
 ### Patch Changes

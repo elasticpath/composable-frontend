@@ -1,5 +1,13 @@
 # @epcc-sdk/sdks-catalog-search
 
+## 0.8.0
+
+### Minor Changes
+
+- b179e110: Regenerate from the upstream `catalog_search` spec (spec version 26.1104.8438036, published 2026-11-04T10:00:48Z).
+
+  Adds 10 exported symbols.
+
 ## 0.7.0
 
 ### Minor Changes
