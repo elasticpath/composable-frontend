@@ -1,17 +1,16 @@
 import { useState } from "react"
 import {
-  ACCEPTED_ALL_VALUE,
-  REJECTED_VALUE,
   readConsentAnswer,
   writeConsentAnswer,
+  type ConsentAnswer,
 } from "./consent-cookie"
 import "./ConsentBanner.css"
 
 export function ConsentBanner() {
   const [open, setOpen] = useState(() => readConsentAnswer() === undefined)
 
-  function choose(value: string) {
-    writeConsentAnswer(value)
+  function recordChoice(answer: ConsentAnswer) {
+    writeConsentAnswer(answer)
     setOpen(false)
   }
 
@@ -43,10 +42,10 @@ export function ConsentBanner() {
         again. If you reject, it sends no visitor id.
       </p>
       <div className="consent-banner-actions">
-        <button type="button" onClick={() => choose(ACCEPTED_ALL_VALUE)}>
+        <button type="button" onClick={() => recordChoice("accepted")}>
           Accept all
         </button>
-        <button type="button" onClick={() => choose(REJECTED_VALUE)}>
+        <button type="button" onClick={() => recordChoice("rejected")}>
           Reject all
         </button>
       </div>

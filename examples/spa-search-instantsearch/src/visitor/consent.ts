@@ -1,20 +1,15 @@
 import { hasBrowserGlobalPrivacyControl } from "@epcc-sdk/sdks-shopper"
 import type { BrowserConsentFunction } from "@epcc-sdk/sdks-shopper"
-import {
-  ACCEPTED_ALL_VALUE,
-  ALL_PURPOSES,
-  REJECTED_VALUE,
-  readConsentAnswer,
-} from "./consent-cookie"
+import { ALL_PURPOSES, readConsentAnswer } from "./consent-cookie"
 
 export const consent: BrowserConsentFunction = () => {
   const answer = readConsentAnswer()
 
-  if (hasBrowserGlobalPrivacyControl() || answer === REJECTED_VALUE) {
+  if (hasBrowserGlobalPrivacyControl() || answer === "rejected") {
     return { state: "objected" }
   }
 
-  if (answer === ACCEPTED_ALL_VALUE) {
+  if (answer === "accepted") {
     return { state: "granted", purposes: ALL_PURPOSES }
   }
 
