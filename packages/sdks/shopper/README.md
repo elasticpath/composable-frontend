@@ -111,7 +111,36 @@ When one client serves many shoppers on a server, give `visitor` a function that
 
 For a client that you make with `createClient`, add `createVisitorInterceptor(visitor)` and `createAnalyticsOffInterceptor()` as request interceptors. `configureClient` has neither option.
 
-Send these headers from a server. A browser can send them only when Elastic Path allows them in its CORS preflight response.
+### Single-page apps with no server
+
+A single-page app sends the headers from the browser. `createBrowserVisitor` returns a function that you give to the `visitor` option. It also comes from this package, so you install only this package.
+
+```ts
+import {
+  createBrowserVisitor,
+  createShopperClient,
+  hasBrowserGlobalPrivacyControl,
+} from "@epcc-sdk/sdks-shopper"
+
+const visitor = createBrowserVisitor({
+  consent: () => {
+    if (hasBrowserGlobalPrivacyControl()) return { state: "objected" }
+    return myCmp.hasAcceptedAll()
+      ? { state: "granted", purposes: ["analytics", "personalization"] }
+      : { state: "none" }
+  },
+})
+
+const { client } = createShopperClient(
+  { baseUrl: "https://euwest.api.elasticpath.com" },
+  { clientId: "your-client-id" },
+  { visitor },
+)
+```
+
+Your consent function reads your consent management platform in the browser and runs on every request. Without consent, the id lives in memory only: it stays the same until the page loads again, sends `EP-Visitor-Consent: none`, and sets no cookie. With consent, the function writes the `ep_vid` cookie with JavaScript. An objection clears `ep_vid` and sends no visitor headers. Safari limits a cookie that JavaScript writes to 7 days, so a lasting id in Safari lasts 7 days at most. The `@epcc-sdk/visitor` README, section "Browser-only storefronts", has the details.
+
+Elastic Path allows `EP-Visitor-Id`, `EP-Visitor-Consent` and `EP-Analytics` in its CORS preflight response, so a browser can send them.
 
 ## Carts
 

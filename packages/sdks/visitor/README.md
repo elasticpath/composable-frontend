@@ -393,7 +393,50 @@ EP-Analytics: off
 
 ## Browser-only storefronts
 
-This package has no browser entry yet. A browser call with a custom header needs a CORS preflight, and until Elastic Path allows `EP-Visitor-Id`, `EP-Visitor-Consent` and `EP-Analytics` in `Access-Control-Allow-Headers`, a browser call that carries them fails. Send the headers from a server. When a browser entry ships, an id for a shopper without consent will live in memory only and reset on a full page load, and a lasting id written by JavaScript is limited to 7 days by Safari.
+A single-page app with no server sends the headers from the browser. Use the `@epcc-sdk/visitor/browser` entry. It has no dependencies and reads `document` and `navigator` only when a visitor is asked for, so you can import it in code that also runs on a server.
+
+```ts
+import {
+  createBrowserVisitor,
+  hasBrowserGlobalPrivacyControl,
+} from "@epcc-sdk/visitor/browser"
+import type { BrowserConsentFunction } from "@epcc-sdk/visitor/browser"
+
+const consent: BrowserConsentFunction = () => {
+  if (hasBrowserGlobalPrivacyControl()) return { state: "objected" }
+  const answer = myCmp.getChoice()
+  if (answer === "rejected") return { state: "objected" }
+  if (answer === "accepted") {
+    return { state: "granted", purposes: ["analytics", "personalization"] }
+  }
+  return { state: "none" }
+}
+
+const visitor = createBrowserVisitor({ consent })
+```
+
+`createBrowserVisitor` returns a function that gives the current `Visitor` as a promise. It fits the `visitor` option of `createShopperClient` as a function source: `createShopperClient(config, auth, { visitor })`. For a client of your own, call it before each request and send `visitorHeaders(await visitor())`.
+
+Your consent function takes no argument, because the browser has no request to read. It reads your consent management platform where the browser keeps the choice, for example a cookie or a JavaScript API. The function runs on every call, so a change of choice takes effect on the next request. It can be async.
+
+What the id does in each state:
+
+| Consent result                   | Visitor    | Headers sent                                      | `ep_vid` cookie                                                       |
+| -------------------------------- | ---------- | ------------------------------------------------- | --------------------------------------------------------------------- |
+| `{ state: "granted", purposes }` | `lasting`  | `EP-Visitor-Id`, `EP-Visitor-Consent: <purposes>` | Reuses a valid `ep_vid`, or makes an id and writes the cookie.        |
+| `{ state: "none" }`              | `session`  | `EP-Visitor-Id`, `EP-Visitor-Consent: none`       | Clears `ep_vid` if present. Writes no cookie.                         |
+| `{ state: "objected" }`          | `objected` | none                                              | Clears `ep_vid` if present. Drops the id in memory. Writes no cookie. |
+
+- Without consent, the id lives in module memory only. It is the same for every call until the page loads again, and then a new id starts. This is the same as the Algolia anonymous token when cookies are off. The `none` result gives this id whether or not it has `sessionId: true`, because `ep_vsid` is a server cookie that the browser entry never writes.
+- The in-memory id is a `session` visitor in the types, because it has the same headers as the `ep_vsid` id. It is a different id: a lasting id is never linked to it.
+- With consent, the entry writes `ep_vid` with JavaScript, with the same attributes as the server: `Path=/`, `Secure`, `SameSite=Lax`, 365 days from creation. It does not roll the lifetime, so it writes only when it makes an id. It reuses a valid `ep_vid`, including one that a server wrote. A value that is not 32 lowercase hex characters counts as absent and is replaced.
+- On an objection, the entry clears `ep_vid` and drops the id in memory. A later consent makes a new id. Any state that is not `granted` clears `ep_vid`, so a withdrawal back to `none` also starts a new in-memory id.
+- A `granted` result with no purposes behaves like `none`.
+- Safari limits a cookie that JavaScript writes to 7 days. A returning shopper whose last visit was more than 7 days ago gets a new `ep_vid` in Safari. A cookie that a server sets with `Set-Cookie` lasts the full 365 days, so a storefront that needs the long lifetime in Safari uses the server entry.
+- `Secure` cookies are stored over HTTPS, and on `localhost`. On plain HTTP elsewhere the browser drops the cookie, and the id then changes on every page load.
+- `hasBrowserGlobalPrivacyControl()` returns true when `navigator.globalPrivacyControl` is true. Put it first in your consent function, as in the example, so it wins over an accepted banner.
+
+A browser call with a custom header needs a CORS preflight. Elastic Path allows `EP-Visitor-Id`, `EP-Visitor-Consent` and `EP-Analytics` in `Access-Control-Allow-Headers`, so the preflight passes.
 
 ## Exports
 
@@ -410,5 +453,13 @@ This package has no browser entry yet. A browser call with a custom header needs
 | `GLOBAL_PRIVACY_CONTROL_HEADER`                                   | `Sec-GPC`.                                                                                                                  |
 | `VISITOR_COOKIE_LIFETIME_SECONDS`                                 | 365 days.                                                                                                                   |
 | Types                                                             | `ConsentFunction`, `ConsentResult`, `Purpose`, `ResolvedVisitor`, `ResolveVisitorOptions`, `Visitor`.                       |
+
+The `@epcc-sdk/visitor/browser` entry exports:
+
+| Export                             | What it is                                                                             |
+| ---------------------------------- | -------------------------------------------------------------------------------------- |
+| `createBrowserVisitor(options)`    | Returns `() => Promise<Visitor>`. Options: `consent`, `cookieName`, `lifetimeSeconds`. |
+| `hasBrowserGlobalPrivacyControl()` | True when `navigator.globalPrivacyControl` is true.                                    |
+| Types                              | `BrowserConsentFunction`, `BrowserVisitorOptions`.                                     |
 
 Cookie names, the `ep_vid` lifetime and the other defaults can be changed through `resolveVisitor` options. The platform team confirms the final names before 1.0.
