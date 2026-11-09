@@ -35,7 +35,6 @@ function App() {
               <a href="/">Home</a>
             </nav>
             <Autocomplete
-              searchClient={searchClient}
               placeholder="Search products"
               detachedMediaQuery="none"
               openOnFocus
