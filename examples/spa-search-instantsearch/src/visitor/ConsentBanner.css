@@ -1,0 +1,37 @@
+.consent-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.consent-banner p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.consent-banner-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.consent-settings-link {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  z-index: 50;
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+}

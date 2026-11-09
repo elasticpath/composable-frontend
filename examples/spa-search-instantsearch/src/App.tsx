@@ -1,5 +1,5 @@
 import "./App.css"
-import { client } from "@epcc-sdk/sdks-shopper"
+import { storefrontClient } from "./storefront-client.ts"
 
 import "instantsearch.css/themes/satellite.css"
 import {
@@ -20,7 +20,7 @@ import { RangeSlider } from "./RangeSlider.tsx"
 
 const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter(
   {
-    client: client,
+    client: storefrontClient,
   },
 )
 const searchClient = catalogSearchInstantSearchAdapter.searchClient

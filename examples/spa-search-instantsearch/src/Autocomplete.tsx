@@ -2,6 +2,7 @@ import type { BaseItem } from "@algolia/autocomplete-core"
 import type { AutocompleteOptions } from "@algolia/autocomplete-js"
 import type { SearchClient } from "instantsearch.js"
 import { postMultiSearch, type Hit } from "@epcc-sdk/sdks-shopper"
+import { storefrontClient } from "./storefront-client.ts"
 
 import {
   createElement,
@@ -226,6 +227,7 @@ export function Autocomplete({
       insights: true,
       async getSources({ query }) {
         const multisearchResponse = await postMultiSearch({
+          client: storefrontClient,
           body: {
             searches: [
               {

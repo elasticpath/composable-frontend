@@ -12,6 +12,7 @@ This React SPA (Vite-based) example demonstrates:
 - Real-time search results with pagination
 - Responsive search UI using InstantSearch components
 - Using the `@elasticpath/catalog-search-instantsearch-adapter` to connect Elastic Path's search API to InstantSearch
+- Sending a visitor id with each search from the browser, with a stand-in consent banner (Accept all, Reject all, Cookie settings)
 
 ## Key Features
 
@@ -33,7 +34,7 @@ The adapter (`@elasticpath/catalog-search-instantsearch-adapter`) bridges Elasti
 
 ```typescript
 const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
-  client: client,
+  client: storefrontClient,
 })
 const searchClient = catalogSearchInstantSearchAdapter.searchClient
 ```
@@ -45,14 +46,15 @@ const searchClient = catalogSearchInstantSearchAdapter.searchClient
 - `src/Hit.tsx`: Product hit component: placeholder image, name, price when present, and brand
 - `src/Panel.tsx`: Reusable panel component for facets
 - `src/RangeSlider.tsx`: Custom price range slider using Radix UI
-- `src/auth/StorefrontProvider.tsx`: Authentication setup (inherited from other examples)
+- `src/storefront-client.ts`: The shopper client, with implicit authentication and the browser visitor
+- `src/visitor/`: The consent function, the consent cookie and the stand-in consent banner
 - `src/constants.ts`: Configuration including hierarchical attribute mapping
 
 ## Store Setup Requirements
 
 ### Required
 
-- **An application key (client ID) for implicit authentication.** `src/auth/StorefrontProvider.tsx` configures the SDK with it and throws at load if it is missing. Create the key in Commerce Manager (Application Keys) and copy its client ID.
+- **An application key (client ID) for implicit authentication.** `src/storefront-client.ts` configures the shopper client with it and throws at load if it is missing. Create the key in Commerce Manager (Application Keys) and copy its client ID.
 - **Catalog Search enabled for the store, with a published catalog indexed.** Every search goes through the adapter in `src/App.tsx`. The adapter throws when the search response carries an error and the example shows no error message, so with Catalog Search off the result list stays empty.
 - **Prices on the products, in GBP.** `src/Hit.tsx` shows `hit.meta.display_price.with_tax.formatted` when the hit has it and leaves the price out when it does not. The price slider in `src/App.tsx` is bound to `price.GBP.float_price`, so the store needs a GBP currency and a GBP price on the products. Without that field the slider has no range and stays disabled (`src/RangeSlider.tsx`). To use another currency, change that attribute.
 - **Products in a category hierarchy.** `src/constants.ts` lists the hierarchical facet fields `categories.lvl0` to `categories.lvl4`. `HierarchicalMenu` and `Breadcrumb` in `src/App.tsx` and the autocomplete in `src/Autocomplete.tsx` read them, so the products need hierarchy nodes in the published catalog for the index to hold category paths.
@@ -109,10 +111,10 @@ The example uses the Elastic Path InstantSearch adapter to connect to your catal
 
 ```typescript
 import CatalogSearchInstantSearchAdapter from "@elasticpath/catalog-search-instantsearch-adapter"
-import { client } from "@epcc-sdk/sdks-shopper"
+import { storefrontClient } from "./storefront-client"
 
 const catalogSearchInstantSearchAdapter = new CatalogSearchInstantSearchAdapter({
-  client: client,
+  client: storefrontClient,
 })
 ```
 
@@ -149,12 +151,26 @@ This creates a `dist` folder with production-ready assets.
 
 ## Authentication
 
-This example includes authentication setup using the `StorefrontProvider`, which handles:
+This example includes authentication setup in `src/storefront-client.ts`, which handles:
 - Automatic token generation using implicit grant
 - Token storage in local storage
 - Automatic token refresh via SDK interceptors
 
 Note: While authentication is implemented, it's not the focus of this example. For detailed authentication patterns, refer to the authentication-specific examples.
+
+## Visitor id and consent
+
+This example has no server, so the browser sends the visitor headers. `src/storefront-client.ts` passes `createBrowserVisitor({ consent })` from `@epcc-sdk/sdks-shopper` to `createShopperClient`. The InstantSearch adapter and the autocomplete (`postMultiSearch`) both use that client, so every search carries the headers.
+
+The consent function (`src/visitor/consent.ts`) reads the consent cookie that the stand-in banner writes. The banner is a demo, not a consent management platform. It has Accept all, Reject all, and a Cookie settings link that opens it again.
+
+| Shopper                                    | Headers on each search                                                        | `ep_vid` cookie                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------- | -------------------------------------------------- |
+| Ignores the banner                         | `EP-Visitor-Id` (an id kept in memory, new after a page load), `EP-Visitor-Consent: none` | none                                               |
+| Accept all                                 | `EP-Visitor-Id` (the `ep_vid` id), `EP-Visitor-Consent: analytics,personalization`        | set by JavaScript, 365 days, same id after reload  |
+| Reject all, or the browser sends Global Privacy Control | none                                                                          | cleared                                            |
+
+Safari limits a cookie that JavaScript writes to 7 days. Elastic Path allows the three visitor headers in its CORS preflight response, so the browser can send them. The `@epcc-sdk/visitor` README describes the browser entry in full.
 
 ## Learn More
 
